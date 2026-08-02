@@ -1,14 +1,22 @@
 package gerenciador_musica_backend.dto;
 
 import gerenciador_musica_backend.model.Role;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class UsuarioRequestDTO {
 
+    @NotBlank
     private String nome;
+    @NotBlank
+    @Email
     private String email;
+    @NotBlank
     private String senha;
+    @NotNull
     private Role role;
-    
+
     public String getNome() {
         return nome;
     }
