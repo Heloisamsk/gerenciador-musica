@@ -10,16 +10,17 @@ import org.springframework.web.bind.annotation.RestController;
 import gerenciador_musica_backend.dto.UsuarioRequestDTO;
 import gerenciador_musica_backend.dto.UsuarioResponseDTO;
 import gerenciador_musica_backend.service.UsuarioService;
+import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/usuarios")
+@RequestMapping("/api/auth")
 public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping("/cadastrar")
-    public ResponseEntity<UsuarioResponseDTO> cadastrar(@RequestBody UsuarioRequestDTO request) {
+    @PostMapping("/register")
+    public ResponseEntity<UsuarioResponseDTO> cadastrar(@Valid @RequestBody UsuarioRequestDTO request) {
         UsuarioResponseDTO response = usuarioService.cadastrarUsuario(request);
         return ResponseEntity.ok(response);
     }
