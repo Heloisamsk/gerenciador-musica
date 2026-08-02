@@ -15,7 +15,7 @@ public class Usuario {
     private String nome;
     private String email;
     private String senha;
-    private String role;
+    private Role role;
 
 
     public Long getId() {
@@ -30,7 +30,7 @@ public class Usuario {
     public String getSenha() {
         return senha;
     }
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
     public void setId(Long id) {
@@ -45,7 +45,7 @@ public class Usuario {
     public void setSenha(String senha) {
         this.senha = senha;
     }
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
