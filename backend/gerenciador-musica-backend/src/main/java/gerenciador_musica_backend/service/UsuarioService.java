@@ -1,6 +1,7 @@
 package gerenciador_musica_backend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import gerenciador_musica_backend.dto.UsuarioRequestDTO;
@@ -13,6 +14,8 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UsuarioResponseDTO cadastrarUsuario(UsuarioRequestDTO request) {
         
@@ -26,7 +29,8 @@ public class UsuarioService {
         novoUsuario.setNome(request.getNome());
         novoUsuario.setEmail(request.getEmail());
         
-        novoUsuario.setSenha(request.getSenha()); 
+        // Criptografando a senha antes de salvar!
+        novoUsuario.setSenha(passwordEncoder.encode(request.getSenha()));
         
         novoUsuario.setRole(request.getRole());
 
