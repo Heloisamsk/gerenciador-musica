@@ -1,0 +1,51 @@
+<main>
+  <section>
+    <h1>Entrar</h1>
+
+    <form [formGroup]="loginForm" (ngSubmit)="entrar()">
+      <div>
+        <label for="email">E-mail</label>
+
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          placeholder="Digite seu e-mail"
+        />
+
+        @if (email.touched && email.hasError('required')) {
+        <small>O e-mail é obrigatório.</small>
+        }
+
+        @if (email.touched && email.hasError('email')) {
+        <small>Digite um e-mail válido.</small>
+        }
+      </div>
+
+      <div>
+        <label for="senha">Senha</label>
+
+        <input
+          id="senha"
+          type="password"
+          formControlName="senha"
+          autocomplete="current-password"
+          placeholder="Digite sua senha"
+        />
+
+        @if (senha.touched && senha.hasError('required')) {
+        <small>A senha é obrigatória.</small>
+        }
+
+        @if (senha.touched && senha.hasError('minlength')) {
+        <small>A senha deve possuir pelo menos 6 caracteres.</small>
+        }
+      </div>
+
+      <button type="submit">
+        Entrar
+      </button>
+    </form>
+  </section>
+</main>
