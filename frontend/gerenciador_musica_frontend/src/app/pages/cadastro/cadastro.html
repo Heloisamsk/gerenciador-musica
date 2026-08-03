@@ -1,0 +1,87 @@
+<main class="cadastro-container">
+  <section class="cadastro-card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Logo do Spotify" class="login-logo" />
+    <h1  class="cadastro-title">Se inscreva e comece a curtir</h1>
+
+    <form class="cadastro-form" [formGroup]="cadastroForm" (ngSubmit)="cadastrar()">
+      <div>
+        <label for="name">Nome</label>
+        <input id="name" placeholder="Digite seu nome" formControlName="name">
+      </div>
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+
+        <input
+          class="form-input"
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          placeholder="nome@dominio.com"
+        />
+
+        @if (email.touched && email.hasError('required')) {
+        <small class="error-message">O e-mail é obrigatório.</small>
+        }
+
+        @if (email.touched && email.hasError('email')) {
+        <small class="error-message">Digite um e-mail válido.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+
+        <input
+          class="form-input"
+          id="senha"
+          type="password"
+          formControlName="senha"
+          placeholder="Digite sua senha"
+        />
+
+        @if (senha.touched && senha.hasError('required')) {
+        <small class="error-message">A senha é obrigatória.</small>
+        }
+
+        @if (senha.touched && senha.hasError('minlength')) {
+        <small class="error-message">A senha deve possuir pelo menos 6 caracteres.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="role-title">Tipo de perfil</label>
+
+        <div class="radio-group">
+          <label class="radio-label">
+            <input
+              type="radio"
+              formControlName="role"
+              value="usuario"
+            />
+            Usuário
+          </label>
+
+          <label class="radio-label">
+            <input
+              type="radio"
+              formControlName="role"
+              value="admin"
+            />
+            Admin
+          </label>
+        </div>
+
+        @if (role.touched && role.hasError('required')) {
+        <small class="error-message">Selecione uma opção de perfil.</small>
+        }
+      </div>
+
+      <button class="cadastro-btn" type="submit">
+        Cadastrar
+      </button>
+    </form>
+  </section>
+</main>
+
