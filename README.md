@@ -23,6 +23,8 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 - Java
 - Maven
 - Git
+- Docker
+- Postgresql
 
 
 ## Status do Projeto
