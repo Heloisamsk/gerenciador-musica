@@ -1,12 +1,14 @@
-<main>
-  <section>
-    <h1>Entrar</h1>
+<main class="login-container">
+  <section class="login-card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Logo do Spotify" class="login-logo" />
+    <h1  class="login-title">Entrar</h1>
 
-    <form [formGroup]="loginForm" (ngSubmit)="entrar()">
-      <div>
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="entrar()">
+      <div class="form-group">
         <label for="email">E-mail</label>
 
         <input
+          class="form-input"
           id="email"
           type="email"
           formControlName="email"
@@ -15,18 +17,19 @@
         />
 
         @if (email.touched && email.hasError('required')) {
-        <small>O e-mail é obrigatório.</small>
+        <small class="error-message">O e-mail é obrigatório.</small>
         }
 
         @if (email.touched && email.hasError('email')) {
-        <small>Digite um e-mail válido.</small>
+        <small class="error-message">Digite um e-mail válido.</small>
         }
       </div>
 
-      <div>
+      <div class="form-group">
         <label for="senha">Senha</label>
 
         <input
+          class="form-input"
           id="senha"
           type="password"
           formControlName="senha"
@@ -35,15 +38,15 @@
         />
 
         @if (senha.touched && senha.hasError('required')) {
-        <small>A senha é obrigatória.</small>
+        <small class="error-message">A senha é obrigatória.</small>
         }
 
         @if (senha.touched && senha.hasError('minlength')) {
-        <small>A senha deve possuir pelo menos 6 caracteres.</small>
+        <small class="error-message">A senha deve possuir pelo menos 6 caracteres.</small>
         }
       </div>
 
-      <button type="submit">
+      <button class="login-btn" type="submit">
         Entrar
       </button>
     </form>
