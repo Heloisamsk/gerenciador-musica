@@ -20,7 +20,7 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/register").permitAll() // Libera apenas o cadastro
+                .requestMatchers("/api/auth/register",  "/api/auth/login").permitAll() // Libera apenas o cadastro
                 .anyRequest().authenticated() 
             );
         return http.build();
