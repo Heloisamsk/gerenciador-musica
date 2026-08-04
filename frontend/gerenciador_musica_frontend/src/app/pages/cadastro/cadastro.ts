@@ -37,7 +37,6 @@ export class Cadastro {
 
     role: new FormControl('usuario', {
       nonNullable: true,
-      validators: [Validators.required]
     })
   });
 
