@@ -26,11 +26,11 @@
         />
 
         @if (email.touched && email.hasError('required')) {
-        <small class="error-message">O e-mail é obrigatório.</small>
+          <small class="error-message">O e-mail é obrigatório.</small>
         }
 
         @if (email.touched && email.hasError('email')) {
-        <small class="error-message">Digite um e-mail válido.</small>
+          <small class="error-message">Digite um e-mail válido.</small>
         }
       </div>
 
@@ -46,11 +46,11 @@
         />
 
         @if (senha.touched && senha.hasError('required')) {
-        <small class="error-message">A senha é obrigatória.</small>
+          <small class="error-message">A senha é obrigatória.</small>
         }
 
         @if (senha.touched && senha.hasError('minlength')) {
-        <small class="error-message">A senha deve possuir pelo menos 6 caracteres.</small>
+          <small class="error-message">A senha deve possuir pelo menos 6 caracteres.</small>
         }
       </div>
 
@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <button class="cadastro-btn" type="submit">
+      <button class="cadastro-btn" type="button" (click)="cadastrar()">
         Cadastrar
       </button>
     </form>
