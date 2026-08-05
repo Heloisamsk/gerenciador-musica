@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import gerenciador_musica_backend.model.Usuario;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
@@ -21,12 +20,12 @@ public class JwtService {
 
     public String gerarToken(Usuario usuario) {
         return Jwts.builder()
-                .setSubject(usuario.getEmail())
+                .subject(usuario.getEmail())
                 .claim("role", usuario.getRole().name())
                 .claim("nome", usuario.getNome())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .signWith(key)
                 .compact();
     }
 
