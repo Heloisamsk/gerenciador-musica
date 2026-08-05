@@ -21,12 +21,12 @@ public class JwtService {
 
     public String gerarToken(Usuario usuario) {
         return Jwts.builder()
-                .setSubject(usuario.getEmail())
+                .subject(usuario.getEmail())
                 .claim("role", usuario.getRole().name())
                 .claim("nome", usuario.getNome())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .signWith(key)
                 .compact();
     }
 
