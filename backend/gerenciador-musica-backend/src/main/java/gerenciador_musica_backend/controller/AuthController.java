@@ -12,27 +12,40 @@ import gerenciador_musica_backend.dto.LoginRequestDTO;
 import gerenciador_musica_backend.dto.LoginResponseDTO;
 import gerenciador_musica_backend.service.AuthService;
 import jakarta.validation.Valid;
-
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import gerenciador_musica_backend.model.Usuario;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
 
+    public AuthController(
+            AuthService authService
+    ) {
+        this.authService = authService;
+    }
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(
-            @Valid @RequestBody LoginRequestDTO request) {
+            @Valid
+            @RequestBody
+            LoginRequestDTO request
+    ) {
+        LoginResponseDTO response =
+                authService.login(request);
 
-        LoginResponseDTO response = authService.login(request);
         return ResponseEntity.ok(response);
     }
     @PostMapping("/logout")
-    public ResponseEntity<LogoutResponseDTO> logout() {
-
-        LogoutResponseDTO response = authService.logout();
+    public ResponseEntity<LogoutResponseDTO> logout(
+            @AuthenticationPrincipal
+            Usuario usuario
+    ) {
+        LogoutResponseDTO response =
+                authService.logout(
+                        usuario.getEmail()
+                );
 
         return ResponseEntity.ok(response);
-
     }
 }
