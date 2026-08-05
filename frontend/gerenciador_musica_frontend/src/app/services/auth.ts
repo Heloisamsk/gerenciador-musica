@@ -1,3 +1,4 @@
+import { Cadastro } from './../pages/cadastro/cadastro';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
@@ -8,6 +9,7 @@ import { Observable, tap } from 'rxjs';
 export class AuthService {
 
   private apiUrl = 'http://localhost:8080/api/auth/login';
+  private cadastroUrl = 'http://localhost:8080/api/auth/cadastro';
 
   constructor(private http: HttpClient) { }
 
@@ -24,6 +26,11 @@ export class AuthService {
       })
     );
   }
+
+  cadastrar(dados: any): Observable<any> {
+    return this.http.post<any>(this.cadastroUrl, dados);
+  }
+
   isAutenticado(): boolean {
     const token = localStorage.getItem('token');
     return token !== null; // Retorna um booleano
