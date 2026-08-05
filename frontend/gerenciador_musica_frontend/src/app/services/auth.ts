@@ -13,17 +13,28 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   login(credenciais: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, credenciais).pipe(
-      tap(resposta => {
-        if (resposta && resposta.token) {
-          localStorage.setItem('token', resposta.token);
+    return this.http
+      .post<any>(this.apiUrl, credenciais)
+      .pipe(
+        tap(resposta => {
+          if (
+            typeof window !== 'undefined' &&
+            resposta?.token
+          ) {
+            localStorage.setItem(
+              'token',
+              resposta.token
+            );
 
-          if (resposta.role) {
-            localStorage.setItem('role', resposta.role);
+            if (resposta.role) {
+              localStorage.setItem(
+                'role',
+                resposta.role
+              );
+            }
           }
-        }
-      })
-    );
+        })
+      );
   }
 
 cadastrar(dados: any): Observable<any> {
@@ -47,7 +58,35 @@ limparSessao(): void {
     return;
   }
 
-  localStorage.removeItem('token');
-  localStorage.removeItem('role');
-}
+  cadastrar(dados: any): Observable<any> {
+    return this.http.post<any>(
+      this.cadastroUrl,
+      dados
+    );
+  }
+
+  getToken(): string | null {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    return localStorage.getItem('token');
+  }
+
+  isAutenticado(): boolean {
+    return this.getToken() !== null;
+  }
+
+  limparSessao(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+  }
+
+  logout(): void {
+    this.limparSessao();
+  }
 }
