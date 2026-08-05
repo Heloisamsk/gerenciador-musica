@@ -29,7 +29,8 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 
 ### [JWT](https://jwt.io/)
 - Autenticação e autorização dos usuários.
----
+
+
 ## 🎶 » Status do Projeto
 
 - Em andamento
