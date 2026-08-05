@@ -25,19 +25,22 @@ public class AuthService {
 
     public LoginResponseDTO login(LoginRequestDTO request) {
 
+        // PARA TESTAR SEM O BANCO
         // Procura o usuário pelo e-mail
-        Usuario usuario = new Usuario();
-        usuario.setNome("Heloisa");
-        usuario.setEmail("heloisa@email.com");
-        usuario.setRole(Role.ADMIN);
+        //Usuario usuario = new Usuario();
+        //usuario.setNome("Heloisa");
+        //usuario.setEmail("heloisa@email.com");
+        //usuario.setRole(Role.ADMIN);
 
         // senha = 123456 criptografada
 
-        usuario.setSenha(passwordEncoder.encode("123456"));
-        // Verifica se a senha está correta
-        if (!usuario.getEmail().equals(request.getEmail()) ||
-                !passwordEncoder.matches(request.getSenha(), usuario.getSenha())) {
 
+        // Procura o usuário pelo e-mail
+        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("E-mail ou senha inválidos."));
+
+        // Verifica se a senha está correta
+        if (!passwordEncoder.matches(request.getSenha(), usuario.getSenha())) {
             throw new RuntimeException("E-mail ou senha inválidos.");
         }
 
