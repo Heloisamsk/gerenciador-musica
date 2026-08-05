@@ -1,47 +1,96 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { finalize, Observable, tap } from 'rxjs';
+
+export type Role = 'USER' | 'ADMIN';
+
+export interface LoginRequest {
+  email: string;
+  senha: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  nome: string;
+  email: string;
+  role: Role;
+}
+
+export interface CadastroRequest {
+  nome: string;
+  email: string;
+  senha: string;
+  role: Role;
+}
+
+export interface CadastroResponse {
+  id: number;
+  nome: string;
+  email: string;
+  role: Role;
+}
+
+export interface LogoutResponse {
+  mensagem: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:8080/api/auth/login';
-  private cadastroUrl = 'http://localhost:8080/api/auth/register';
+  private readonly apiBaseUrl =
+    'http://localhost:8080/api/auth';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  login(credenciais: any): Observable<any> {
+  login(
+    credenciais: LoginRequest
+  ): Observable<LoginResponse> {
+
     return this.http
-      .post<any>(this.apiUrl, credenciais)
+      .post<LoginResponse>(
+        `${this.apiBaseUrl}/login`,
+        credenciais
+      )
       .pipe(
         tap(resposta => {
-          if (
-            typeof window !== 'undefined' &&
-            resposta?.token
-          ) {
-            localStorage.setItem(
-              'token',
-              resposta.token
-            );
-
-            if (resposta.role) {
-              localStorage.setItem(
-                'role',
-                resposta.role
-              );
-            }
+          if (typeof window === 'undefined') {
+            return;
           }
+
+          localStorage.setItem(
+            'token',
+            resposta.token
+          );
+
+          localStorage.setItem(
+            'role',
+            resposta.role
+          );
         })
       );
   }
 
-  cadastrar(dados: any): Observable<any> {
-    return this.http.post<any>(
-      this.cadastroUrl,
+  cadastrar(
+    dados: CadastroRequest
+  ): Observable<CadastroResponse> {
+
+    return this.http.post<CadastroResponse>(
+      `${this.apiBaseUrl}/register`,
       dados
     );
+  }
+
+  logout(): Observable<LogoutResponse> {
+    return this.http
+      .post<LogoutResponse>(
+        `${this.apiBaseUrl}/logout`,
+        {}
+      )
+      .pipe(
+        finalize(() => this.limparSessao())
+      );
   }
 
   getToken(): string | null {
@@ -50,6 +99,20 @@ export class AuthService {
     }
 
     return localStorage.getItem('token');
+  }
+
+  getRole(): Role | null {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const role = localStorage.getItem('role');
+
+    if (role === 'USER' || role === 'ADMIN') {
+      return role;
+    }
+
+    return null;
   }
 
   isAutenticado(): boolean {
@@ -63,9 +126,5 @@ export class AuthService {
 
     localStorage.removeItem('token');
     localStorage.removeItem('role');
-  }
-
-  logout(): void {
-    this.limparSessao();
   }
 }
