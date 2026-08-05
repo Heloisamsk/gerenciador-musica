@@ -37,27 +37,6 @@ export class AuthService {
       );
   }
 
-cadastrar(dados: any): Observable<any> {
-  return this.http.post<any>(this.cadastroUrl, dados);
-}
-
-isAutenticado(): boolean {
-  return this.getToken() !== null;
-}
-
-getToken(): string | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  return localStorage.getItem('token');
-}
-
-limparSessao(): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
   cadastrar(dados: any): Observable<any> {
     return this.http.post<any>(
       this.cadastroUrl,

@@ -8,6 +8,7 @@ import gerenciador_musica_backend.dto.UsuarioRequestDTO;
 import gerenciador_musica_backend.dto.UsuarioResponseDTO;
 import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.UsuarioRepository;
+import gerenciador_musica_backend.exception.EmailJaCadastradoException;
 
 @Service
 public class UsuarioService {
@@ -21,7 +22,9 @@ public class UsuarioService {
         
         // 1. Regra de negócio: Verificar se o e-mail já está em uso
         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Já existe um usuário cadastrado com este e-mail.");
+            throw new EmailJaCadastradoException(
+                    "Já existe um usuário cadastrado com este e-mail."
+            );
         }
 
         // 2. Converter DTO de Entrada (Request) em Entidade

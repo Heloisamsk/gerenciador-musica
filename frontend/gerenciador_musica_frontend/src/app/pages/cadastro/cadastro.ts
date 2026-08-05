@@ -11,10 +11,10 @@ import { AuthService } from '../../services/auth';
 })
 export class Cadastro {
   cadastroForm = new FormGroup({
-    name: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required]
-    }),
+      nome: new FormControl('', {
+        nonNullable: true,
+       validators: [Validators.required]
+      }),
 
     email: new FormControl('', {
       nonNullable: true,
@@ -32,13 +32,13 @@ export class Cadastro {
       ]
     }),
 
-    role: new FormControl('usuario', {
-      nonNullable: true,
+    role: new FormControl<'USER' | 'ADMIN'>('USER', {
+      nonNullable: true
     })
   });
 
-  get name() {
-    return this.cadastroForm.controls.name;
+  get nome() {
+    return this.cadastroForm.controls.nome;
   }
 
   get email() {
@@ -59,6 +59,7 @@ export class Cadastro {
   ) {}
 
   cadastrar(): void {
+    console.log('O método cadastrar foi chamado');
     if (this.cadastroForm.invalid) {
       this.cadastroForm.markAllAsTouched();
       return;
@@ -74,15 +75,21 @@ export class Cadastro {
       error: (erro) => {
         console.error('Erro no cadastro:', erro);
 
-        if (erro.status === 409 || (erro.error && typeof erro.error === 'string' && erro.error.toLowerCase().includes('email'))) {
-          alert('Este e-mail já está cadastrado. Tente utilizar outro.');
+        if (erro.status === 409) {
+          const mensagem =
+          erro.error?.message ??
+          'Este e-mail já está cadastrado.';
+
+           alert(mensagem);
         }
         else if (erro.status === 400 && erro.error) {
-          const mensagemErro = erro.error.message || 'Dados inválidos. Verifique as informações digitadas.';
+           const mensagemErro =
+           erro.error.message ??
+          'Dados inválidos. Verifique as informações digitadas.';
           alert(`Erro de validação: ${mensagemErro}`);
         }
         else {
-          alert('Ocorreu um erro ao realizar o cadastro. Tente novamente mais tarde.');
+          alert(`Erro ao realizar o cadastro. Status: ${erro.status}`);
         }
       }
     });
