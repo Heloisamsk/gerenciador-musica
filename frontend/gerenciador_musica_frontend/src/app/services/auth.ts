@@ -35,4 +35,10 @@ export class AuthService {
     const token = localStorage.getItem('token');
     return token !== null; // Retorna um booleano
   }
+
+  logout(): void {
+  // Remove as credenciais guardadas no navegador
+  localStorage.removeItem('token');
+  localStorage.removeItem('role');
+}
 }
