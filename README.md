@@ -3,17 +3,14 @@
 
 
 
----
 ## 👥 » Integrantes
 
 #### [Álvaro Henrique Nunes de Andrade](https://github.com/alwvaro) | [Arthur Oliveira Ramos](https://github.com/thuramos) | [Maria Heloisa da Silva Montebelo](https://github.com/Heloisamsk) | [Vinicius Freire Pereira](https://github.com/VinFpe)
 
----
 ## 📍 » Sobre o Projeto
 
 Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playlists para a disciplina de Engenharia de Software ministrado pela professora [Thais Burity](https://github.com/taburity), da UFAPE, referente ao período de 2026.1 com intuito de avaliação para a 2° Verificação de Aprendizagem.
 
----
 
 
 ## 🤖 » Tecnologias
@@ -38,7 +35,6 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 - Em andamento
 
 
----
 ## 🗺️ » Como executar
 
 ### Pré-requisitos
@@ -79,7 +75,6 @@ npm start
 
 O frontend ficará disponível em `http://localhost:4200`.
 
----
 
 ## 🔗 » Endpoints principais
 
@@ -89,4 +84,3 @@ O frontend ficará disponível em `http://localhost:4200`.
 | POST | `/api/auth/login` | Público | Realizar login |
 | POST | `/api/auth/logout` | Autenticado | Realizar logout |
 
----
