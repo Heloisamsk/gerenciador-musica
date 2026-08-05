@@ -8,23 +8,22 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (!authService.isAutenticado()) {
-    router.navigate(['/login']);
-    return false;
-  } else {
+    return router.createUrlTree(['/login']);
+  }
 
     const expectedRole = route.data['expectedRole'];
 
-    if (expectedRole) {
-      const userRole = localStorage.getItem('role');
+  if (
+    expectedRole &&
+    authService.getRole() !== expectedRole
+  ) {
+    alert(
+      'Acesso negado: seu perfil não possui essa permissão.'
+    );
 
-      if (userRole !== expectedRole) {
-        alert('Acesso negado: você não tem permissão de Administrador!');
-        router.navigate(['/login']);
-        return false;
-      }
-    }
+    return router.createUrlTree(['/home']);
+  }
 
     return true;
-  }
 };
 

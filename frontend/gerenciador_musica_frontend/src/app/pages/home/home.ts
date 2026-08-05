@@ -11,11 +11,20 @@ import { AuthService } from '../../services/auth';
 export class Home {
   constructor(private authService: AuthService, private router: Router) {}
 
-  fazerLogout(): void {
-    // 1. Limpa o token e a role do navegador
-    this.authService.logout();
-    
-    // 2. Manda o usuário de volta para a tela de login
-    this.router.navigate(['/login']);
+fazerLogout(): void {
+  this.authService.logout().subscribe({
+    next: () => {
+      void this.router.navigate(['/login']);
+    },
+
+    error: (erro) => {
+      console.error(
+        'Erro ao comunicar o logout ao backend:',
+        erro
+      );
+
+      void this.router.navigate(['/login']);
+    }
+  });
   }
 }

@@ -23,4 +23,17 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT)
                 .body(resposta);
     }
+
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<Map<String, String>>
+    tratarCredenciaisInvalidas(
+            CredenciaisInvalidasException exception
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of(
+                        "message",
+                        exception.getMessage()
+                ));
+    }
 }

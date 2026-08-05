@@ -53,16 +53,16 @@ entrar(): void {
       this.loginForm.markAllAsTouched();
       return;
     }
-    
-    const credenciais = this.loginForm.getRawValue(); 
+
+    const credenciais = this.loginForm.getRawValue();
 
     this.authService.login(credenciais).subscribe({
-      
+
       next: (resposta) => {
         console.log('Login feito com sucesso!', resposta);
-        this.router.navigate(['/']); // Muda de página
+        void this.router.navigate(['/home']);
       },
-      
+
       error: (erro) => {
         console.error('Erro no login', erro);
         alert('E-mail ou senha incorretos. Tente novamente!');

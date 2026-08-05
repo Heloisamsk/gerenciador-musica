@@ -41,3 +41,14 @@ gerenciador_musica
 ├── frontend
 └── backend
 ```
+
+### Estratégia de logout com JWT
+
+A aplicação utiliza JWT de maneira stateless. O backend valida o
+token recebido em POST /api/auth/logout e confirma o logout.
+
+Após a resposta, o frontend remove o token e a Role armazenados no
+localStorage, deixando de enviar o JWT nas próximas requisições.
+
+Nesta versão acadêmica não é utilizada uma lista de tokens revogados.
+O token também deixa de ser aceito automaticamente após sua expiração.
