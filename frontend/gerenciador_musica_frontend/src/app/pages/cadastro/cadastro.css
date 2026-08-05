@@ -109,7 +109,9 @@ body {
   font-size: 0.95rem;
 }
 .error-message {
-  color: #b00020;
+  color: #ff6b6b;
+  display: block;
+  font-size: 0.875rem;
 }
 
 .cadastro-btn {

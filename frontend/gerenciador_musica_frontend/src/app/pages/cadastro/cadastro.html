@@ -1,14 +1,23 @@
-<body class="cadastro-container">
+<main class="cadastro-container">
   <section class="cadastro-card">
     <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Logo do Spotify" class="login-logo" />
     <h1  class="cadastro-title">Se inscreva e comece a curtir</h1>
 
-    <form class="cadastro-form" [formGroup]="cadastroForm" (ngSubmit)="cadastrar()">
+    <form
+      class="cadastro-form"
+      [formGroup]="cadastroForm"
+      (ngSubmit)="cadastrar()"
+      novalidate
+    >
       <div class="form-group">
-        <label for="name">Nome</label>
-        <input class="form-input" id="name" placeholder="Digite seu nome" formControlName="name">
+        <label for="nome">Nome</label>
+        <input
+          id="nome"
+          formControlName="nome"
+          placeholder="Digite seu nome"
+        />
 
-        @if (name.touched && name.hasError('required')) {
+        @if (nome.touched && nome.hasError('required')) {
         <small class="error-message">O nome é obrigatório.</small>
         }
       </div>
@@ -62,8 +71,7 @@
             <input
               type="radio"
               formControlName="role"
-              name="role"
-              value="usuario"
+              value="USER"
             />
             Usuário
           </label>
@@ -72,18 +80,17 @@
             <input
               type="radio"
               formControlName="role"
-              name="role"
-              value="admin"
+              value="ADMIN"
             />
             Admin
           </label>
         </div>
       </div>
 
-      <button class="cadastro-btn" type="button" (click)="cadastrar()">
+      <button class="cadastro-btn" type="submit">
         Cadastrar
       </button>
     </form>
   </section>
-</body>
+</main>
 
