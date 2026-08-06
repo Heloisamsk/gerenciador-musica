@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import gerenciador_musica_backend.model.Usuario;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
