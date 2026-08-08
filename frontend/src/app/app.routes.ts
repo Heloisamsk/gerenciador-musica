@@ -32,6 +32,16 @@ export const routes: Routes = [
     }
   },
   {
+   path: 'admin/banco/usuarios',
+    loadComponent: () =>
+      import('./pages/admin-usuarios/admin-usuarios')
+        .then(modulo => modulo.AdminUsuarios),
+   canActivate: [authGuard],
+   data: {
+     expectedRole: 'ADMIN'
+   }
+  },
+  {
     path: '**',
     redirectTo: 'login'
   }
