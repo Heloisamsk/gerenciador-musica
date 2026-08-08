@@ -1,0 +1,137 @@
+<section class="usuarios-page">
+  <div class="usuarios-card">
+
+    <header class="usuarios-header">
+      <div class="usuarios-title">
+        <p class="section-label">Painel administrativo</p>
+
+        <h1>Banco de Dados</h1>
+
+        <p>
+          Veja os usuários registrados no sistema.
+        </p>
+      </div>
+
+      <button
+        class="atualizar-button"
+        type="button"
+        (click)="carregarUsuarios()"
+        [disabled]="carregando"
+      >
+        @if (carregando) {
+        Carregando...
+        } @else {
+        Atualizar
+        }
+      </button>
+    </header>
+
+    <div class="database-visual">
+      <img
+        src="/dog.gif"
+        alt="dog"
+      />
+    </div>
+
+    @if (carregando) {
+    <div
+      class="status-message loading-message"
+      role="status"
+      aria-live="polite"
+    >
+      <p>Carregando usuários...</p>
+    </div>
+    }
+
+    @else if (mensagemErro) {
+    <div
+      class="status-message error-message"
+      role="alert"
+    >
+      <h2>Não foi possível carregar a listagem</h2>
+
+      <p>{{ mensagemErro }}</p>
+
+      <button
+        class="tentar-novamente-button"
+        type="button"
+        (click)="carregarUsuarios()"
+      >
+        Tentar novamente
+      </button>
+    </div>
+    }
+
+    @else if (usuarios.length === 0) {
+    <div
+      class="status-message empty-message"
+      role="status"
+    >
+      <h2>Nenhum usuário encontrado</h2>
+
+      <p>
+        Ainda não existem usuários cadastrados no sistema.
+      </p>
+    </div>
+    }
+
+    @else {
+    <div class="table-information">
+      <p>
+        Total de usuários:
+        <strong>{{ usuarios.length }}</strong>
+      </p>
+    </div>
+
+    <div class="table-container">
+      <table class="usuarios-table">
+        <caption class="sr-only">
+          Lista de usuários cadastrados no sistema
+        </caption>
+
+        <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Nome</th>
+          <th scope="col">E-mail</th>
+          <th scope="col">Perfil</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        @for (usuario of usuarios; track usuario.id) {
+        <tr>
+          <td data-label="ID">
+            {{ usuario.id }}
+          </td>
+
+          <td data-label="Nome">
+            {{ usuario.nome }}
+          </td>
+
+          <td data-label="E-mail">
+            {{ usuario.email }}
+          </td>
+
+          <td data-label="Perfil">
+                  <span
+                    class="role-badge"
+                    [class.role-admin]="usuario.role === 'ADMIN'"
+                    [class.role-user]="usuario.role === 'USER'"
+                  >
+                    @if (usuario.role === 'ADMIN') {
+                      Administrador
+                    } @else {
+                      Usuário
+                    }
+                  </span>
+          </td>
+        </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+    }
+
+  </div>
+</section>
