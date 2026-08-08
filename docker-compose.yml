@@ -2,25 +2,62 @@ services:
   postgres:
     image: postgres:18
     container_name: gerenciador-musica-db
-    restart: unless-stopped
 
     environment:
       POSTGRES_DB: gerenciador_musica
       POSTGRES_USER: gerenciador
-      POSTGRES_PASSWORD: gerenciador_dev
+      POSTGRES_PASSWORD: gerenciador
 
     ports:
       - "5432:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql
-      - ./database/init:/docker-entrypoint-initdb.d:ro
+      - ./database/init:/docker-entrypoint-initdb.d
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U gerenciador -d gerenciador_musica"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
+
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: gerenciador-musica-backend
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gerenciador_musica
+      SPRING_DATASOURCE_USERNAME: gerenciador
+      SPRING_DATASOURCE_PASSWORD: gerenciador
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: gerenciador-musica-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
 
 volumes:
   postgres_data:
