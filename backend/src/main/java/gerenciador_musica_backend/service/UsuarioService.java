@@ -1,5 +1,6 @@
 package gerenciador_musica_backend.service;
 
+import gerenciador_musica_backend.dto.UsuarioListagemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,9 @@ import gerenciador_musica_backend.dto.UsuarioResponseDTO;
 import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.UsuarioRepository;
 import gerenciador_musica_backend.exception.EmailJaCadastradoException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UsuarioService {
@@ -50,5 +54,22 @@ public class UsuarioService {
         // Sem senha no DTO de resposta por questões de segurança.
 
         return response;
+    }
+
+    public List<UsuarioListagemDTO> listarUsuarios() {
+
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<UsuarioListagemDTO> listagem = new ArrayList<>();
+
+        for (Usuario usuario : usuarios) {
+            UsuarioListagemDTO dto = new UsuarioListagemDTO();
+            dto.setId(usuario.getId());
+            dto.setNome(usuario.getNome());
+            dto.setEmail(usuario.getEmail());
+            dto.setRole(usuario.getRole());
+
+            listagem.add(dto);
+        }
+        return listagem;
     }
 }
