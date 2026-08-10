@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
@@ -22,7 +23,11 @@ public class Musica {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_musica")
-    private Long id;
+    private Long idMusica;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_artista", nullable = false)
+    private Artista artistaPrincipal;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "id_album", nullable = true)
@@ -31,18 +36,32 @@ public class Musica {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "musica_artista",
-            joinColumns = @JoinColumn(name = "id_musica"),
-            inverseJoinColumns = @JoinColumn(name = "id_artista")
+            joinColumns = @JoinColumn(
+                    name = "id_musica",
+                    nullable = false
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "id_artista",
+                    nullable = false
+            )
     )
-    private Set<Artista> artistas = new HashSet<>();
+    private Set<Artista> artistasParticipantes =
+            new LinkedHashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "musica_genero",
-            joinColumns = @JoinColumn(name = "id_musica"),
-            inverseJoinColumns = @JoinColumn(name = "id_genero")
+            joinColumns = @JoinColumn(
+                    name = "id_musica",
+                    nullable = false
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "id_genero",
+                    nullable = false
+            )
     )
-    private Set<Genero> generos = new HashSet<>();
+    private Set<Genero> generos =
+            new LinkedHashSet<>();
 
     @Column(name = "titulo", nullable = false, length = 255)
     private String titulo;
@@ -59,12 +78,48 @@ public class Musica {
     protected Musica() {
     }
 
-    public Long getId() {
-        return id;
+    public Musica(
+            String titulo,
+            String letra,
+            Integer duracaoSegundos,
+            Short anoLancamento,
+            Artista artistaPrincipal,
+            Album album,
+            Set<Artista> participantes,
+            Set<Genero> generos
+    ) {
+        this.titulo = titulo;
+        this.letra = letra;
+        this.duracaoSegundos = duracaoSegundos;
+        this.anoLancamento = anoLancamento;
+        this.artistaPrincipal = artistaPrincipal;
+        this.album = album;
+
+        this.artistasParticipantes =
+                participantes == null
+                        ? new LinkedHashSet<>()
+                        : new LinkedHashSet<>(participantes);
+
+        this.generos =
+                generos == null
+                        ? new LinkedHashSet<>()
+                        : new LinkedHashSet<>(generos);
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getIdMusica() {
+        return idMusica;
+    }
+
+    public void setIdMusica(Long idMusica) {
+        this.idMusica = idMusica;
+    }
+
+    public Artista getArtistaPrincipal() {
+        return artistaPrincipal;
+    }
+
+    public void setArtistaPrincipal(Artista artistaPrincipal) {
+        this.artistaPrincipal = artistaPrincipal;
     }
 
     public Album getAlbum() {
@@ -75,12 +130,17 @@ public class Musica {
         this.album = album;
     }
 
-    public Set<Artista> getArtistas() {
-        return artistas;
+    public Set<Artista> getArtistasParticipantes() {
+        return artistasParticipantes;
     }
 
-    public void setArtistas(Set<Artista> artistas) {
-        this.artistas = artistas;
+    public void setArtistasParticipantes(
+            Set<Artista> artistasParticipantes
+    ) {
+        this.artistasParticipantes =
+                artistasParticipantes == null
+                        ? new LinkedHashSet<>()
+                        : new LinkedHashSet<>(artistasParticipantes);
     }
 
     public Set<Genero> getGeneros() {
@@ -88,7 +148,10 @@ public class Musica {
     }
 
     public void setGeneros(Set<Genero> generos) {
-        this.generos = generos;
+        this.generos =
+                generos == null
+                        ? new LinkedHashSet<>()
+                        : new LinkedHashSet<>(generos);
     }
 
     public String getTitulo() {

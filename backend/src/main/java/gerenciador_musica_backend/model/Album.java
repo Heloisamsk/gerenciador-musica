@@ -35,6 +35,18 @@ public class Album {
     protected Album() {
     }
 
+    public Album(
+            Artista artista,
+            String titulo,
+            Short anoLancamento,
+            String capaUrl
+    ) {
+        this.artista = artista;
+        this.titulo = titulo;
+        this.anoLancamento = anoLancamento;
+        this.capaUrl = capaUrl;
+    }
+
     public Long getIdAlbum() {
         return idAlbum;
     }
