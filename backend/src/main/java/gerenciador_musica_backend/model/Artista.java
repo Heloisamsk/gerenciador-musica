@@ -28,6 +28,16 @@ public class Artista {
     protected Artista() {
     }
 
+    public Artista(
+            String nome,
+            String descricao,
+            String fotoPerfilUrl
+    ) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.fotoPerfilUrl = fotoPerfilUrl;
+    }
+
     public Long getIdArtista() {
         return idArtista;
     }

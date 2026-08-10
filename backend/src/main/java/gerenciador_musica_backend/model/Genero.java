@@ -27,6 +27,10 @@ public class Genero {
     protected Genero() {
     }
 
+    public Genero(String nome) {
+        this.nome = nome;
+    }
+
     public Long getIdGenero() {
         return idGenero;
     }
