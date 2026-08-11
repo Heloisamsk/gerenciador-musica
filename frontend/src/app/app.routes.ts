@@ -41,8 +41,20 @@ export const routes: Routes = [
      expectedRole: 'ADMIN'
    }
   },
+ { 
+    path: 'admin/banco/musicas', 
+    loadComponent: () =>
+      import('./pages/admin-musicas/admin-musicas')
+        .then(modulo => modulo.AdminMusicas),
+    canActivate: [authGuard],
+    data: {
+      expectedRole: 'ADMIN'
+    }
+  },
+
   {
     path: '**',
     redirectTo: 'login'
   }
+
 ];
