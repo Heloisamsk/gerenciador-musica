@@ -40,4 +40,19 @@ public class PlaylistResponseDTO {
     public List<MusicaResumoDTO> getMusicas() {
         return musicas;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+    public void setMusicas(List<MusicaResumoDTO> musicas) {
+        this.musicas = musicas;
+    }
 }
