@@ -1,13 +1,9 @@
 package gerenciador_musica_backend.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "usuario")
@@ -46,6 +42,10 @@ public class Usuario {
             nullable = false,
             length = 255
     )
+
+    // Um usuário pode ter Muitas playlists.
+    @OneToMany(mappedBy = "usuario")
+    private List<Playlist> playlists = new ArrayList<>();
     private Role role;
 
     public Usuario() {
