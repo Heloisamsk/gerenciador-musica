@@ -19,11 +19,11 @@ export class AdminMusicas implements OnInit {
 
   constructor(private adminMusicaService: AdminMusicaService) {}
   ngOnInit(): void {
-    this.carregarCatologo();
+    this.carregarCatalogo();
   }
 
 
-  carregarCatologo(): void {
+  carregarCatalogo(): void {
     this.carregando = true; 
     this.mensagemErro = ''; 
 

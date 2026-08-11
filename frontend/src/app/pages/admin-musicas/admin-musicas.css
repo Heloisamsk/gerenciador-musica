@@ -1,137 +1,300 @@
 :host {
-  --bg-base: #121212;         
-  --bg-elevated: #181818;     
-  --bg-hover: #2a2a2a;        
-  --text-base: #ffffff;       
-  --text-subdued: #a7a7a7;    
-  --brand-green: #1db954;     
-  --brand-green-hover: #1ed760; 
+  display: block;
+
+  --background: #0f0f0f;
+  --card-background: #181818;
+  --table-background: #202020;
+  --table-row-hover: #292929;
+  --border-color: #343434;
+  --primary: #1ed760;
+  --primary-hover: #1fdf64;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --error: #ff6b6b;
+
+  min-height: 100vh;
+  color: var(--text-primary);
+  background-color: var(--background);
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 }
 
-
-.container {
-  background-color: var(--bg-base);
-  color: var(--text-base);
-  min-height: 100vh;
-  padding: 32px;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+* {
   box-sizing: border-box;
 }
 
+.musicas-page {
+  min-height: 100vh;
+  padding: 2rem;
 
-.header {
+  background:
+    radial-gradient(
+      circle at top,
+      #1c1c1c 0%,
+      var(--background) 45%
+    );
+}
+
+.musicas-card {
+  width: 100%;
+  max-width: 1200px;
+  min-height: calc(100vh - 4rem);
+
+  margin: 0 auto;
+  padding: 2rem;
+
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+
+  box-shadow:
+    0 1.5rem 4rem
+    rgb(0 0 0 / 35%);
+}
+
+.musicas-header {
   display: flex;
+  align-items: flex-end;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  gap: 2rem;
+
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+
+  border-bottom:
+    1px solid var(--border-color);
 }
 
-.header h1 {
-  font-size: 28px;
-  font-weight: 700;
+.musicas-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.section-label {
   margin: 0;
-}
 
+  color: var(--primary);
 
-.btn-atualizar {
-  background-color: transparent;
-  color: var(--text-base);
-  border: 1px solid var(--text-subdued);
-  border-radius: 500px; 
-  padding: 8px 16px;
-  font-size: 14px;
+  font-size: 0.8rem;
   font-weight: 700;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+}
+
+.musicas-title h1 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+}
+
+.musicas-title > p:last-child {
+  margin: 0.5rem 0 0;
+
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.atualizar-button,
+.tentar-novamente-button {
+  min-width: 9rem;
+
+  padding: 0.8rem 1.4rem;
+
+  color: #000000;
+  background-color: var(--primary);
+
+  border: none;
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
   cursor: pointer;
-  transition: all 0.2s ease;
+
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
 }
 
-.btn-atualizar:hover:not(:disabled) {
-  border-color: var(--text-base);
-  transform: scale(1.04);
+.atualizar-button:hover:not(:disabled),
+.tentar-novamente-button:hover {
+  background-color: var(--primary-hover);
+  transform: scale(1.03);
 }
 
-.btn-atualizar:disabled {
-  opacity: 0.5;
+.atualizar-button:disabled {
+  color: #777777;
+  background-color: #333333;
   cursor: not-allowed;
 }
 
+.database-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-.tabela-container {
-  background-color: var(--bg-elevated);
-  border-radius: 8px;
-  padding: 0;
-  width: 100%;
-  overflow-x: auto; 
+  min-height: 10rem;
+  margin-bottom: 2rem;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  min-width: 700px; 
+.database-visual img {
+  display: block;
+
+  width: 8rem;
+  max-width: 100%;
+  height: 8rem;
+
+  object-fit: contain;
+  border-radius: 1rem;
 }
 
+.status-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-th {
-  color: var(--text-subdued);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 12px 24px;
-  border-bottom: 1px solid #282828;
-}
+  min-height: 18rem;
 
+  padding: 2rem;
 
-td {
-  padding: 16px 24px;
-  color: var(--text-subdued);
-  font-size: 14px;
-  border-bottom: 1px solid #282828;
-  transition: background-color 0.2s ease;
-}
-
-
-td strong {
-  color: var(--text-base);
-  font-size: 16px;
-  font-weight: 500;
-}
-
-
-tbody tr:hover td {
-  background-color: var(--bg-hover);
-  color: var(--text-base);
-}
-
-
-.status-box {
-  background-color: var(--bg-elevated);
-  border-radius: 8px;
-  padding: 64px 24px;
   text-align: center;
-  color: var(--text-subdued);
+
+  background-color: var(--table-background);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
 }
 
-
-.status-box.error {
-  border-left: 4px solid #e22134; 
+.status-message h2 {
+  margin: 0 0 0.75rem;
 }
 
-
-.status-box button {
-  margin-top: 24px;
-  background-color: var(--brand-green);
-  color: #000;
-  border: none;
-  border-radius: 500px;
-  padding: 12px 32px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
+.status-message p {
+  margin: 0;
+  color: var(--text-secondary);
 }
 
-.status-box button:hover {
-  background-color: var(--brand-green-hover);
-  transform: scale(1.04);
+.error-message {
+  color: var(--error);
+  border-color: rgb(255 107 107 / 40%);
+}
+
+.error-message p {
+  margin-bottom: 1.5rem;
+}
+
+.table-information {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 1rem;
+}
+
+.table-information p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.table-information strong {
+  color: var(--text-primary);
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+
+  background-color: var(--table-background);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+}
+
+.musicas-table {
+  width: 100%;
+  min-width: 42rem;
+
+  border-collapse: collapse;
+}
+
+.musicas-table th,
+.musicas-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+}
+
+.musicas-table th {
+  color: var(--text-secondary);
+  background-color: #171717;
+
+  border-bottom:
+    1px solid var(--border-color);
+
+  font-size: 0.75rem;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+}
+
+.musicas-table td {
+  color: var(--text-primary);
+
+  border-bottom:
+    1px solid var(--border-color);
+}
+
+.musicas-table tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.musicas-table tbody tr:hover {
+  background-color: var(--table-row-hover);
+}
+
+.musicas-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 700px) {
+  .musicas-page {
+    padding: 1rem;
+  }
+
+  .musicas-card {
+    min-height: calc(100vh - 2rem);
+    padding: 1.25rem;
+  }
+
+  .musicas-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .atualizar-button {
+    width: 100%;
+  }
+
+  .musicas-title h1 {
+    font-size: 2rem;
+  }
 }
