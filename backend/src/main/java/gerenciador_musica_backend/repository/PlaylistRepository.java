@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
-
+    //Buscar playlists do usuário:
     List<Playlist> findByUsuarioId(Long usuarioId);
 
+
+    //Buscar uma playlist específica do usuário:
     Optional<Playlist> findByIdAndUsuarioId(Long id, Long usuarioId);
 }
