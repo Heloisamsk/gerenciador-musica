@@ -3,6 +3,8 @@ import { Login } from './pages/login/login';
 import { Cadastro } from './pages/cadastro/cadastro';
 import { Home } from './pages/home/home';
 import { authGuard } from './guards/auth-guard';
+import { Playlists } from './pages/playlists/playlists';
+import { PlaylistDetalhe } from './pages/playlist-detalhe/playlist-detalhe';
 
 export const routes: Routes = [
   {
@@ -61,6 +63,12 @@ export const routes: Routes = [
       expectedRole: 'ADMIN'
     }
   },
+  { path: 'playlists',
+     component: Playlists, 
+     canActivate: [authGuard] },
+  { path: 'playlists/:id', 
+    component: PlaylistDetalhe, 
+    canActivate: [authGuard] },
 
   {
     path: '**',
