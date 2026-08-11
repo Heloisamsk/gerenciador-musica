@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -194,8 +195,8 @@ public class GlobalExceptionHandler {
             String path,
             Map<String, String> fieldErrors
     ) {
-        ErrorResponseDTO response = new ErrorResponseDTO(
-                Instant.now(),
+        ErrorResponseDTO resposta = new ErrorResponseDTO(
+                OffsetDateTime.now(),
                 status.value(),
                 status.getReasonPhrase(),
                 message,
@@ -205,6 +206,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(status)
-                .body(response);
+                .body(resposta);
     }
 }

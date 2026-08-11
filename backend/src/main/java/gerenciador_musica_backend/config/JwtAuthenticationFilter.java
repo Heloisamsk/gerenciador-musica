@@ -1,17 +1,7 @@
 package gerenciador_musica_backend.config;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.UsuarioRepository;
@@ -22,19 +12,30 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UsuarioRepository usuarioRepository;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
 
     public JwtAuthenticationFilter(
             JwtService jwtService,
-            UsuarioRepository usuarioRepository
+            UsuarioRepository usuarioRepository,
+            RestAuthenticationEntryPoint authenticationEntryPoint
     ) {
         this.jwtService = jwtService;
         this.usuarioRepository = usuarioRepository;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     @Override
@@ -44,8 +45,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String authorization = request.getHeader("Authorization");
+        String authorization =
+                request.getHeader("Authorization");
 
+        /*
+         * Se não houver token, o filtro continua normalmente.
+         *
+         * Caso o endpoint seja protegido, o próprio Spring Security
+         * chamará o RestAuthenticationEntryPoint e retornará 401.
+         *
+         * Isso também permite acessar /api/auth/login e
+         * /api/auth/register sem token.
+         */
         if (authorization == null
                 || !authorization.startsWith("Bearer ")) {
 
@@ -53,7 +64,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authorization.substring(7);
+        String token =
+                authorization.substring(7).trim();
+
+        if (token.isBlank()) {
+            responderNaoAutorizado(
+                    request,
+                    response,
+                    new BadCredentialsException(
+                            "Token não informado."
+                    )
+            );
+            return;
+        }
 
         try {
             Claims claims =
@@ -62,10 +85,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = claims.getSubject();
 
             if (email == null || email.isBlank()) {
-                responderNaoAutorizado(response);
+                responderNaoAutorizado(
+                        request,
+                        response,
+                        new BadCredentialsException(
+                                "Token sem identificação do usuário."
+                        )
+                );
                 return;
             }
 
+            /*
+             * Só cria uma autenticação se ainda não existir
+             * uma no contexto desta requisição.
+             */
             if (SecurityContextHolder
                     .getContext()
                     .getAuthentication() == null) {
@@ -75,7 +108,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .orElse(null);
 
                 if (usuario == null) {
-                    responderNaoAutorizado(response);
+                    responderNaoAutorizado(
+                            request,
+                            response,
+                            new BadCredentialsException(
+                                    "Usuário do token não encontrado."
+                            )
+                    );
                     return;
                 }
 
@@ -83,7 +122,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         List.of(
                                 new SimpleGrantedAuthority(
                                         "ROLE_"
-                                                + usuario.getRole().name()
+                                                + usuario
+                                                .getRole()
+                                                .name()
                                 )
                         );
 
@@ -100,7 +141,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContext context =
-                        SecurityContextHolder.createEmptyContext();
+                        SecurityContextHolder
+                                .createEmptyContext();
 
                 context.setAuthentication(authentication);
 
@@ -110,28 +152,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (JwtException | IllegalArgumentException exception) {
-            responderNaoAutorizado(response);
+            responderNaoAutorizado(
+                    request,
+                    response,
+                    new BadCredentialsException(
+                            "Token inválido ou expirado.",
+                            exception
+                    )
+            );
         }
     }
 
     private void responderNaoAutorizado(
-            HttpServletResponse response
+            HttpServletRequest request,
+            HttpServletResponse response,
+            BadCredentialsException exception
     ) throws IOException {
 
-        response.setStatus(
-                HttpServletResponse.SC_UNAUTHORIZED
-        );
+        /*
+         * Garante que nenhuma autenticação parcial ou antiga
+         * permaneça associada à requisição.
+         */
+        SecurityContextHolder.clearContext();
 
-        response.setContentType(
-                MediaType.APPLICATION_JSON_VALUE
-        );
-
-        response.setCharacterEncoding(
-                StandardCharsets.UTF_8.name()
-        );
-
-        response.getWriter().write(
-                "{\"erro\":\"Token inválido ou expirado\"}"
+        /*
+         * Produz o mesmo JSON padronizado definido no
+         * RestAuthenticationEntryPoint.
+         */
+        authenticationEntryPoint.commence(
+                request,
+                response,
+                exception
         );
     }
 }

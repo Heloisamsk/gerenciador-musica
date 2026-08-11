@@ -1,15 +1,16 @@
 package gerenciador_musica_backend.config;
+
 import java.util.List;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -17,20 +18,41 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
-    
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
+
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            RestAuthenticationEntryPoint authenticationEntryPoint,
+            RestAccessDeniedHandler accessDeniedHandler
+    ) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            CorsConfigurationSource corsConfigurationSource
+    ) throws Exception {
+
         http
                 .cors(cors ->
                         cors.configurationSource(corsConfigurationSource)
                 )
-            .csrf(csrf -> csrf.disable())
+
+                .csrf(csrf -> csrf.disable())
+
                 .formLogin(form -> form.disable())
+
                 .httpBasic(basic -> basic.disable())
 
                 .sessionManagement(session ->
@@ -39,51 +61,42 @@ public class SecurityConfig {
                         )
                 )
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
 
+                .authorizeHttpRequests(auth -> auth
+                        // Requisições de verificação do navegador
+                        .requestMatchers(HttpMethod.OPTIONS, "/**")
+                        .permitAll()
+
+                        // Cadastro e login não exigem autenticação
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login"
-                        ).permitAll()
+                        )
+                        .permitAll()
 
+                        // Somente ADMIN
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")
 
+                        // USER e ADMIN
                         .requestMatchers("/api/user/**")
                         .hasAnyRole("USER", "ADMIN")
 
+                        // Catálogo disponível para qualquer usuário autenticado
+                        .requestMatchers("/api/musicas/**")
+                        .authenticated()
+
+                        // Logout exige autenticação
                         .requestMatchers("/api/auth/logout")
                         .authenticated()
 
+                        // Qualquer outro endpoint também exige autenticação
                         .anyRequest()
                         .authenticated()
-                )
-
-                .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(
-                                (request, response, exception) -> {
-                                    response.setStatus(401);
-                                    response.setContentType(
-                                            "application/json;charset=UTF-8"
-                                    );
-                                    response.getWriter().write(
-                                            "{\"message\":\"Autenticação necessária.\"}"
-                                    );
-                                }
-                        )
-
-                        .accessDeniedHandler(
-                                (request, response, exception) -> {
-                                    response.setStatus(403);
-                                    response.setContentType(
-                                            "application/json;charset=UTF-8"
-                                    );
-                                    response.getWriter().write(
-                                            "{\"message\":\"Acesso negado.\"}"
-                                    );
-                                }
-                        )
                 )
 
                 .addFilterBefore(
@@ -94,6 +107,10 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /*
+     * Evita que o JwtAuthenticationFilter seja executado duas vezes:
+     * uma como filtro comum do Servlet e outra no Spring Security.
+     */
     @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter>
     jwtFilterRegistration(JwtAuthenticationFilter filter) {
@@ -102,22 +119,37 @@ public class SecurityConfig {
                 new FilterRegistrationBean<>(filter);
 
         registration.setEnabled(false);
+
         return registration;
     }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+
+        CorsConfiguration configuration =
+                new CorsConfiguration();
 
         configuration.setAllowedOrigins(
                 List.of("http://localhost:4200")
         );
 
         configuration.setAllowedMethods(
-                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE",
+                        "OPTIONS"
+                )
         );
 
         configuration.setAllowedHeaders(
-                List.of("Authorization", "Content-Type")
+                List.of(
+                        "Authorization",
+                        "Content-Type",
+                        "Accept"
+                )
         );
 
         configuration.setAllowCredentials(true);
@@ -125,7 +157,10 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
 
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration(
+                "/**",
+                configuration
+        );
 
         return source;
     }
