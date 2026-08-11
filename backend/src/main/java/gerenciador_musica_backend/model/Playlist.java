@@ -1,8 +1,22 @@
 package gerenciador_musica_backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "playlist")
@@ -10,31 +24,52 @@ public class Playlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_playlist")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "nome", nullable = false, length = 255)
     private String nome;
 
-    @Column
+    @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
-    //Muitas playlists podem pertencer a um usuário.
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
+    @CreationTimestamp
+    @Column(name = "data_criacao", nullable = false, updatable = false)
+    private OffsetDateTime dataCriacao;
+
+    @OneToMany(
+            mappedBy = "playlist",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
     private List<PlaylistMusica> musicas = new ArrayList<>();
 
-    public Playlist() {
+    protected Playlist() {
+    }
+
+    public Playlist(String nome, String descricao, Usuario usuario) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.usuario = usuario;
+    }
+
+    public void adicionarMusica(Musica musica) {
+        PlaylistMusica item = new PlaylistMusica(this, musica);
+        this.musicas.add(item);
+    }
+
+    public boolean removerMusica(Long musicaId) {
+        return this.musicas.removeIf(item ->
+                Objects.equals(item.getMusica().getIdMusica(), musicaId)
+        );
     }
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getNome() {
@@ -61,11 +96,11 @@ public class Playlist {
         this.usuario = usuario;
     }
 
-    public List<PlaylistMusica> getMusicas() {
-        return musicas;
+    public OffsetDateTime getDataCriacao() {
+        return dataCriacao;
     }
 
-    public void setMusicas(List<PlaylistMusica> musicas) {
-        this.musicas = musicas;
+    public List<PlaylistMusica> getMusicas() {
+        return musicas;
     }
 }

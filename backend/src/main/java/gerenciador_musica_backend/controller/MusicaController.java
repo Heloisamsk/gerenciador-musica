@@ -1,18 +1,14 @@
 package gerenciador_musica_backend.controller;
 
-import gerenciador_musica_backend.dto.MusicaRequestDTO;
 import gerenciador_musica_backend.dto.MusicaResponseDTO;
 import gerenciador_musica_backend.service.MusicaService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/banco/musicas")
+@RequestMapping("/api/musicas")
 public class MusicaController {
 
     private final MusicaService musicaService;
@@ -21,14 +17,19 @@ public class MusicaController {
         this.musicaService = musicaService;
     }
 
-    @PostMapping
-    public ResponseEntity<MusicaResponseDTO> cadastrarMusica(
-            @Valid @RequestBody MusicaRequestDTO request
-    ) {
-        MusicaResponseDTO response = musicaService.cadastrarMusica(request);
+    @GetMapping
+    public ResponseEntity<List<MusicaResponseDTO>> listar() {
+        return ResponseEntity.ok(
+                musicaService.listarMusicas()
+        );
+    }
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
+    @GetMapping("/{id}")
+    public ResponseEntity<MusicaResponseDTO> buscarPorId(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(
+                musicaService.buscarPorId(id)
+        );
     }
 }
