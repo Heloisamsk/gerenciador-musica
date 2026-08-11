@@ -5,6 +5,7 @@ import { Home } from './pages/home/home';
 import { authGuard } from './guards/auth-guard';
 import { Playlists } from './pages/playlists/playlists';
 import { PlaylistDetalhe } from './pages/playlist-detalhe/playlist-detalhe';
+import { PlaylistNova } from './pages/playlist-nova/playlist-nova';
 
 export const routes: Routes = [
   {
@@ -34,45 +35,54 @@ export const routes: Routes = [
     }
   },
   {
-   path: 'admin/banco/usuarios',
-    loadComponent: () =>
-      import('./pages/admin-usuarios/admin-usuarios')
-        .then(modulo => modulo.AdminUsuarios),
-   canActivate: [authGuard],
-   data: {
-     expectedRole: 'ADMIN'
-   }
+  path: 'admin/banco/usuarios',
+  loadComponent: () =>
+    import('./pages/admin-usuarios/admin-usuarios')
+      .then(modulo => modulo.AdminUsuarios),
+  canActivate: [authGuard],
+  data: {
+    expectedRole: 'ADMIN'
+  }
   },
  { 
-    path: 'admin/banco/musicas', 
-    loadComponent: () =>
-      import('./pages/admin-musicas/admin-musicas')
-        .then(modulo => modulo.AdminMusicas),
-    canActivate: [authGuard],
-    data: {
-      expectedRole: 'ADMIN'
-    }
+  path: 'admin/banco/musicas', 
+  loadComponent: () =>
+    import('./pages/admin-musicas/admin-musicas')
+      .then(modulo => modulo.AdminMusicas),
+  canActivate: [authGuard],
+  data: {
+    expectedRole: 'ADMIN'
+  }
   },
   { 
-    path: 'admin/banco/musicas/nova', 
-    loadComponent: () =>
-      import('./pages/admin-musica-nova/admin-musica-nova')
-        .then(modulo => modulo.AdminMusicaNova),
-    canActivate: [authGuard],
-    data: {
-      expectedRole: 'ADMIN'
-    }
-  },
-  { path: 'playlists',
-     component: Playlists, 
-     canActivate: [authGuard] },
-  { path: 'playlists/:id', 
-    component: PlaylistDetalhe, 
-    canActivate: [authGuard] },
-
-  {
-    path: '**',
-    redirectTo: 'login'
+  path: 'admin/banco/musicas/nova', 
+  loadComponent: () =>
+    import('./pages/admin-musica-nova/admin-musica-nova')
+      .then(modulo => modulo.AdminMusicaNova),
+  canActivate: [authGuard],
+  data: {
+    expectedRole: 'ADMIN'
   }
+  },
+  { 
+  path: 'playlists',
+  component: Playlists, 
+  canActivate: [authGuard]
+},
+{ 
+  path: 'playlists/nova',
+  component: PlaylistNova,
+  canActivate: [authGuard]
+},
+{ 
+  path: 'playlists/:id', 
+  component: PlaylistDetalhe, 
+  canActivate: [authGuard]
+},
+
+{
+  path: '**',
+  redirectTo: 'login'
+}
 
 ];
