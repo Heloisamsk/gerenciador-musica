@@ -1,0 +1,137 @@
+:host {
+  --bg-base: #121212;         
+  --bg-elevated: #181818;     
+  --bg-hover: #2a2a2a;        
+  --text-base: #ffffff;       
+  --text-subdued: #a7a7a7;    
+  --brand-green: #1db954;     
+  --brand-green-hover: #1ed760; 
+}
+
+
+.container {
+  background-color: var(--bg-base);
+  color: var(--text-base);
+  min-height: 100vh;
+  padding: 32px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+
+.btn-atualizar {
+  background-color: transparent;
+  color: var(--text-base);
+  border: 1px solid var(--text-subdued);
+  border-radius: 500px; 
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-atualizar:hover:not(:disabled) {
+  border-color: var(--text-base);
+  transform: scale(1.04);
+}
+
+.btn-atualizar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+.tabela-container {
+  background-color: var(--bg-elevated);
+  border-radius: 8px;
+  padding: 0;
+  width: 100%;
+  overflow-x: auto; 
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 700px; 
+}
+
+
+th {
+  color: var(--text-subdued);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 12px 24px;
+  border-bottom: 1px solid #282828;
+}
+
+
+td {
+  padding: 16px 24px;
+  color: var(--text-subdued);
+  font-size: 14px;
+  border-bottom: 1px solid #282828;
+  transition: background-color 0.2s ease;
+}
+
+
+td strong {
+  color: var(--text-base);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
+tbody tr:hover td {
+  background-color: var(--bg-hover);
+  color: var(--text-base);
+}
+
+
+.status-box {
+  background-color: var(--bg-elevated);
+  border-radius: 8px;
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--text-subdued);
+}
+
+
+.status-box.error {
+  border-left: 4px solid #e22134; 
+}
+
+
+.status-box button {
+  margin-top: 24px;
+  background-color: var(--brand-green);
+  color: #000;
+  border: none;
+  border-radius: 500px;
+  padding: 12px 32px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.status-box button:hover {
+  background-color: var(--brand-green-hover);
+  transform: scale(1.04);
+}

@@ -1,0 +1,53 @@
+<div class="container">
+  <header class="header">
+    <h1>Catálogo de Músicas</h1>
+    <button class="btn-atualizar" (click)="carregarCatologo()" [disabled]="carregando">
+      🔄 Recarregar
+    </button>
+  </header>
+
+  @if (carregando) {
+    <div class="status-box loading">
+      <p>Carregando músicas...</p>
+    </div>
+  }
+  @else if (mensagemErro) {
+    <div class="status-box error">
+      <p>{{ mensagemErro }}</p>
+      <button (click)="carregarCatologo()">Tentar Novamente</button>
+    </div>
+  }
+  @else if (musicas.length === 0) {
+    <div class="status-box empty">
+      <p>Nenhuma música cadastrada no momento.</p>
+    </div>
+  }
+  @else {
+    <div class="tabela-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Artista</th>
+            <th>Álbum</th>
+            <th>Gênero</th>
+            <th>Ano</th>
+            <th>Duração (s)</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (musica of musicas; track musica.id) {
+            <tr>
+              <td><strong>{{ musica.titulo }}</strong></td>
+              <td>{{ musica.artista?.nome || '-' }}</td>
+              <td>{{ musica.album?.titulo || '-' }}</td>
+              <td>{{ musica.genero?.nome || '-' }}</td>
+              <td>{{ musica.anoLancamento }}</td>
+              <td>{{ musica.duracao }}s</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
