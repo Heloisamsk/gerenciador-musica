@@ -1,6 +1,16 @@
 package gerenciador_musica_backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +52,39 @@ public class Usuario {
             nullable = false,
             length = 255
     )
-
-    // Um usuário pode ter Muitas playlists.
-    @OneToMany(mappedBy = "usuario")
-    private List<Playlist> playlists = new ArrayList<>();
     private Role role;
 
+    @OneToMany(
+            mappedBy = "usuario",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Playlist> playlists = new ArrayList<>();
+
     public Usuario() {
+    }
+
+    public Usuario(
+            String nome,
+            String email,
+            String senha,
+            Role role
+    ) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.role = role;
+    }
+
+    public void adicionarPlaylist(Playlist playlist) {
+        playlists.add(playlist);
+        playlist.setUsuario(this);
+    }
+
+    public void removerPlaylist(Playlist playlist) {
+        playlists.remove(playlist);
+        playlist.setUsuario(null);
     }
 
     public Long getId() {
@@ -85,5 +121,9 @@ public class Usuario {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public List<Playlist> getPlaylists() {
+        return playlists;
     }
 }
