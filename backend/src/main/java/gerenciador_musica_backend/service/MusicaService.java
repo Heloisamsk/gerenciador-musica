@@ -3,6 +3,7 @@ package gerenciador_musica_backend.service;
 import gerenciador_musica_backend.dto.*;
 import gerenciador_musica_backend.exception.DadosMusicaInvalidosException;
 import gerenciador_musica_backend.exception.MusicaDuplicadaException;
+import gerenciador_musica_backend.exception.MusicaNaoEncontradaException;
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Genero;
@@ -11,13 +12,11 @@ import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.GeneroRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -488,6 +487,26 @@ public class MusicaService {
                 genero.getIdGenero(),
                 genero.getNome()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<MusicaResponseDTO> listarMusicas() {
+        return musicaRepository
+                .findAll(Sort.by(Sort.Direction.ASC, "titulo"))
+                .stream()
+                .map(this::converterParaResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public MusicaResponseDTO buscarPorId(Long id) {
+        Musica musica = musicaRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new MusicaNaoEncontradaException(id)
+                );
+
+        return converterParaResponse(musica);
     }
 }
 
