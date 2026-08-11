@@ -1,53 +1,140 @@
-<div class="container">
-  <header class="header">
-    <h1>Catálogo de Músicas</h1>
-    <button class="btn-atualizar" (click)="carregarCatologo()" [disabled]="carregando">
-      🔄 Recarregar
-    </button>
-  </header>
+<section class="musicas-page">
+  <div class="musicas-card">
+    <header class="musicas-header">
+      <div class="musicas-title-wrapper" style="display: flex; align-items: center; gap: 1.5rem;">
+        <img 
+          src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" 
+          alt="Logo do Spotify" 
+          style="width: 45px; height: auto;"
+        />
+        <div class="musicas-title">
+          <p class="section-label">Painel administrativo</p>
+          <h1>Catálogo de Músicas</h1>
+          <p>
+            Veja as músicas cadastradas no sistema.
+          </p>
+        </div>
+      </div>
+      <button
+        class="atualizar-button"
+        type="button"
+        (click)="carregarCatalogo()"
+        [disabled]="carregando"
+      >
+        @if (carregando) {
+        Carregando...
+        } @else {
+        Atualizar
+        }
+      </button>
+    </header>
 
-  @if (carregando) {
-    <div class="status-box loading">
+    <div class="database-visual">
+      <img
+        src="/ari.gif"
+        alt="ari"
+      />
+    </div>
+
+    @if (carregando) {
+    <div
+      class="status-message loading-message"
+      role="status"
+      aria-live="polite"
+    >
       <p>Carregando músicas...</p>
     </div>
-  }
-  @else if (mensagemErro) {
-    <div class="status-box error">
+    }
+
+    @else if (mensagemErro) {
+    <div
+      class="status-message error-message"
+      role="alert"
+    >
+      <h2>Não foi possível carregar a listagem</h2>
+
       <p>{{ mensagemErro }}</p>
-      <button (click)="carregarCatologo()">Tentar Novamente</button>
+
+      <button
+        class="tentar-novamente-button"
+        type="button"
+        (click)="carregarCatalogo()"
+      >
+        Tentar novamente
+      </button>
     </div>
-  }
-  @else if (musicas.length === 0) {
-    <div class="status-box empty">
-      <p>Nenhuma música cadastrada no momento.</p>
+    }
+
+    @else if (musicas.length === 0) {
+    <div
+      class="status-message empty-message"
+      role="status"
+    >
+      <h2>Nenhuma música encontrada</h2>
+
+      <p>
+        Ainda não existem músicas cadastradas no sistema.
+      </p>
     </div>
-  }
-  @else {
-    <div class="tabela-container">
-      <table>
+    }
+
+    @else {
+    <div class="table-information">
+      <p>
+        Total de músicas:
+        <strong>{{ musicas.length }}</strong>
+      </p>
+    </div>
+
+    <div class="table-container">
+      <table class="musicas-table">
+        <caption class="sr-only">
+          Lista de músicas cadastradas no sistema
+        </caption>
+
         <thead>
-          <tr>
-            <th>Título</th>
-            <th>Artista</th>
-            <th>Álbum</th>
-            <th>Gênero</th>
-            <th>Ano</th>
-            <th>Duração (s)</th>
-          </tr>
+        <tr>
+          <th scope="col">Título</th>
+          <th scope="col">Artista</th>
+          <th scope="col">Álbum</th>
+          <th scope="col">Gênero</th>
+          <th scope="col">Ano</th>
+          <th scope="col">Duração</th>
+        </tr>
         </thead>
+
         <tbody>
-          @for (musica of musicas; track musica.id) {
-            <tr>
-              <td><strong>{{ musica.titulo }}</strong></td>
-              <td>{{ musica.artista?.nome || '-' }}</td>
-              <td>{{ musica.album?.titulo || '-' }}</td>
-              <td>{{ musica.genero?.nome || '-' }}</td>
-              <td>{{ musica.anoLancamento }}</td>
-              <td>{{ musica.duracao }}s</td>
-            </tr>
-          }
+        @for (musica of musicas; track musica.id) {
+        <tr>
+          <td data-label="Título">
+            <strong>{{ musica.titulo }}</strong>
+          </td>
+
+          <td data-label="Artista">
+            {{ musica.artista?.nome || '-' }}
+          </td>
+
+          <td data-label="Álbum">
+            {{ musica.album?.titulo || '-' }}
+          </td>
+
+          <td data-label="Gênero">
+            {{ musica.genero?.nome || '-' }}
+          </td>
+
+          <td data-label="Ano">
+            {{ musica.anoLancamento }}
+          </td>
+
+          <td data-label="Duração">
+            {{ musica.duracao }}s
+          </td>
+        </tr>
+        }
         </tbody>
       </table>
     </div>
-  }
-</div>
+    }
+
+  </div>
+</section>
