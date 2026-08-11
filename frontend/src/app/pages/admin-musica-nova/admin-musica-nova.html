@@ -1,0 +1,61 @@
+<div class="cadastro-container">
+  <div class="cadastro-card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Logo do Spotify" class="login-logo" />
+    <h2 class="cadastro-title">Cadastrar Música</h2>
+    <div class="alerta alerta-sucesso" *ngIf="mensagemSucesso">
+      {{ mensagemSucesso }}
+    </div>
+    <div class="alerta alerta-erro" *ngIf="mensagemErro">
+      {{ mensagemErro }}
+    </div>
+    <form class="cadastro-form" [formGroup]="formularioMusica" (ngSubmit)="salvar()">
+
+      <div class="form-group">
+        <label>Título da Música</label>
+        <input type="text" class="form-input" formControlName="titulo" placeholder="Ex: Bohemian Rhapsody">
+        <small class="error-message" *ngIf="formularioMusica.get('titulo')?.invalid && formularioMusica.get('titulo')?.touched">
+          O título é obrigatório.
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Duração (em segundos)</label>
+        <input type="text" class="form-input" formControlName="duracao" placeholder="Ex: 355">
+        <small class="error-message" *ngIf="formularioMusica.get('duracao')?.invalid && formularioMusica.get('duracao')?.touched">
+          A duração é obrigatória.
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Ano de Lançamento</label>
+        <input type="number" class="form-input" formControlName="anoLancamento" placeholder="Ex: 1975">
+        <small class="error-message" *ngIf="formularioMusica.get('anoLancamento')?.invalid && formularioMusica.get('anoLancamento')?.touched">
+          O ano é obrigatório.
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Gênero</label>
+        <input type="text" class="form-input" formControlName="genero" placeholder="Ex: Rock">
+        <small class="error-message" *ngIf="formularioMusica.get('genero')?.invalid && formularioMusica.get('genero')?.touched">
+          O gênero é obrigatório.
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Artista</label>
+        <input type="text" class="form-input" formControlName="artista" placeholder="Ex: Queen">
+        <small class="error-message" *ngIf="formularioMusica.get('artista')?.invalid && formularioMusica.get('artista')?.touched">
+          O artista é obrigatório.
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Álbum</label>
+        <input type="text" class="form-input" formControlName="album" placeholder="Ex: A Night at the Opera">
+        <small class="error-message" *ngIf="formularioMusica.get('album')?.invalid && formularioMusica.get('album')?.touched">
+          O álbum é obrigatório.
+        </small>
+      </div>
+      <button type="submit" class="cadastro-btn" [disabled]="formularioMusica.invalid || carregando">
+        <span *ngIf="!carregando">Salvar Música</span>
+        <span *ngIf="carregando">Salvando...</span>
+      </button>
+    </form>
+  </div>
+</div>

@@ -51,6 +51,16 @@ export const routes: Routes = [
       expectedRole: 'ADMIN'
     }
   },
+  { 
+    path: 'admin/banco/musicas/nova', 
+    loadComponent: () =>
+      import('./pages/admin-musica-nova/admin-musica-nova')
+        .then(modulo => modulo.AdminMusicaNova),
+    canActivate: [authGuard],
+    data: {
+      expectedRole: 'ADMIN'
+    }
+  },
 
   {
     path: '**',
