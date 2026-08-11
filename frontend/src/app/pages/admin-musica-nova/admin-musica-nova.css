@@ -1,0 +1,124 @@
+.cadastro-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  background-color: #121212;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 2rem;
+}
+
+.cadastro-card {
+  background-color: #181818;
+  border: 1px solid #282828;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  width: 100%;
+  max-width: 500px;
+}
+
+.login-logo {
+  width: 45px; /* Controla o tamanho da logo*/
+  height: auto;
+  display: block;
+  margin: 0 auto 20px auto;
+}
+
+.cadastro-title {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #ffffff;
+  font-size: 1.8rem;
+}
+
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  color: #b3b3b3;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.form-input {
+  padding: 12px;
+  background-color: #282828;
+  color: white;
+  border: 1px solid #3e3e3e;
+  border-radius: 6px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box; /* Garante que o padding não estoure a largura */
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #1db954;
+}
+
+.error-message {
+  color: #ff6b6b;
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.cadastro-btn {
+  background-color: #1db954;
+  color: #000000;
+  font-weight: bold;
+  padding: 14px;
+  border: none;
+  border-radius: 500px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: 100%;
+}
+
+.cadastro-btn:hover:not([disabled]) {
+  background-color: #1ed760;
+  transform: scale(1.01);
+}
+
+.cadastro-btn[disabled] {
+  background-color: #535353;
+  color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+/* Alertas */
+.alerta {
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.alerta-sucesso {
+  background-color: rgba(29, 185, 84, 0.15);
+  color: #1db954;
+  border: 1px solid #1db954;
+}
+
+.alerta-erro {
+  background-color: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+  border: 1px solid #ff6b6b;
+}
