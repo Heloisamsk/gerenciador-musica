@@ -48,7 +48,7 @@ public class Playlist {
     )
     private List<PlaylistMusica> musicas = new ArrayList<>();
 
-    protected Playlist() {
+    public Playlist() {
     }
 
     public Playlist(String nome, String descricao, Usuario usuario) {
