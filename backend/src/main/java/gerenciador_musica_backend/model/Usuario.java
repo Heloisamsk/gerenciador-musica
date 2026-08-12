@@ -11,7 +11,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,6 +63,17 @@ public class Usuario {
             orphanRemoval = true
     )
     private List<Playlist> playlists = new ArrayList<>();
+
+    @Column(name = "username", length = 30)
+    private String username;
+
+    @CreationTimestamp
+    @Column(
+            name = "data_cadastro",
+            nullable = false,
+            updatable = false
+    )
+    private OffsetDateTime dataCadastro;
 
     public Usuario() {
     }
@@ -125,5 +138,21 @@ public class Usuario {
 
     public List<Playlist> getPlaylists() {
         return playlists;
+    }
+
+    public OffsetDateTime getDataCadastro() {
+        return dataCadastro;
+    }
+
+    public void setDataCadastro(OffsetDateTime dataCadastro) {
+        this.dataCadastro = dataCadastro;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
