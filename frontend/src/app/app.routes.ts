@@ -6,6 +6,7 @@ import { authGuard } from './guards/auth-guard';
 import { Playlists } from './pages/playlists/playlists';
 import { PlaylistDetalhe } from './pages/playlist-detalhe/playlist-detalhe';
 import { PlaylistNova } from './pages/playlist-nova/playlist-nova';
+import { Catalogo } from './pages/catalogo/catalogo';
 
 export const routes: Routes = [
   {
@@ -44,8 +45,8 @@ export const routes: Routes = [
     expectedRole: 'ADMIN'
   }
   },
- { 
-  path: 'admin/banco/musicas', 
+ {
+  path: 'admin/banco/musicas',
   loadComponent: () =>
     import('./pages/admin-musicas/admin-musicas')
       .then(modulo => modulo.AdminMusicas),
@@ -54,8 +55,8 @@ export const routes: Routes = [
     expectedRole: 'ADMIN'
   }
   },
-  { 
-  path: 'admin/banco/musicas/nova', 
+  {
+  path: 'admin/banco/musicas/nova',
   loadComponent: () =>
     import('./pages/admin-musica-nova/admin-musica-nova')
       .then(modulo => modulo.AdminMusicaNova),
@@ -64,19 +65,25 @@ export const routes: Routes = [
     expectedRole: 'ADMIN'
   }
   },
-  { 
+  {
   path: 'playlists',
-  component: Playlists, 
+  component: Playlists,
   canActivate: [authGuard]
 },
-{ 
+{
   path: 'playlists/nova',
   component: PlaylistNova,
   canActivate: [authGuard]
 },
-{ 
-  path: 'playlists/:id', 
-  component: PlaylistDetalhe, 
+{
+  path: 'playlists/:id',
+  component: PlaylistDetalhe,
+  canActivate: [authGuard]
+},
+
+{
+  path: 'playlists/:id/catalogo',
+  component: Catalogo,
   canActivate: [authGuard]
 },
 

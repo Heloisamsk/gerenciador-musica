@@ -1,0 +1,62 @@
+<div class="spotify-container">
+  <h2 class="page-title">Catálogo de Músicas</h2>
+
+  @if (mensagemSucesso) {
+    <div class="alert success">
+      {{ mensagemSucesso }}
+    </div>
+  }
+
+  @if (mensagemErro) {
+    <div class="alert error">
+      {{ mensagemErro }}
+    </div>
+  }
+
+  <div class="musica-list">
+
+    @for (musica of musicas; track musica.id) {
+      <div class="musica-row">
+
+        <div class="musica-left">
+          <div class="musica-cover">
+            <span class="cover-icon">🎵</span>
+          </div>
+
+          <div class="musica-info">
+            <span class="musica-title">{{ musica.titulo }}</span>
+            <span class="musica-subtitle">
+              <span class="badge-explicit">E</span>
+              Música • {{ musica.artista?.nome || 'Desconhecido' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="musica-right">
+          <span class="musica-badge">Música</span>
+
+          <button
+            class="btn-add"
+            (click)="adicionarMusica(musica.id)"
+            [disabled]="loadingAdicionar[musica.id] || musicasAdicionadas[musica.id]"
+            [class.is-added]="musicasAdicionadas[musica.id]"
+            title="Adicionar à playlist"
+          >
+            @if (loadingAdicionar[musica.id]) {
+              <span class="loading-dots">...</span>
+            } @else if (musicasAdicionadas[musica.id]) {
+              <span>✓</span>
+            } @else {
+              <span>+</span>
+            }
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="musica-row">
+        <p>Nenhuma música encontrada no catálogo.</p>
+      </div>
+    }
+
+  </div>
+</div>

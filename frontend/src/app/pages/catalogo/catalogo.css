@@ -1,0 +1,146 @@
+.spotify-container {
+  background-color: #121212;
+  color: white;
+  min-height: 100vh;
+  padding: 30px;
+  font-family: 'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.page-title {
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.musica-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.musica-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.musica-row:hover {
+  background-color: #2a2a2a;
+}
+
+.musica-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.musica-cover {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  background-color: #282828;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.musica-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.musica-title {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.musica-subtitle {
+  font-size: 14px;
+  color: #b3b3b3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-explicit {
+  background-color: #b3b3b3;
+  color: #121212;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.musica-right {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.musica-badge {
+  background-color: transparent;
+  color: #b3b3b3;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid #727272;
+}
+
+.btn-add {
+  background: transparent;
+  border: 1px solid #727272;
+  color: #727272;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.btn-add:hover:not([disabled]) {
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.btn-add.is-added {
+  border-color: #1db954;
+  color: #1db954;
+  background-color: transparent;
+}
+
+.btn-add[disabled] {
+  cursor: default;
+}
+
+.loading-dots {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.alert {
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.success {
+  background-color: #1db954;
+  color: white;
+}
+.error {
+  background-color: #e22134;
+  color: white;
+}
