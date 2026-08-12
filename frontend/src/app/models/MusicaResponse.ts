@@ -1,10 +1,10 @@
 export interface MusicaResponse {
   id: number;
   titulo: string;
-  duracao: number;
+  duracaoSegundos: number;
   anoLancamento: number;
-  genero: GeneroResumo;
-  artista: ArtistaResumo;
+  generos: GeneroResumo[];
+  artistaPrincipal: ArtistaResumo;
   album: AlbumResumo;
 }
 
