@@ -40,10 +40,6 @@ public class PlaylistService {
         this.musicaRepository = musicaRepository;
     }
 
-    public PlaylistService(PlaylistRepository playlistRepository, UsuarioRepository usuarioRepository) {
-        this.playlistRepository = playlistRepository;
-        this.usuarioRepository = usuarioRepository;
-    }
     //pegar o usuário autenticado
     private Usuario obterUsuarioAutenticado() {
 
