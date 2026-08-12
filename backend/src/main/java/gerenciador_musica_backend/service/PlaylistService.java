@@ -125,7 +125,7 @@ public class PlaylistService {
         return responseDTO;
     }
     @Transactional
-    public PlaylistResponseDTO adicionarMusica(Long playlistId, Long musicaId) {
+    public void adicionarMusica(Long playlistId, Long musicaId) {
 
         Usuario usuario = obterUsuarioAutenticado();
 
@@ -157,8 +157,6 @@ public class PlaylistService {
         playlist.adicionarMusica(musica);
         playlistRepository.save(playlist);
 
-        // 6. Retornar playlist atualizada
-        return converterParaResponseDTO(playlist);
     }
 
 }
