@@ -1,0 +1,224 @@
+:host {
+  display: block;
+
+  --background: #0f0f0f;
+  --card-background: #181818;
+  --field-background: #202020;
+  --border-color: #343434;
+  --primary: #1ed760;
+  --primary-hover: #1fdf64;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --error: #ff6b6b;
+
+  min-height: 100vh;
+  color: var(--text-primary);
+  background-color: var(--background);
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.playlist-nova-page {
+  min-height: 100vh;
+  padding: 2rem;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #1c1c1c 0%,
+      var(--background) 45%
+    );
+}
+
+.playlist-nova-card {
+  width: 100%;
+  max-width: 640px;
+
+  margin: 0 auto;
+  padding: 2rem;
+
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+
+  box-shadow:
+    0 1.5rem 4rem
+    rgb(0 0 0 / 35%);
+}
+
+.voltar-link {
+  display: inline-block;
+
+  margin-bottom: 1.5rem;
+
+  color: var(--text-secondary);
+  text-decoration: none;
+
+  font-size: 0.9rem;
+
+  transition: color 150ms ease;
+}
+
+.voltar-link:hover {
+  color: var(--primary);
+}
+
+.playlist-nova-header {
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-label {
+  margin: 0;
+
+  color: var(--primary);
+
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+}
+
+.playlist-nova-header h1 {
+  margin: 0.5rem 0 0;
+
+  color: var(--text-primary);
+
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.playlist-nova-header > p:last-child {
+  margin: 0.5rem 0 0;
+
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.playlist-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.campo label {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.campo input,
+.campo textarea {
+  padding: 0.75rem 1rem;
+
+  color: var(--text-primary);
+  background-color: var(--field-background);
+
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+
+  font-size: 0.95rem;
+  font-family: inherit;
+
+  transition: border-color 150ms ease;
+}
+
+.campo input:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.campo input.campo-invalido {
+  border-color: var(--error);
+}
+
+.campo textarea {
+  resize: vertical;
+}
+
+.mensagem-validacao {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.85rem;
+}
+
+.status-message {
+  padding: 1rem;
+
+  background-color: var(--field-background);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+}
+
+.status-message p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.error-message {
+  color: var(--error);
+  border-color: rgb(255 107 107 / 40%);
+}
+
+.criar-button {
+  align-self: flex-start;
+
+  min-width: 10rem;
+
+  padding: 0.8rem 1.4rem;
+
+  color: #000000;
+  background-color: var(--primary);
+
+  border: none;
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.criar-button:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  transform: scale(1.03);
+}
+
+.criar-button:disabled {
+  color: #777777;
+  background-color: #333333;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .playlist-nova-page {
+    padding: 1rem;
+  }
+
+  .playlist-nova-card {
+    padding: 1.25rem;
+  }
+
+  .criar-button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,256 @@
+:host {
+  display: block;
+
+  --background: #0f0f0f;
+  --card-background: #181818;
+  --table-background: #202020;
+  --table-row-hover: #292929;
+  --border-color: #343434;
+  --primary: #1ed760;
+  --primary-hover: #1fdf64;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --error: #ff6b6b;
+
+  min-height: 100vh;
+  color: var(--text-primary);
+  background-color: var(--background);
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.playlist-detalhe-page {
+  min-height: 100vh;
+  padding: 2rem;
+
+  background:
+    radial-gradient(
+      circle at top,
+      #1c1c1c 0%,
+      var(--background) 45%
+    );
+}
+
+.playlist-detalhe-card {
+  width: 100%;
+  max-width: 1200px;
+  min-height: calc(100vh - 4rem);
+
+  margin: 0 auto;
+  padding: 2rem;
+
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+
+  box-shadow:
+    0 1.5rem 4rem
+    rgb(0 0 0 / 35%);
+}
+
+.voltar-link {
+  display: inline-block;
+
+  margin-bottom: 1.5rem;
+
+  color: var(--text-secondary);
+  text-decoration: none;
+
+  font-size: 0.9rem;
+
+  transition: color 150ms ease;
+}
+
+.voltar-link:hover {
+  color: var(--primary);
+}
+
+.playlist-header {
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-label {
+  margin: 0;
+
+  color: var(--primary);
+
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+}
+
+.playlist-header h1 {
+  margin: 0.5rem 0 0;
+
+  color: var(--text-primary);
+
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+}
+
+.playlist-descricao {
+  margin: 0.75rem 0 0;
+
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.tentar-novamente-button {
+  min-width: 9rem;
+
+  padding: 0.8rem 1.4rem;
+
+  color: #000000;
+  background-color: var(--primary);
+
+  border: none;
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: background-color 150ms ease;
+}
+
+.tentar-novamente-button:hover {
+  background-color: var(--primary-hover);
+}
+
+.status-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+
+  min-height: 18rem;
+
+  padding: 2rem;
+
+  text-align: center;
+
+  background-color: var(--table-background);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+}
+
+.status-message h2 {
+  margin: 0;
+}
+
+.status-message p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.error-message {
+  color: var(--error);
+  border-color: rgb(255 107 107 / 40%);
+}
+
+.table-information {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 1rem;
+}
+
+.table-information p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.table-information strong {
+  color: var(--text-primary);
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+
+  background-color: var(--table-background);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+}
+
+.musicas-table {
+  width: 100%;
+  min-width: 30rem;
+
+  border-collapse: collapse;
+}
+
+.musicas-table th,
+.musicas-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+}
+
+.musicas-table th {
+  color: var(--text-secondary);
+  background-color: #171717;
+
+  border-bottom: 1px solid var(--border-color);
+
+  font-size: 0.75rem;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+}
+
+.musicas-table td {
+  color: var(--text-primary);
+
+  border-bottom: 1px solid var(--border-color);
+}
+
+.musicas-table tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.musicas-table tbody tr:hover {
+  background-color: var(--table-row-hover);
+}
+
+.musicas-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 700px) {
+  .playlist-detalhe-page {
+    padding: 1rem;
+  }
+
+  .playlist-detalhe-card {
+    min-height: calc(100vh - 2rem);
+    padding: 1.25rem;
+  }
+}

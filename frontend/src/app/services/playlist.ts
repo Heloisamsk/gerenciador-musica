@@ -10,7 +10,7 @@ import { PlaylistResponse } from '../models/PlaylistResponse';
 })
 
 export class PlaylistService {
-  private apiUrl = 'http://localhost:8080/playlists';
+  private apiUrl = 'http://localhost:8080/api/playlists';
 
   constructor(private http: HttpClient) { }
 
@@ -20,9 +20,9 @@ export class PlaylistService {
   }
 
   listarMinhas(): Observable<PlaylistResponse[]> {
-    return this.http.get<PlaylistResponse[]>(`${this.apiUrl}/minhas`)
-      .pipe(catchError(this.handleError));
-  }
+  return this.http.get<PlaylistResponse[]>(this.apiUrl)
+    .pipe(catchError(this.handleError));
+}
 
   buscarPorId(id: number): Observable<PlaylistResponse> {
     return this.http.get<PlaylistResponse>(`${this.apiUrl}/${id}`)
