@@ -1,0 +1,97 @@
+<section class="playlist-detalhe-page">
+  <div class="playlist-detalhe-card">
+
+    <a class="voltar-link" routerLink="/playlists">
+      ← Voltar para playlists
+    </a>
+
+    @if (carregando) {
+    <div
+      class="status-message loading-message"
+      role="status"
+      aria-live="polite"
+    >
+      <p>Carregando playlist...</p>
+    </div>
+    }
+
+    @else if (mensagemErro) {
+    <div
+      class="status-message error-message"
+      role="alert"
+    >
+      <h2>Não foi possível carregar a playlist</h2>
+
+      <p>{{ mensagemErro }}</p>
+
+      <button
+        class="tentar-novamente-button"
+        type="button"
+        (click)="carregarPlaylist()"
+      >
+        Tentar novamente
+      </button>
+    </div>
+    }
+
+    @else if (playlist) {
+    <header class="playlist-header">
+      <p class="section-label">Playlist</p>
+      <h1>{{ playlist.nome }}</h1>
+
+      @if (playlist.descricao) {
+      <p class="playlist-descricao">{{ playlist.descricao }}</p>
+      }
+    </header>
+
+    @if (playlist.musicas.length === 0) {
+    <div
+      class="status-message empty-message"
+      role="status"
+    >
+      <h2>Essa playlist ainda não tem músicas</h2>
+
+      <p>
+        Adicione músicas ao catálogo para começar a montar sua playlist.
+      </p>
+    </div>
+    }
+
+    @else {
+    <div class="table-information">
+      <p>
+        Total de músicas:
+        <strong>{{ playlist.musicas.length }}</strong>
+      </p>
+    </div>
+
+    <div class="table-container">
+      <table class="musicas-table">
+        <caption class="sr-only">
+          Músicas da playlist {{ playlist.nome }}
+        </caption>
+
+        <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Título</th>
+          <th scope="col">Artista</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        @for (musica of playlist.musicas; track musica.id; let i = $index) {
+        <tr>
+          <td data-label="#">{{ i + 1 }}</td>
+          <td data-label="Título"><strong>{{ musica.titulo }}</strong></td>
+          <td data-label="Artista">{{ musica.artista }}</td>
+        </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+    }
+    }
+
+  </div>
+</section>

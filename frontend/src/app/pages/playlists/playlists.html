@@ -1,0 +1,93 @@
+<section class="playlists-page">
+  <div class="playlists-card">
+    <header class="playlists-header">
+      <div class="playlists-title-wrapper" style="display: flex; align-items: center; gap: 1.5rem;">
+        <img 
+          src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" 
+          alt="Logo do Spotify" 
+          style="width: 45px; height: auto;"
+        />
+        <div class="playlists-title">
+          <p class="section-label">Minha biblioteca</p>
+          <h1>Minhas Playlists</h1>
+          <p>
+            Veja as playlists que você criou.
+          </p>
+        </div>
+      </div>
+
+      <a class="nova-playlist-button" routerLink="/playlists/nova">
+        + Nova playlist
+      </a>
+    </header>
+
+    @if (carregando) {
+    <div
+      class="status-message loading-message"
+      role="status"
+      aria-live="polite"
+    >
+      <p>Carregando playlists...</p>
+    </div>
+    }
+
+    @else if (mensagemErro) {
+    <div
+      class="status-message error-message"
+      role="alert"
+    >
+      <h2>Não foi possível carregar a listagem</h2>
+
+      <p>{{ mensagemErro }}</p>
+
+      <button
+        class="tentar-novamente-button"
+        type="button"
+        (click)="carregarPlaylists()"
+      >
+        Tentar novamente
+      </button>
+    </div>
+    }
+
+    @else if (playlists.length === 0) {
+    <div
+      class="status-message empty-message"
+      role="status"
+    >
+      <h2>Nenhuma playlist criada ainda</h2>
+
+      <p>
+        Crie sua primeira playlist para começar a organizar suas músicas.
+      </p>
+
+      <a class="nova-playlist-button" routerLink="/playlists/nova">
+        + Nova playlist
+      </a>
+    </div>
+    }
+
+    @else {
+    <div class="playlists-grid">
+      @for (playlist of playlists; track playlist.id) {
+      <a 
+        class="playlist-card"
+        [routerLink]="['/playlists', playlist.id]"
+      >
+        <h3>{{ playlist.nome }}</h3>
+
+        @if (playlist.descricao) {
+        <p class="playlist-descricao">{{ playlist.descricao }}</p>
+        }
+
+        <p class="playlist-contagem">
+          {{ playlist.musicas.length }}
+          {{ playlist.musicas.length === 1 ? 'música' : 'músicas' }}
+        </p>
+      </a>
+      }
+    </div>
+    }
+
+  </div>
+</section>
