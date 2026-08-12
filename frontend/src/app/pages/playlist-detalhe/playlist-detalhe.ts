@@ -21,6 +21,7 @@ export class PlaylistDetalhe implements OnInit {
   playlist: PlaylistResponse | null = null;
   carregando = false;
   mensagemErro = '';
+  removendoMusicaId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -66,6 +67,39 @@ export class PlaylistDetalhe implements OnInit {
           } else {
             this.mensagemErro = 'Não foi possível carregar a playlist. Tente novamente mais tarde.';
           }
+        }
+      });
+  }
+
+  removerMusica(musicaId: number): void {
+    if (!this.playlist || this.removendoMusicaId !== null) {
+      return;
+    }
+
+    this.removendoMusicaId = musicaId;
+    this.mensagemErro = '';
+
+    this.playlistService.removerMusica(this.playlist.id, musicaId)
+      .pipe(
+        finalize(() => {
+          this.removendoMusicaId = null;
+          this.changeDetectorRef.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          if (this.playlist) {
+            this.playlist = {
+              ...this.playlist,
+              musicas: this.playlist.musicas.filter(
+                musica => musica.id !== musicaId
+              )
+            };
+          }
+        },
+        error: (erro: HttpErrorResponse) => {
+          console.error(erro);
+          this.mensagemErro = 'Não foi possível remover a música. Tente novamente.';
         }
       });
   }

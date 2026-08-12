@@ -2,11 +2,11 @@
   <div class="cadastro-card">
     <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Logo do Spotify" class="login-logo" />
     <h2 class="cadastro-title">Cadastrar Música</h2>
-    <div class="alerta alerta-sucesso" *ngIf="mensagemSucesso">
-      {{ mensagemSucesso }}
+    <div class="alerta alerta-sucesso" *ngIf="mensagemSucesso()">
+      {{ mensagemSucesso() }}
     </div>
-    <div class="alerta alerta-erro" *ngIf="mensagemErro">
-      {{ mensagemErro }}
+    <div class="alerta alerta-erro" *ngIf="mensagemErro()">
+      {{ mensagemErro() }}
     </div>
     <form class="cadastro-form" [formGroup]="formularioMusica" (ngSubmit)="salvar()">
 
@@ -52,9 +52,9 @@
           O álbum é obrigatório.
         </small>
       </div>
-      <button type="submit" class="cadastro-btn" [disabled]="formularioMusica.invalid || carregando">
-        <span *ngIf="!carregando">Salvar Música</span>
-        <span *ngIf="carregando">Salvando...</span>
+      <button type="submit" class="cadastro-btn" [disabled]="formularioMusica.invalid || carregando()">
+        <span *ngIf="!carregando()">Salvar Música</span>
+        <span *ngIf="carregando()">Salvando...</span>
       </button>
     </form>
   </div>

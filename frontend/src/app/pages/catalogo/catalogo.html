@@ -1,21 +1,25 @@
 <div class="spotify-container">
+  <a class="voltar-link" [routerLink]="['/playlists', playlistId]">
+    ← Voltar para a playlist
+  </a>
+
   <h2 class="page-title">Catálogo de Músicas</h2>
 
-  @if (mensagemSucesso) {
+  @if (mensagemSucesso()) {
     <div class="alert success">
-      {{ mensagemSucesso }}
+      {{ mensagemSucesso() }}
     </div>
   }
 
-  @if (mensagemErro) {
+  @if (mensagemErro()) {
     <div class="alert error">
-      {{ mensagemErro }}
+      {{ mensagemErro() }}
     </div>
   }
 
   <div class="musica-list">
 
-    @for (musica of musicas; track musica.id) {
+    @for (musica of musicas(); track musica.id) {
       <div class="musica-row">
 
         <div class="musica-left">
@@ -27,7 +31,7 @@
             <span class="musica-title">{{ musica.titulo }}</span>
             <span class="musica-subtitle">
               <span class="badge-explicit">E</span>
-              Música • {{ musica.artista?.nome || 'Desconhecido' }}
+              Música • {{ musica.artistaPrincipal?.nome || 'Desconhecido' }}
             </span>
           </div>
         </div>
@@ -38,13 +42,13 @@
           <button
             class="btn-add"
             (click)="adicionarMusica(musica.id)"
-            [disabled]="loadingAdicionar[musica.id] || musicasAdicionadas[musica.id]"
-            [class.is-added]="musicasAdicionadas[musica.id]"
+            [disabled]="loadingAdicionar()[musica.id] || musicasAdicionadas()[musica.id]"
+            [class.is-added]="musicasAdicionadas()[musica.id]"
             title="Adicionar à playlist"
           >
-            @if (loadingAdicionar[musica.id]) {
+            @if (loadingAdicionar()[musica.id]) {
               <span class="loading-dots">...</span>
-            } @else if (musicasAdicionadas[musica.id]) {
+            } @else if (musicasAdicionadas()[musica.id]) {
               <span>✓</span>
             } @else {
               <span>+</span>

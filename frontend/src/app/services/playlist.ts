@@ -34,6 +34,11 @@ export class PlaylistService {
       .pipe(catchError(this.handleError));
   }
 
+  removerMusica(playlistId: number, musicaId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${playlistId}/musicas/${musicaId}`)
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Ocorreu um erro desconhecido!';
     if (error.error instanceof ErrorEvent) {
