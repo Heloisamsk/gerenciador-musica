@@ -10,6 +10,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import gerenciador_musica_backend.dto.MusicaResumoDTO;
+import gerenciador_musica_backend.exception.PlaylistAcessoNegadoException;
+import gerenciador_musica_backend.exception.PlaylistNaoEncontradaException;
+import gerenciador_musica_backend.model.PlaylistMusica;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PlaylistService {
 
@@ -21,7 +29,67 @@ public class PlaylistService {
         this.playlistRepository = playlistRepository;
         this.usuarioRepository = usuarioRepository;
     }
+    //pegar o usuário autenticado
+    private Usuario obterUsuarioAutenticado() {
 
+        String email = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado."));
+    }
+
+    // usuario so recebe as playlist dele
+    @Transactional(readOnly = true)
+    public List<PlaylistResponseDTO> listarMinhasPlaylists() {
+        Usuario usuario = obterUsuarioAutenticado();
+
+        List<Playlist> playlists =
+                playlistRepository.findByUsuarioIdOrderByDataCriacaoDesc(usuario.getId());
+
+        return playlists.stream()
+                .map(this::converterParaResponseDTO)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public PlaylistResponseDTO buscarPlaylist(Long id) {
+
+        Usuario usuario = obterUsuarioAutenticado();
+
+        Playlist playlist = playlistRepository.buscarComMusicasPorId(id)
+                .orElseThrow(() -> new PlaylistNaoEncontradaException("Playlist não encontrada."));
+
+        if (!playlist.getUsuario().getId().equals(usuario.getId())) {
+            throw new PlaylistAcessoNegadoException(
+                    "Você não possui permissão para acessar esta playlist."
+            );
+        }
+
+        return converterParaResponseDTO(playlist);
+    }
+    private PlaylistResponseDTO converterParaResponseDTO(Playlist playlist) {
+
+        List<MusicaResumoDTO> musicas = playlist.getMusicas()
+                .stream()
+                .map(PlaylistMusica::getMusica)
+                .map(musica -> new MusicaResumoDTO(
+                        musica.getIdMusica(),
+                        musica.getTitulo(),
+                        musica.getArtistaPrincipal().getNome()
+                ))
+                .toList();
+
+        return new PlaylistResponseDTO(
+                playlist.getId(),
+                playlist.getNome(),
+                playlist.getDescricao(),
+                musicas
+        );
+    }
     @Transactional
     public PlaylistResponseDTO criarPlaylist(PlaylistRequestDTO dto) {
 
@@ -45,4 +113,5 @@ public class PlaylistService {
         
         return responseDTO;
     }
+
 }
