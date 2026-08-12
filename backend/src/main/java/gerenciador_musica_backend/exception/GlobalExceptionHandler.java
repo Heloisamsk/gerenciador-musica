@@ -133,6 +133,38 @@ public class GlobalExceptionHandler {
                 Map.of()
         );
     }
+    /*
+     * 403 - Usuário autenticado tentando acessar
+     * playlist que não é dele.
+     */
+    @ExceptionHandler(PlaylistAcessoNegadoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarPlaylistAcessoNegado(
+            PlaylistAcessoNegadoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.FORBIDDEN,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
+    /*
+     * 404 - Playlist não encontrada.
+     */
+    @ExceptionHandler(PlaylistNaoEncontradaException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarPlaylistNaoEncontrada(
+            PlaylistNaoEncontradaException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
 
     /*
      * 409 - Tentativa de cadastrar a mesma música novamente.
