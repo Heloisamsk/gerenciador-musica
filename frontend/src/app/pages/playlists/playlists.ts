@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
@@ -18,7 +22,10 @@ export class Playlists implements OnInit {
   carregando = false;
   mensagemErro = '';
 
-  constructor(private playlistService: PlaylistService) {}
+  constructor(
+    private playlistService: PlaylistService,
+    private changeDetectorRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.carregarPlaylists();
@@ -30,7 +37,10 @@ export class Playlists implements OnInit {
 
     this.playlistService.listarMinhas()
       .pipe(
-        finalize(() => this.carregando = false)
+        finalize(() => {
+          this.carregando = false;
+          this.changeDetectorRef.detectChanges();
+        })
       )
       .subscribe({
         next: (dados) => {

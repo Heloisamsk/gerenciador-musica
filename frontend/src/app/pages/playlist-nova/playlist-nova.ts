@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -25,7 +25,8 @@ export class PlaylistNova {
 
   constructor(
     private playlistService: PlaylistService,
-    private router: Router
+    private router: Router,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   enviar(): void {
@@ -44,7 +45,10 @@ export class PlaylistNova {
 
     this.playlistService.criar(dados)
       .pipe(
-        finalize(() => this.enviando = false)
+        finalize(() => {
+          this.enviando = false;
+          this.changeDetectorRef.detectChanges();
+        })
       )
       .subscribe({
         next: (playlistCriada) => {

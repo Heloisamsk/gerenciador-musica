@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
@@ -20,7 +24,8 @@ export class PlaylistDetalhe implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private playlistService: PlaylistService
+    private playlistService: PlaylistService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -40,7 +45,10 @@ export class PlaylistDetalhe implements OnInit {
 
     this.playlistService.buscarPorId(Number(idParam))
       .pipe(
-        finalize(() => this.carregando = false)
+        finalize(() => {
+          this.carregando = false;
+          this.changeDetectorRef.detectChanges();
+        })
       )
       .subscribe({
         next: (dados) => {
