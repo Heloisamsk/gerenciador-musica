@@ -21,36 +21,42 @@ public class PlaylistController {
     }
 
     @PostMapping
-    public ResponseEntity<PlaylistResponseDTO> criarPlaylist(@Valid @RequestBody PlaylistRequestDTO dto) {
-        PlaylistResponseDTO playlistCriada = playlistService.criarPlaylist(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(playlistCriada);
+    public ResponseEntity<PlaylistResponseDTO> criarPlaylist(
+            @Valid @RequestBody PlaylistRequestDTO dto
+    ) {
+        PlaylistResponseDTO playlistCriada =
+                playlistService.criarPlaylist(dto);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(playlistCriada);
     }
 
     @GetMapping
     public ResponseEntity<List<PlaylistResponseDTO>> listarPlaylists() {
-        List<PlaylistResponseDTO> playlists = playlistService.listarMinhasPlaylists();
+        List<PlaylistResponseDTO> playlists =
+                playlistService.listarMinhasPlaylists();
+
         return ResponseEntity.ok(playlists);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PlaylistResponseDTO> buscarPlaylist(@PathVariable Long id) {
-        PlaylistResponseDTO playlist = playlistService.buscarPlaylist(id);
+    public ResponseEntity<PlaylistResponseDTO> buscarPlaylist(
+            @PathVariable("id") Long id
+    ) {
+        PlaylistResponseDTO playlist =
+                playlistService.buscarPlaylist(id);
+
         return ResponseEntity.ok(playlist);
     }
-    
-    @PostMapping
-    public ResponseEntity<PlaylistResponseDTO> criarPlaylist(@Valid @RequestBody PlaylistRequestDTO dto) {
-        
-        PlaylistResponseDTO playlistCriada = playlistService.criarPlaylist(dto);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(playlistCriada);
-    }
+
     @PostMapping("/{playlistId}/musicas/{musicaId}")
     public ResponseEntity<Void> adicionarMusica(
-            @PathVariable Long playlistId,
-            @PathVariable Long musicaId
+            @PathVariable("playlistId") Long playlistId,
+            @PathVariable("musicaId") Long musicaId
     ) {
         playlistService.adicionarMusica(playlistId, musicaId);
+
         return ResponseEntity.noContent().build();
     }
 }

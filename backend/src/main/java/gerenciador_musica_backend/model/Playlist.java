@@ -1,16 +1,6 @@
 package gerenciador_musica_backend.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
@@ -46,6 +36,7 @@ public class Playlist {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @OrderBy("ordem ASC")
     private List<PlaylistMusica> musicas = new ArrayList<>();
 
     public Playlist() {
@@ -58,7 +49,15 @@ public class Playlist {
     }
 
     public void adicionarMusica(Musica musica) {
-        PlaylistMusica item = new PlaylistMusica(this, musica);
+        int proximaOrdem = this.musicas.stream()
+                .map(PlaylistMusica::getOrdem)
+                .filter(Objects::nonNull)
+                .max(Integer::compareTo)
+                .orElse(0) + 1;
+
+        PlaylistMusica item =
+                new PlaylistMusica(this, musica, proximaOrdem);
+
         this.musicas.add(item);
     }
 
