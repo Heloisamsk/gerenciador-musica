@@ -67,9 +67,12 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        // Requisições de verificação do navegador
                         .requestMatchers(HttpMethod.OPTIONS, "/**")
                         .permitAll()
+
+                        // Playlists exigem autenticação
+                        .requestMatchers("/api/playlists/**")
+                        .authenticated()
 
                         // Cadastro e login não exigem autenticação
                         .requestMatchers(
