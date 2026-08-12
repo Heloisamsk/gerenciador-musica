@@ -9,7 +9,7 @@
 
 ## 📍 » Sobre o Projeto
 
-Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playlists para a disciplina de Engenharia de Software ministrado pela professora [Thais Burity](https://github.com/taburity), da UFAPE, referente ao período de 2026.1 com intuito de avaliação para a 2° Verificação de Aprendizagem.
+Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playlists, desenvolvido para as disciplinas de Engenharia de Software, ministrada pela professora [Thais Burity](https://github.com/taburity), e Banco de Dados, ministrada pela professora Priscila Kelly, da UFAPE, referente ao período de 2026.1, com intuito de avaliação para a 2ª Verificação de Aprendizagem.
 
 
 
@@ -34,6 +34,18 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 ## 🎶 » Status do Projeto
 
 - Em andamento
+
+
+
+## 🎏 » Diagrama UML
+<img width="3332" height="1792" alt="Diagrama_Spotify_BD drawio" src="https://github.com/user-attachments/assets/5d18dd92-99a7-4091-8edc-ffeb6d852892" />
+
+
+
+## 🔖 » Dicionário de Dados
+[Dicionário de Dados.pdf](https://github.com/user-attachments/files/30991513/Dicionario.de.Dados.pdf)
+
+
 
 
 ## 🗺️ » Como executar
