@@ -36,12 +36,23 @@
 
     @else if (playlist) {
     <header class="playlist-header">
-      <p class="section-label">Playlist</p>
-      <h1>{{ playlist.nome }}</h1>
+      <div class="playlist-header-linha">
+        <div>
+          <p class="section-label">Playlist</p>
+          <h1>{{ playlist.nome }}</h1>
 
-      @if (playlist.descricao) {
-      <p class="playlist-descricao">{{ playlist.descricao }}</p>
-      }
+          @if (playlist.descricao) {
+          <p class="playlist-descricao">{{ playlist.descricao }}</p>
+          }
+        </div>
+
+        <a
+          class="nova-playlist-button"
+          [routerLink]="['/playlists', playlist.id, 'catalogo']"
+        >
+          + Adicionar música
+        </a>
+      </div>
     </header>
 
     @if (playlist.musicas.length === 0) {
@@ -54,6 +65,13 @@
       <p>
         Adicione músicas ao catálogo para começar a montar sua playlist.
       </p>
+
+      <a
+        class="nova-playlist-button"
+        [routerLink]="['/playlists', playlist.id, 'catalogo']"
+      >
+        + Adicionar música
+      </a>
     </div>
     }
 
@@ -76,6 +94,7 @@
           <th scope="col">#</th>
           <th scope="col">Título</th>
           <th scope="col">Artista</th>
+          <th scope="col">Ações</th>
         </tr>
         </thead>
 
@@ -85,6 +104,20 @@
           <td data-label="#">{{ i + 1 }}</td>
           <td data-label="Título"><strong>{{ musica.titulo }}</strong></td>
           <td data-label="Artista">{{ musica.artista }}</td>
+          <td data-label="Ações">
+            <button
+              class="remover-button"
+              type="button"
+              [disabled]="removendoMusicaId === musica.id"
+              (click)="removerMusica(musica.id)"
+            >
+              @if (removendoMusicaId === musica.id) {
+              Removendo...
+              } @else {
+              Remover
+              }
+            </button>
+          </td>
         </tr>
         }
         </tbody>

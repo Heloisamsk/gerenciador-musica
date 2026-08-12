@@ -112,6 +112,29 @@ public class PlaylistService {
         playlistRepository.save(playlist);
     }
 
+    @Transactional
+    public void removerMusica(Long playlistId, Long musicaId) {
+        Usuario usuario = obterUsuarioAutenticado();
+
+        Playlist playlist = playlistRepository
+                .buscarComMusicasPorId(playlistId)
+                .orElseThrow(() ->
+                        new PlaylistNaoEncontradaException(
+                                "Playlist não encontrada."
+                        )
+                );
+
+        verificarProprietario(playlist, usuario);
+
+        boolean removida = playlist.removerMusica(musicaId);
+
+        if (!removida) {
+            throw new MusicaNaoEncontradaException(musicaId);
+        }
+
+        playlistRepository.save(playlist);
+    }
+
     private Usuario obterUsuarioAutenticado() {
         Authentication authentication = SecurityContextHolder
                 .getContext()

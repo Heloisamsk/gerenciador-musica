@@ -78,6 +78,46 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+.playlist-header-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.nova-playlist-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 9rem;
+
+  padding: 0.8rem 1.4rem;
+
+  color: #000000;
+  background-color: var(--primary);
+
+  border: none;
+  border-radius: 999px;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.nova-playlist-button:hover {
+  background-color: var(--primary-hover);
+  transform: scale(1.03);
+}
+
 .section-label {
   margin: 0;
 
@@ -226,6 +266,35 @@
 
 .musicas-table tbody tr:last-child td {
   border-bottom: none;
+}
+
+.remover-button {
+  padding: 0.4rem 0.9rem;
+
+  color: var(--error);
+  background-color: transparent;
+
+  border: 1px solid rgb(255 107 107 / 40%);
+  border-radius: 999px;
+
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.remover-button:hover:not([disabled]) {
+  color: #000000;
+  background-color: var(--error);
+}
+
+.remover-button[disabled] {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .sr-only {
