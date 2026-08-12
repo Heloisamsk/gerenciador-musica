@@ -1,5 +1,26 @@
 <div class="home-container">
   <h1>Olá de novo! 🎵</h1>
   <p>Você fez o login com sucesso.</p>
+
+  <div class="home-atalhos">
+    <a class="atalho-card" routerLink="/playlists">
+      🎵 Minhas Playlists
+    </a>
+
+    <a class="atalho-card" routerLink="/playlists/nova">
+      + Nova Playlist
+    </a>
+
+    @if (isAdmin) {
+    <a class="atalho-card" routerLink="/admin/banco/musicas">
+      📀 Catálogo de Músicas
+    </a>
+
+    <a class="atalho-card" routerLink="/admin/banco/usuarios">
+      👤 Usuários
+    </a>
+    }
+  </div>
+
   <button (click)="fazerLogout()" class="btn-logout">Sair da Conta</button>
 </div>
