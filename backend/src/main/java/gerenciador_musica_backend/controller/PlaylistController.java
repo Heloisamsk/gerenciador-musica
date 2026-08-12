@@ -27,12 +27,14 @@ public class PlaylistController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PlaylistResponseDTO>> listarMinhas() {
-        return ResponseEntity.ok(playlistService.listarMinhas());
+    public ResponseEntity<List<PlaylistResponseDTO>> listarPlaylists() {
+        List<PlaylistResponseDTO> playlists = playlistService.listarMinhasPlaylists();
+        return ResponseEntity.ok(playlists);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PlaylistResponseDTO> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(playlistService.buscarPorId(id));
+    public ResponseEntity<PlaylistResponseDTO> buscarPlaylist(@PathVariable Long id) {
+        PlaylistResponseDTO playlist = playlistService.buscarPlaylist(id);
+        return ResponseEntity.ok(playlist);
     }
 }
