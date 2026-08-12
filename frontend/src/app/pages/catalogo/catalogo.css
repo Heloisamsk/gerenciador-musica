@@ -6,6 +6,19 @@
   font-family: 'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+.voltar-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #b3b3b3;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.voltar-link:hover {
+  color: #1db954;
+}
+
 .page-title {
   margin-bottom: 24px;
   font-size: 24px;
