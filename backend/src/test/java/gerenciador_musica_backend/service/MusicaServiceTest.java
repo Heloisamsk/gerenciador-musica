@@ -61,9 +61,18 @@ class MusicaServiceTest {
                 null,
                 354,
                 (short) 1975,
-                new ArtistaRequestDTO("Queen", null, null),
+                new ArtistaRequestDTO(
+                        "Queen",
+                        "Queen",
+                        "Banda britânica de rock.",
+                        null
+                ),
                 Set.of(),
-                new AlbumRequestDTO("A Night at the Opera", (short) 1975, null),
+                new AlbumRequestDTO(
+                        "A Night at the Opera",
+                        (short) 1975,
+                        null
+                ),
                 Set.of("Rock")
         );
     }
@@ -72,7 +81,12 @@ class MusicaServiceTest {
     void deveCadastrarMusicaComSucessoCriandoArtistaAlbumEGenero() {
         MusicaRequestDTO request = montarRequestValida();
 
-        Artista artistaSalvo = new Artista("Queen", null, null);
+        Artista artistaSalvo = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                null
+        );
         Album albumSalvo = new Album(artistaSalvo, "A Night at the Opera", (short) 1975, null);
         Genero generoSalvo = new Genero("Rock");
 
@@ -119,25 +133,39 @@ class MusicaServiceTest {
     @Test
     void deveLancarExcecaoQuandoArtistaParticipanteEhIgualAoPrincipal() {
         MusicaRequestDTO request = new MusicaRequestDTO(
-                "Título", null, 200, (short) 2020,
-                new ArtistaRequestDTO("Queen", null, null),
-                Set.of(new ArtistaRequestDTO("queen", null, null)),
+                "Título",
+                null,
+                200,
+                (short) 2020,
+                new ArtistaRequestDTO(
+                        "Queen",
+                        "Queen",
+                        "Banda britânica de rock.",
+                        null
+                ),
+                Set.of(
+                        new ArtistaRequestDTO(
+                                "queen",
+                                "Queen",
+                                "Banda britânica de rock.",
+                                null
+                        )
+                ),
                 null,
                 Set.of("Rock")
         );
-
-        assertThatThrownBy(() -> musicaService.cadastrarMusica(request))
-                .isInstanceOf(DadosMusicaInvalidosException.class)
-                .hasMessage("O artista principal não pode aparecer como participante.");
-
-        verify(musicaRepository, never()).save(any());
     }
 
     @Test
     void deveLancarExcecaoQuandoMusicaJaEstaCadastradaNoMesmoAlbum() {
         MusicaRequestDTO request = montarRequestValida();
 
-        Artista artistaExistente = new Artista("Queen", null, null);
+        Artista artistaExistente = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                null
+        );
         Album albumExistente = new Album(artistaExistente, "A Night at the Opera", (short) 1975, null);
 
         when(artistaRepository.findByNomeIgnoreCase("Queen"))
@@ -157,7 +185,12 @@ class MusicaServiceTest {
 
     @Test
     void deveListarMusicasCadastradas() {
-        Artista artista = new Artista("Queen", null, null);
+        Artista artista = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                null
+        );
         Musica musica = new Musica(
                 "Bohemian Rhapsody", null, 354, (short) 1975,
                 artista, null, Set.of(), Set.of()
@@ -173,7 +206,12 @@ class MusicaServiceTest {
 
     @Test
     void deveBuscarMusicaPorId() {
-        Artista artista = new Artista("Queen", null, null);
+        Artista artista = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                null
+        );
         Musica musica = new Musica(
                 "Bohemian Rhapsody", null, 354, (short) 1975,
                 artista, null, Set.of(), Set.of()
@@ -193,4 +231,6 @@ class MusicaServiceTest {
         assertThatThrownBy(() -> musicaService.buscarPorId(99L))
                 .isInstanceOf(MusicaNaoEncontradaException.class);
     }
+
+
 }

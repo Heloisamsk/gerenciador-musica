@@ -40,16 +40,23 @@ class AdminMusicaControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private static final String CORPO_VALIDO = """
-            {
-                "titulo": "Bohemian Rhapsody",
-                "duracaoSegundos": 354,
-                "anoLancamento": 1975,
-                "artistaPrincipal": { "nome": "Queen" },
-                "artistasParticipantes": [],
-                "album": { "titulo": "A Night at the Opera", "anoLancamento": 1975 },
-                "generos": ["Rock"]
-            }
-            """;
+        {
+            "titulo": "Bohemian Rhapsody",
+            "duracaoSegundos": 354,
+            "anoLancamento": 1975,
+            "artistaPrincipal": {
+                "nome": "Queen",
+                "nomeCompleto": "Queen",
+                "descricao": "Banda britânica de rock."
+            },
+            "artistasParticipantes": [],
+            "album": {
+                "titulo": "A Night at the Opera",
+                "anoLancamento": 1975
+            },
+            "generos": ["Rock"]
+        }
+        """;
 
     @Test
     void deveCadastrarMusicaComSucesso() throws Exception {
@@ -59,7 +66,7 @@ class AdminMusicaControllerTest {
                 null,
                 354,
                 (short) 1975,
-                new ArtistaResumoDTO(1L, "Queen", null, null),
+                new ArtistaResumoDTO(1L, "Queen", "Queen", null, null),
                 null,
                 Set.of(),
                 Set.of()
@@ -72,7 +79,10 @@ class AdminMusicaControllerTest {
                         .content(CORPO_VALIDO))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
-                .andExpect(jsonPath("$.titulo").value("Bohemian Rhapsody"));
+                .andExpect(jsonPath("$.titulo")
+                        .value("Bohemian Rhapsody"))
+                .andExpect(jsonPath("$.artistaPrincipal.nomeCompleto")
+                        .value("Queen"));
     }
 
     @Test
@@ -80,14 +90,18 @@ class AdminMusicaControllerTest {
         mockMvc.perform(post("/api/admin/musicas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {
-                                    "duracaoSegundos": 354,
-                                    "anoLancamento": 1975,
-                                    "artistaPrincipal": { "nome": "Queen" },
-                                    "artistasParticipantes": [],
-                                    "generos": ["Rock"]
-                                }
-                                """))
+                            {
+                                "duracaoSegundos": 354,
+                                "anoLancamento": 1975,
+                                "artistaPrincipal": {
+                                    "nome": "Queen",
+                                    "nomeCompleto": "Queen",
+                                    "descricao": "Banda britânica de rock."
+                                },
+                                "artistasParticipantes": [],
+                                "generos": ["Rock"]
+                            }
+                            """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors.titulo").exists());
     }

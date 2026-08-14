@@ -97,6 +97,17 @@ public class MusicaService {
             );
         }
 
+        String nomeCompletoArtistaPrincipal =
+                normalizarParaComparacao(
+                        artistaPrincipal.nomeCompleto()
+                );
+
+        if (nomeCompletoArtistaPrincipal.isBlank()) {
+            throw new DadosMusicaInvalidosException(
+                    "O nome completo do artista principal é obrigatório."
+            );
+        }
+
         validarParticipantes(
                 request.artistasParticipantes(),
                 nomeArtistaPrincipal
@@ -107,16 +118,27 @@ public class MusicaService {
         validarAlbum(request.album());
     }
 
-    private Artista buscarOuCriarArtista(ArtistaRequestDTO dadosArtista) {
-        String nomeNormalizado = normalizarTexto(dadosArtista.nome());
+    private Artista buscarOuCriarArtista(
+            ArtistaRequestDTO dadosArtista
+    ) {
+        String nomeNormalizado =
+                normalizarTexto(dadosArtista.nome());
+
+        String nomeCompletoNormalizado =
+                normalizarTexto(dadosArtista.nomeCompleto());
 
         return artistaRepository
                 .findByNomeIgnoreCase(nomeNormalizado)
                 .orElseGet(() -> {
                     Artista novoArtista = new Artista(
                             nomeNormalizado,
-                            normalizarTextoOpcional(dadosArtista.descricao()),
-                            normalizarTextoOpcional(dadosArtista.fotoPerfilUrl())
+                            nomeCompletoNormalizado,
+                            normalizarTextoOpcional(
+                                    dadosArtista.descricao()
+                            ),
+                            normalizarTextoOpcional(
+                                    dadosArtista.fotoPerfilUrl()
+                            )
                     );
 
                     return artistaRepository.save(novoArtista);
@@ -376,13 +398,24 @@ public class MusicaService {
                             participante.nome()
                     );
 
-            if(nomeParticipante.isBlank()) {
+            if (nomeParticipante.isBlank()) {
                 throw new DadosMusicaInvalidosException(
                         "O nome do artista participante é obrigatório."
                 );
             }
 
-            if(nomeParticipante.equals(nomeArtistaPrincipal)) {
+            String nomeCompletoParticipante =
+                    normalizarParaComparacao(
+                            participante.nomeCompleto()
+                    );
+
+            if (nomeCompletoParticipante.isBlank()) {
+                throw new DadosMusicaInvalidosException(
+                        "O nome completo do artista participante é obrigatório."
+                );
+            }
+
+            if (nomeParticipante.equals(nomeArtistaPrincipal)) {
                 throw new DadosMusicaInvalidosException(
                         "O artista principal não pode aparecer como participante."
                 );
@@ -460,6 +493,7 @@ public class MusicaService {
         return new ArtistaResumoDTO(
                 artista.getIdArtista(),
                 artista.getNome(),
+                artista.getNomeCompleto(),
                 artista.getDescricao(),
                 artista.getFotoPerfilUrl()
         );

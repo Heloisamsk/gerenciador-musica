@@ -1,0 +1,114 @@
+package gerenciador_musica_backend.service;
+
+import gerenciador_musica_backend.dto.ArtistaRequestDTO;
+import gerenciador_musica_backend.dto.ArtistaResponseDTO;
+import gerenciador_musica_backend.exception.ArtistaDuplicadoException;
+import gerenciador_musica_backend.exception.DadosArtistaInvalidosException;
+import gerenciador_musica_backend.model.Artista;
+import gerenciador_musica_backend.repository.ArtistaRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+@Service
+public class ArtistaService {
+
+    private final ArtistaRepository artistaRepository;
+
+    public ArtistaService(ArtistaRepository artistaRepository) {
+        this.artistaRepository = artistaRepository;
+    }
+
+    @Transactional
+    public ArtistaResponseDTO cadastrarArtista(ArtistaRequestDTO request){
+        if (request == null) {
+            throw new DadosArtistaInvalidosException(
+                    "Os dados do artista são obrigatórios"
+            );
+        }
+
+
+        String nomeNormalizado = normalizarCampoObrigatorio(
+                request.nome(),
+                "Nome Artístico");
+        String nomeCompletoNormalizado = normalizarCampoObrigatorio(
+                request.nomeCompleto(),
+                "Nome Completo");
+        String descricaoNormalizada = normalizarCampoObrigatorio(
+                request.descricao(),
+                "Descrição do Artista");
+        String fotoPerfilUrlNormalizada = normalizarFotoPerfilUrl(
+                request.fotoPerfilUrl()
+        );
+
+
+        verificarDuplicidade(nomeNormalizado);
+
+
+        Artista artista = new Artista(
+                nomeNormalizado,
+                nomeCompletoNormalizado,
+                descricaoNormalizada,
+                fotoPerfilUrlNormalizada
+        );
+
+
+        Artista artistaSalvo =
+                artistaRepository.save(artista);
+
+
+        return converterParaResponse(artistaSalvo);
+    }
+
+    private String normalizarCampoObrigatorio(String valor, String nomeDoCampo){
+        if (valor == null) {
+            throw new DadosArtistaInvalidosException(
+                    nomeDoCampo + " é obrigatório"
+            );
+        }
+
+        String valorNormalizado = valor.trim();
+
+        if (valorNormalizado.isBlank()) {
+            throw new DadosArtistaInvalidosException(
+                    nomeDoCampo + " não pode ficar vazio"
+            );
+        }
+
+        return valorNormalizado;
+    }
+
+    private String normalizarFotoPerfilUrl(String fotoPerfilUrl){
+        if (fotoPerfilUrl == null){
+            return null;
+        }
+
+        String fotoPerfilUrlNormalizada = fotoPerfilUrl.trim();
+
+        if (fotoPerfilUrlNormalizada.isBlank()) {
+            return null;
+        }
+
+        return fotoPerfilUrlNormalizada;
+    }
+
+    private void verificarDuplicidade(String nome){
+        boolean artistaJaExiste = artistaRepository.existsByNomeIgnoreCase(
+                nome
+        );
+
+        if (artistaJaExiste) {
+            throw new ArtistaDuplicadoException(
+                    "Esse artista já foi cadastrado: " + nome
+            );
+        }
+    }
+
+    private ArtistaResponseDTO converterParaResponse(Artista artista){
+        return new ArtistaResponseDTO(
+                artista.getIdArtista(),
+                artista.getNome(),
+                artista.getNomeCompleto(),
+                artista.getDescricao(),
+                artista.getFotoPerfilUrl()
+        );
+    }
+}

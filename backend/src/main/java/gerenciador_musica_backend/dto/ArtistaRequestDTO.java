@@ -12,6 +12,14 @@ public record ArtistaRequestDTO(
         )
         String nome,
 
+        @NotBlank(message = "O nome completo do artista é obrigatório")
+        @Size(
+                max = 255,
+                message = "O nome completo do artista deve possuir no máximo 255 caracteres"
+        )
+        String nomeCompleto,
+
+        @NotBlank(message = "A descrição do artista é obrigatória")
         @Size(
                 max = 500,
                 message = "A descrição deve possuir no máximo 500 caracteres"
