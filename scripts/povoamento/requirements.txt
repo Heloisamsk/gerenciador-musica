@@ -1,0 +1,4 @@
+spotipy==2.24.0
+python-dotenv==1.0.1
+Faker==26.0.0
+bcrypt==4.2.0
