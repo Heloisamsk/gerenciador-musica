@@ -1,2 +1,8 @@
 .idea/
 *.log
+
+# Script de povoamento (credenciais e arquivos locais)
+scripts/povoamento/.env
+scripts/povoamento/venv/
+scripts/povoamento/.cache
+scripts/povoamento/__pycache__/
