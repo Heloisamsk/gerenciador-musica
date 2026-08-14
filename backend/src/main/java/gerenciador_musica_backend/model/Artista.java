@@ -17,7 +17,10 @@ public class Artista {
     private Long idArtista;
 
     @Column(name = "nome", nullable = false, length = 255)
-    private String nome;
+    private String nome; //esse é o nome artístico
+
+    @Column(name = "nome_completo", nullable = false, length = 255)
+    private String nomeCompleto;
 
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
@@ -30,11 +33,13 @@ public class Artista {
 
     public Artista(
             String nome,
+            String nomeCompleto,
             String descricao,
             String fotoPerfilUrl
     ) {
         this.nome = nome;
         this.descricao = descricao;
+        this.nomeCompleto = nomeCompleto;
         this.fotoPerfilUrl = fotoPerfilUrl;
     }
 
@@ -52,6 +57,14 @@ public class Artista {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public String getNomeCompleto() {
+        return nomeCompleto;
+    }
+
+    public void setNomeCompleto(String nomeCompleto) {
+        this.nomeCompleto = nomeCompleto;
     }
 
     public String getDescricao() {

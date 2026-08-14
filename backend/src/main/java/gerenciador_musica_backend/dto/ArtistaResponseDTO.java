@@ -1,7 +1,7 @@
 package gerenciador_musica_backend.dto;
 
-public record ArtistaResumoDTO(
-        Long id,
+public record ArtistaResponseDTO(
+        Long idArtista,
         String nome,
         String nomeCompleto,
         String descricao,

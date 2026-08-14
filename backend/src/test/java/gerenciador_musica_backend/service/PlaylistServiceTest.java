@@ -148,7 +148,12 @@ class PlaylistServiceTest {
     @Test
     void deveAdicionarMusicaNaPlaylist() {
         Playlist playlist = new Playlist("Rock", null, usuarioLogado);
-        Artista artista = new Artista("Queen", null, null);
+        Artista artista = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                null
+        );
         Musica musica = new Musica(
                 "Bohemian Rhapsody", null, 354, (short) 1975,
                 artista, null, java.util.Set.of(), java.util.Set.of()
@@ -168,7 +173,12 @@ class PlaylistServiceTest {
     @Test
     void deveLancarExcecaoAoAdicionarMusicaJaPresenteNaPlaylist() {
         Playlist playlist = new Playlist("Rock", null, usuarioLogado);
-        Artista artista = new Artista("Queen", null, null);
+        Artista artista = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                null
+        );
         Musica musica = new Musica(
                 "Bohemian Rhapsody", null, 354, (short) 1975,
                 artista, null, java.util.Set.of(), java.util.Set.of()
@@ -190,7 +200,12 @@ class PlaylistServiceTest {
     @Test
     void deveRemoverMusicaDaPlaylist() {
         Playlist playlist = new Playlist("Rock", null, usuarioLogado);
-        Artista artista = new Artista("Queen", null, null);
+        Artista artista = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                null
+        );
         Musica musica = new Musica(
                 "Bohemian Rhapsody", null, 354, (short) 1975,
                 artista, null, java.util.Set.of(), java.util.Set.of()

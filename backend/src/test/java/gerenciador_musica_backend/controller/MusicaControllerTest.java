@@ -45,7 +45,7 @@ class MusicaControllerTest {
                 null,
                 354,
                 (short) 1975,
-                new ArtistaResumoDTO(1L, "Queen", null, null),
+                new ArtistaResumoDTO(1L, "Queen", "Queen", null, null),
                 null,
                 Set.of(),
                 Set.of()

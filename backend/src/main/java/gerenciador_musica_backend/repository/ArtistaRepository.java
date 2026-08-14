@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface ArtistaRepository extends JpaRepository<Artista, Long> {
 
     Optional<Artista> findByNomeIgnoreCase(String nome);
+
+    boolean existsByNomeIgnoreCase(String nome);
 }
