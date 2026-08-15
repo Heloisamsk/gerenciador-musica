@@ -221,6 +221,55 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /*
+     * 404 - Artista não encontrado.
+     */
+    @ExceptionHandler(ArtistaNaoEncontradoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarArtistaNaoEncontrado(
+            ArtistaNaoEncontradoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
+    /*
+     * 409 - Tentativa de cadastrar Artista já existente.
+     */
+    @ExceptionHandler(ArtistaDuplicadoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarArtistaDuplicado(
+            ArtistaDuplicadoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
+    /*
+     * 400 - Dados da artista inválidos segundo
+     * as regras de negócio do ArtistaService.
+     */
+    @ExceptionHandler(DadosArtistaInvalidosException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarDadosArtistaInvalidos(
+            DadosArtistaInvalidosException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
     private ResponseEntity<ErrorResponseDTO> criarResposta(
             HttpStatus status,
             String message,

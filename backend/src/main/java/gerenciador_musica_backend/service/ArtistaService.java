@@ -3,6 +3,7 @@ package gerenciador_musica_backend.service;
 import gerenciador_musica_backend.dto.ArtistaRequestDTO;
 import gerenciador_musica_backend.dto.ArtistaResponseDTO;
 import gerenciador_musica_backend.exception.ArtistaDuplicadoException;
+import gerenciador_musica_backend.exception.ArtistaNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosArtistaInvalidosException;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.ArtistaRepository;
@@ -65,7 +66,9 @@ public class ArtistaService {
             );
         }
 
-        String valorNormalizado = valor.trim();
+        String valorNormalizado = valor
+                .strip()
+                .replaceAll("\\s+", " ");
 
         if (valorNormalizado.isBlank()) {
             throw new DadosArtistaInvalidosException(
@@ -110,5 +113,19 @@ public class ArtistaService {
                 artista.getDescricao(),
                 artista.getFotoPerfilUrl()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Artista buscarEntidadePorId(Long idArtista) {
+        if (idArtista == null || idArtista == 0) {
+            throw new DadosArtistaInvalidosException(
+                    "O ID precisa ser válido."
+            );
+        }
+
+        return artistaRepository.findById(idArtista)
+                .orElseThrow(
+                        () -> new ArtistaNaoEncontradoException(idArtista)
+                );
     }
 }
