@@ -36,12 +36,16 @@ public record MusicaRequestDTO(
         )
         Short anoLancamento,
 
-        @NotNull(message = "O artista principal é obrigatório")
-        @Valid
-        ArtistaRequestDTO artistaPrincipal,
+        @NotNull(message = "O ID do artista principal é obrigatório")
+        @Positive(message = "O ID do artista principal deve ser positivo")
+        Long artistaPrincipalId,
 
         @NotNull(message = "Informe a lista de artistas participantes")
-        Set<@Valid ArtistaRequestDTO> artistasParticipantes,
+        Set<
+                @NotNull(message = "O ID do participante não pode ser nulo")
+                @Positive(message = "O ID do participante deve ser positivo")
+                        Long
+                > artistasParticipantesIds,
 
         @Valid
         AlbumRequestDTO album,

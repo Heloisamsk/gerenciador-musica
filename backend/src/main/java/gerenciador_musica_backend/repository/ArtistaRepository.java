@@ -9,5 +9,7 @@ public interface ArtistaRepository extends JpaRepository<Artista, Long> {
 
     Optional<Artista> findByNomeIgnoreCase(String nome);
 
+    Optional<Artista> findById(Long idArtista);
+
     boolean existsByNomeIgnoreCase(String nome);
 }

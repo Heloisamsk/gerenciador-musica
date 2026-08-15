@@ -9,7 +9,6 @@ import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Genero;
 import gerenciador_musica_backend.model.Musica;
 import gerenciador_musica_backend.repository.AlbumRepository;
-import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.GeneroRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import org.springframework.data.domain.Sort;
@@ -24,34 +23,43 @@ public class MusicaService {
 
     private final MusicaRepository musicaRepository;
     private final AlbumRepository albumRepository;
-    private final ArtistaRepository artistaRepository;
+    private final ArtistaService artistaService;
     private final GeneroRepository generoRepository;
 
-    public MusicaService(MusicaRepository musicaRepository, AlbumRepository albumRepository, ArtistaRepository artistaRepository, GeneroRepository generoRepository) {
+    public MusicaService(
+            MusicaRepository musicaRepository,
+            AlbumRepository albumRepository,
+            ArtistaService artistaService,
+            GeneroRepository generoRepository
+    ) {
         this.musicaRepository = musicaRepository;
         this.albumRepository = albumRepository;
-        this.artistaRepository = artistaRepository;
+        this.artistaService = artistaService;
         this.generoRepository = generoRepository;
     }
 
     @Transactional
     public MusicaResponseDTO cadastrarMusica(MusicaRequestDTO request) {
-
         validarRegrasDeNegocio(request);
 
-        Artista artistaPrincipal = buscarOuCriarArtista(request.artistaPrincipal());
+        Artista artistaPrincipal = artistaService.buscarEntidadePorId(
+                request.artistaPrincipalId()
+        );
 
-        Album album = buscarOuCriarAlbum(request.album(), artistaPrincipal);
+        Set<Artista> participantes = buscarParticipantes(
+                request.artistasParticipantesIds(),
+                artistaPrincipal
+        );
+
+        Album album = buscarOuCriarAlbum(
+                request.album(),
+                artistaPrincipal
+        );
 
         verificarDuplicidade(
                 request,
                 artistaPrincipal,
                 album
-        );
-
-        Set<Artista> participantes = buscarOuCriarParticipantes(
-                request.artistasParticipantes(),
-                artistaPrincipal
         );
 
         Set<Genero> generos = buscarOuCriarGeneros(request.generos());
@@ -69,93 +77,70 @@ public class MusicaService {
         return converterParaResponse(musicaSalva);
     }
 
-    private void validarRegrasDeNegocio(
-            MusicaRequestDTO request
-    ) {
-        if (request == null){
+    private void validarRegrasDeNegocio(MusicaRequestDTO request) {
+        if (request == null) {
             throw new DadosMusicaInvalidosException(
                     "Os dados da música são obrigatórios."
             );
         }
 
-        ArtistaRequestDTO artistaPrincipal = request.artistaPrincipal();
+        Long artistaPrincipalId = request.artistaPrincipalId();
 
-        if (artistaPrincipal == null){
+        if (artistaPrincipalId == null || artistaPrincipalId <= 0) {
             throw new DadosMusicaInvalidosException(
-                    "O artista principal é obrigatório."
-            );
-        }
-
-        String nomeArtistaPrincipal =
-                normalizarParaComparacao(
-                        artistaPrincipal.nome()
-                );
-
-        if (nomeArtistaPrincipal.isBlank()) {
-            throw new DadosMusicaInvalidosException(
-                    "O nome do artista principal é obrigatório"
-            );
-        }
-
-        String nomeCompletoArtistaPrincipal =
-                normalizarParaComparacao(
-                        artistaPrincipal.nomeCompleto()
-                );
-
-        if (nomeCompletoArtistaPrincipal.isBlank()) {
-            throw new DadosMusicaInvalidosException(
-                    "O nome completo do artista principal é obrigatório."
+                    "O ID do artista principal deve ser válido."
             );
         }
 
         validarParticipantes(
-                request.artistasParticipantes(),
-                nomeArtistaPrincipal
+                request.artistasParticipantesIds(),
+                artistaPrincipalId
         );
 
         validarGeneros(request.generos());
-
         validarAlbum(request.album());
     }
 
-    private Artista buscarOuCriarArtista(
-            ArtistaRequestDTO dadosArtista
+    private Set<Artista> buscarParticipantes(
+            Set<Long> idsParticipantes,
+            Artista artistaPrincipal
     ) {
-        String nomeNormalizado =
-                normalizarTexto(dadosArtista.nome());
+        Set<Artista> participantes = new LinkedHashSet<>();
 
-        String nomeCompletoNormalizado =
-                normalizarTexto(dadosArtista.nomeCompleto());
+        if (idsParticipantes == null || idsParticipantes.isEmpty()) {
+            return participantes;
+        }
 
-        return artistaRepository
-                .findByNomeIgnoreCase(nomeNormalizado)
-                .orElseGet(() -> {
-                    Artista novoArtista = new Artista(
-                            nomeNormalizado,
-                            nomeCompletoNormalizado,
-                            normalizarTextoOpcional(
-                                    dadosArtista.descricao()
-                            ),
-                            normalizarTextoOpcional(
-                                    dadosArtista.fotoPerfilUrl()
-                            )
-                    );
+        for (Long idParticipante : idsParticipantes) {
+            boolean mesmoArtistaPrincipal = idParticipante.equals(
+                    artistaPrincipal.getIdArtista()
+            );
 
-                    return artistaRepository.save(novoArtista);
-                });
+            if (mesmoArtistaPrincipal) {
+                throw new DadosMusicaInvalidosException(
+                        "O artista principal não pode aparecer entre os participantes."
+                );
+            }
+
+            Artista participante = artistaService.buscarEntidadePorId(
+                    idParticipante
+            );
+
+            participantes.add(participante);
+        }
+
+        return participantes;
     }
 
     private Album buscarOuCriarAlbum(
             AlbumRequestDTO dadosAlbum,
             Artista artistaPrincipal
     ) {
-
         if (dadosAlbum == null) {
             return null;
         }
 
-        String tituloNormalizado =
-                normalizarTexto(dadosAlbum.titulo());
+        String tituloNormalizado = normalizarTexto(dadosAlbum.titulo());
 
         return albumRepository
                 .findByTituloIgnoreCaseAndArtistaAndAnoLancamento(
@@ -180,70 +165,32 @@ public class MusicaService {
             Artista artistaPrincipal,
             Album album
     ) {
-
-        String tituloNormalizado =
-                normalizarTexto(request.titulo());
+        String tituloNormalizado = normalizarTexto(request.titulo());
 
         boolean musicaJaExiste;
 
-        if (album != null){
-            musicaJaExiste =
-                    musicaRepository.existsByAlbumAndTituloIgnoreCase(
-                            album,
-                            tituloNormalizado
-                    );
+        if (album != null) {
+            musicaJaExiste = musicaRepository.existsByAlbumAndTituloIgnoreCase(
+                    album,
+                    tituloNormalizado
+            );
         } else {
-            musicaJaExiste =
-                    musicaRepository.existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamento(
+            musicaJaExiste = musicaRepository
+                    .existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamento(
                             artistaPrincipal,
                             tituloNormalizado,
                             request.anoLancamento()
                     );
         }
 
-        if(musicaJaExiste) {
+        if (musicaJaExiste) {
             throw new MusicaDuplicadaException(
-              "A música já está cadastrada."
+                    "A música já está cadastrada."
             );
         }
     }
 
-
-
-    private Set<Artista> buscarOuCriarParticipantes(
-            Set<ArtistaRequestDTO> dadosParticipantes,
-            Artista artistaPrincipal
-    ) {
-
-        Set<Artista> participantes = new LinkedHashSet<>();
-
-        if (dadosParticipantes == null || dadosParticipantes.isEmpty()) {
-            return participantes;
-        }
-
-        for (ArtistaRequestDTO dadosParticipante : dadosParticipantes) {
-            Artista participante = buscarOuCriarArtista(dadosParticipante);
-
-            boolean mesmoArtistaPrincipal =
-                    participante
-                            .getIdArtista()
-                            .equals(artistaPrincipal.getIdArtista());
-
-            if (mesmoArtistaPrincipal) {
-                throw new DadosMusicaInvalidosException(
-                  "O Artista principal não pode aparecer entre os participantes"
-                );
-            }
-
-            participantes.add(participante);
-        }
-
-        return participantes;
-    }
-
-    private Set<Genero> buscarOuCriarGeneros(
-            Set<String> nomesGeneros
-    ) {
+    private Set<Genero> buscarOuCriarGeneros(Set<String> nomesGeneros) {
         Set<Genero> generos = new LinkedHashSet<>();
 
         if (nomesGeneros == null || nomesGeneros.isEmpty()) {
@@ -251,8 +198,7 @@ public class MusicaService {
         }
 
         for (String nomeRecebido : nomesGeneros) {
-            String nomeNormalizado =
-                    normalizarTexto(nomeRecebido);
+            String nomeNormalizado = normalizarTexto(nomeRecebido);
 
             if (nomeNormalizado.isBlank()) {
                 throw new DadosMusicaInvalidosException(
@@ -263,9 +209,7 @@ public class MusicaService {
             Genero genero = generoRepository
                     .findByNomeIgnoreCase(nomeNormalizado)
                     .orElseGet(() -> {
-                        Genero novoGenero =
-                                new Genero(nomeNormalizado);
-
+                        Genero novoGenero = new Genero(nomeNormalizado);
                         return generoRepository.save(novoGenero);
                     });
 
@@ -282,11 +226,8 @@ public class MusicaService {
             Set<Artista> artistasParticipantes,
             Set<Genero> generos
     ) {
-        String tituloNormalizado =
-                normalizarTexto(request.titulo());
-
-        String letraNormalizada =
-                normalizarLetra(request.letra());
+        String tituloNormalizado = normalizarTexto(request.titulo());
+        String letraNormalizada = normalizarLetra(request.letra());
 
         return new Musica(
                 tituloNormalizado,
@@ -300,38 +241,24 @@ public class MusicaService {
         );
     }
 
-    private MusicaResponseDTO converterParaResponse(
-            Musica musica
-    ) {
-        ArtistaResumoDTO artistaPrincipal =
-                converterArtistaParaResumo(
-                        musica.getArtistaPrincipal()
-                );
+    private MusicaResponseDTO converterParaResponse(Musica musica) {
+        ArtistaResumoDTO artistaPrincipal = converterArtistaParaResumo(
+                musica.getArtistaPrincipal()
+        );
 
-        AlbumResumoDTO album =
-                converterAlbumParaResumo(
-                        musica.getAlbum()
-                );
+        AlbumResumoDTO album = converterAlbumParaResumo(musica.getAlbum());
 
-        Set<ArtistaResumoDTO> participantes =
-                musica.getArtistasParticipantes()
-                        .stream()
-                        .map(this::converterArtistaParaResumo)
-                        .collect(
-                                Collectors.toCollection(
-                                        LinkedHashSet::new
-                                )
-                        );
+        Set<ArtistaResumoDTO> participantes = musica
+                .getArtistasParticipantes()
+                .stream()
+                .map(this::converterArtistaParaResumo)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
-        Set<GeneroResumoDTO> generos =
-                musica.getGeneros()
-                        .stream()
-                        .map(this::converterGeneroParaResumo)
-                        .collect(
-                                Collectors.toCollection(
-                                        LinkedHashSet::new
-                                )
-                        );
+        Set<GeneroResumoDTO> generos = musica
+                .getGeneros()
+                .stream()
+                .map(this::converterGeneroParaResumo)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         return new MusicaResponseDTO(
                 musica.getIdMusica(),
@@ -346,9 +273,7 @@ public class MusicaService {
         );
     }
 
-    private String normalizarParaComparacao(
-            String texto
-    ) {
+    private String normalizarParaComparacao(String texto) {
         if (texto == null) {
             return "";
         }
@@ -373,49 +298,24 @@ public class MusicaService {
         return normalizarTexto(texto);
     }
 
-    private void validarParticipantes (
-            Set<ArtistaRequestDTO> participantes,
-            String nomeArtistaPrincipal
+    private void validarParticipantes(
+            Set<Long> idsParticipantes,
+            Long artistaPrincipalId
     ) {
-        if (participantes == null) {
+        if (idsParticipantes == null) {
             throw new DadosMusicaInvalidosException(
                     "A lista de artistas participantes é obrigatória."
             );
         }
 
-        Set<String> nomesEncontrados = new HashSet<>();
-
-        for(ArtistaRequestDTO participante : participantes) {
-
-            if(participante == null) {
+        for (Long idParticipante : idsParticipantes) {
+            if (idParticipante == null || idParticipante <= 0) {
                 throw new DadosMusicaInvalidosException(
-                        "A lista possui um participante inválido."
+                        "A lista possui um ID de participante inválido."
                 );
             }
 
-            String nomeParticipante =
-                    normalizarParaComparacao(
-                            participante.nome()
-                    );
-
-            if (nomeParticipante.isBlank()) {
-                throw new DadosMusicaInvalidosException(
-                        "O nome do artista participante é obrigatório."
-                );
-            }
-
-            String nomeCompletoParticipante =
-                    normalizarParaComparacao(
-                            participante.nomeCompleto()
-                    );
-
-            if (nomeCompletoParticipante.isBlank()) {
-                throw new DadosMusicaInvalidosException(
-                        "O nome completo do artista participante é obrigatório."
-                );
-            }
-
-            if (nomeParticipante.equals(nomeArtistaPrincipal)) {
+            if (idParticipante.equals(artistaPrincipalId)) {
                 throw new DadosMusicaInvalidosException(
                         "O artista principal não pode aparecer como participante."
                 );
@@ -423,22 +323,17 @@ public class MusicaService {
         }
     }
 
-    private void validarGeneros(
-            Set<String> generos
-    ) {
-
+    private void validarGeneros(Set<String> generos) {
         if (generos == null || generos.isEmpty()) {
             throw new DadosMusicaInvalidosException(
-                    "A música deve possuir pelo ou menos um gênero."
+                    "A música deve possuir pelo menos um gênero."
             );
         }
 
         Set<String> nomesEncontrados = new HashSet<>();
 
         for (String genero : generos) {
-
-            String nomeNormalizado =
-                    normalizarParaComparacao(genero);
+            String nomeNormalizado = normalizarParaComparacao(genero);
 
             if (nomeNormalizado.isBlank()) {
                 throw new DadosMusicaInvalidosException(
@@ -448,7 +343,7 @@ public class MusicaService {
 
             boolean foiAdicionado = nomesEncontrados.add(nomeNormalizado);
 
-            if(!foiAdicionado) {
+            if (!foiAdicionado) {
                 throw new DadosMusicaInvalidosException(
                         "O gênero está repetido: " + genero
                 );
@@ -456,15 +351,12 @@ public class MusicaService {
         }
     }
 
-    private void validarAlbum(
-            AlbumRequestDTO album
-    ) {
+    private void validarAlbum(AlbumRequestDTO album) {
         if (album == null) {
             return;
         }
 
-        String tituloNormalizado =
-                normalizarParaComparacao(album.titulo());
+        String tituloNormalizado = normalizarParaComparacao(album.titulo());
 
         if (tituloNormalizado.isBlank()) {
             throw new DadosMusicaInvalidosException(
@@ -474,7 +366,7 @@ public class MusicaService {
 
         if (album.anoLancamento() == null) {
             throw new DadosMusicaInvalidosException(
-              "O ano de lançamento do álbum é obrigatório"
+                    "O ano de lançamento do álbum é obrigatório."
             );
         }
     }
@@ -487,9 +379,7 @@ public class MusicaService {
         return letra.strip();
     }
 
-    private ArtistaResumoDTO converterArtistaParaResumo(
-            Artista artista
-    ) {
+    private ArtistaResumoDTO converterArtistaParaResumo(Artista artista) {
         return new ArtistaResumoDTO(
                 artista.getIdArtista(),
                 artista.getNome(),
@@ -499,9 +389,7 @@ public class MusicaService {
         );
     }
 
-    private AlbumResumoDTO converterAlbumParaResumo(
-            Album album
-    ) {
+    private AlbumResumoDTO converterAlbumParaResumo(Album album) {
         if (album == null) {
             return null;
         }
@@ -514,9 +402,7 @@ public class MusicaService {
         );
     }
 
-    private GeneroResumoDTO converterGeneroParaResumo(
-            Genero genero
-    ) {
+    private GeneroResumoDTO converterGeneroParaResumo(Genero genero) {
         return new GeneroResumoDTO(
                 genero.getIdGenero(),
                 genero.getNome()

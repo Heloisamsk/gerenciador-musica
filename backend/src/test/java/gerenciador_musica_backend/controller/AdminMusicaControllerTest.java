@@ -2,6 +2,7 @@ package gerenciador_musica_backend.controller;
 
 import gerenciador_musica_backend.config.JwtAuthenticationFilter;
 import gerenciador_musica_backend.dto.ArtistaResumoDTO;
+import gerenciador_musica_backend.dto.MusicaRequestDTO;
 import gerenciador_musica_backend.dto.MusicaResponseDTO;
 import gerenciador_musica_backend.exception.MusicaDuplicadaException;
 import gerenciador_musica_backend.service.MusicaService;
@@ -40,23 +41,19 @@ class AdminMusicaControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private static final String CORPO_VALIDO = """
-        {
-            "titulo": "Bohemian Rhapsody",
-            "duracaoSegundos": 354,
-            "anoLancamento": 1975,
-            "artistaPrincipal": {
-                "nome": "Queen",
-                "nomeCompleto": "Queen",
-                "descricao": "Banda britânica de rock."
-            },
-            "artistasParticipantes": [],
-            "album": {
-                "titulo": "A Night at the Opera",
-                "anoLancamento": 1975
-            },
-            "generos": ["Rock"]
-        }
-        """;
+            {
+                "titulo": "Bohemian Rhapsody",
+                "duracaoSegundos": 354,
+                "anoLancamento": 1975,
+                "artistaPrincipalId": 1,
+                "artistasParticipantesIds": [],
+                "album": {
+                    "titulo": "A Night at the Opera",
+                    "anoLancamento": 1975
+                },
+                "generos": ["Rock"]
+            }
+            """;
 
     @Test
     void deveCadastrarMusicaComSucesso() throws Exception {
@@ -66,13 +63,20 @@ class AdminMusicaControllerTest {
                 null,
                 354,
                 (short) 1975,
-                new ArtistaResumoDTO(1L, "Queen", "Queen", null, null),
+                new ArtistaResumoDTO(
+                        1L,
+                        "Queen",
+                        "Queen",
+                        "Banda britânica de rock.",
+                        null
+                ),
                 null,
                 Set.of(),
                 Set.of()
         );
 
-        when(musicaService.cadastrarMusica(any())).thenReturn(resposta);
+        when(musicaService.cadastrarMusica(any(MusicaRequestDTO.class)))
+                .thenReturn(resposta);
 
         mockMvc.perform(post("/api/admin/musicas")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -82,7 +86,9 @@ class AdminMusicaControllerTest {
                 .andExpect(jsonPath("$.titulo")
                         .value("Bohemian Rhapsody"))
                 .andExpect(jsonPath("$.artistaPrincipal.nomeCompleto")
-                        .value("Queen"));
+                        .value("Queen"))
+                .andExpect(jsonPath("$.artistaPrincipal.descricao")
+                        .value("Banda britânica de rock."));
     }
 
     @Test
@@ -90,31 +96,30 @@ class AdminMusicaControllerTest {
         mockMvc.perform(post("/api/admin/musicas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                                "duracaoSegundos": 354,
-                                "anoLancamento": 1975,
-                                "artistaPrincipal": {
-                                    "nome": "Queen",
-                                    "nomeCompleto": "Queen",
-                                    "descricao": "Banda britânica de rock."
-                                },
-                                "artistasParticipantes": [],
-                                "generos": ["Rock"]
-                            }
-                            """))
+                                {
+                                    "duracaoSegundos": 354,
+                                    "anoLancamento": 1975,
+                                    "artistaPrincipalId": 1,
+                                    "artistasParticipantesIds": [],
+                                    "generos": ["Rock"]
+                                }
+                                """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors.titulo").exists());
     }
 
     @Test
     void deveRetornar409QuandoMusicaJaCadastrada() throws Exception {
-        when(musicaService.cadastrarMusica(any()))
-                .thenThrow(new MusicaDuplicadaException("A música já está cadastrada."));
+        when(musicaService.cadastrarMusica(any(MusicaRequestDTO.class)))
+                .thenThrow(new MusicaDuplicadaException(
+                        "A música já está cadastrada."
+                ));
 
         mockMvc.perform(post("/api/admin/musicas")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(CORPO_VALIDO))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("A música já está cadastrada."));
+                .andExpect(jsonPath("$.message")
+                        .value("A música já está cadastrada."));
     }
 }

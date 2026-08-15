@@ -22,7 +22,11 @@ public class Artista {
     @Column(name = "nome_completo", nullable = false, length = 255)
     private String nomeCompleto;
 
-    @Column(name = "descricao", columnDefinition = "TEXT")
+    @Column(
+            name = "descricao",
+            nullable = false,
+            columnDefinition = "TEXT"
+    )
     private String descricao;
 
     @Column(name = "foto_perfil_url", length = 2048)
