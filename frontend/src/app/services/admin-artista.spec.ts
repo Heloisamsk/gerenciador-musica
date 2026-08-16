@@ -17,8 +17,11 @@ describe('AdminArtistaService', () => {
   let service: AdminArtistaService;
   let httpTesting: HttpTestingController;
 
-  const apiUrl =
+  const cadastroApiUrl =
     'http://localhost:8080/api/admin/artistas';
+
+  const listagemApiUrl =
+    'http://localhost:8080/api/artistas';
 
   const artistaRequest: ArtistaRequest = {
     nome: 'Queen',
@@ -63,12 +66,24 @@ describe('AdminArtistaService', () => {
         expect(response).toEqual(artistaResponse);
       });
 
-    const request = httpTesting.expectOne(apiUrl);
+    const request = httpTesting.expectOne(cadastroApiUrl);
 
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual(artistaRequest);
 
     request.flush(artistaResponse);
+  });
+
+  it('deve listar os artistas pelo endpoint de catálogo', () => {
+    service.listarArtistas().subscribe(response => {
+      expect(response).toEqual([artistaResponse]);
+    });
+
+    const request = httpTesting.expectOne(listagemApiUrl);
+
+    expect(request.request.method).toBe('GET');
+
+    request.flush([artistaResponse]);
   });
 
   for (const status of [400, 401, 403, 409]) {
@@ -81,7 +96,7 @@ describe('AdminArtistaService', () => {
         }
       });
 
-      const request = httpTesting.expectOne(apiUrl);
+      const request = httpTesting.expectOne(cadastroApiUrl);
 
       request.flush(
         {
