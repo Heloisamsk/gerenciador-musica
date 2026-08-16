@@ -9,26 +9,78 @@
 
 ## 📍 » Sobre o Projeto
 
-Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playlists, desenvolvido para as disciplinas de Engenharia de Software, ministrada pela professora [Thais Burity](https://github.com/taburity), e Banco de Dados, ministrada pela professora Priscila Kelly, da UFAPE, referente ao período de 2026.1, com intuito de avaliação para a 2ª Verificação de Aprendizagem.
+Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playlists, desenvolvido para as disciplinas de Engenharia de Software, ministrada pela professora [Thais Burity](https://github.com/taburity), e Banco de Dados, ministrada pela professora Priscilla Kelly, da UFAPE, referente ao período de 2026.1, com intuito de avaliação para a 2ª Verificação de Aprendizagem.
 
 
 
 ## 🤖 » Tecnologias
 
-### [Angular](https://angular.dev/)
-- Desenvolvimento do frontend.
+### Frontend
 
-### [Spring Boot](https://spring.io/projects/spring-boot)
-- Desenvolvimento da API backend.
+#### [Angular](https://angular.dev/)
 
-### [PostgreSQL](https://www.postgresql.org/)
-- Banco de dados relacional.
+- Desenvolvimento da interface web em componentes.
+- Formulários reativos, rotas protegidas e integração com a API REST.
 
-### [Docker](https://www.docker.com/)
-- Execução e configuração do banco de dados.
+#### [TypeScript](https://www.typescriptlang.org/)
 
-### [JWT](https://jwt.io/)
-- Autenticação e autorização dos usuários.
+- Linguagem utilizada no desenvolvimento do frontend.
+- Tipagem de serviços, modelos, formulários e respostas da API.
+
+#### [RxJS](https://rxjs.dev/)
+
+- Tratamento de requisições HTTP e operações assíncronas.
+- Controle dos estados de carregamento, sucesso e erro.
+
+### Backend
+
+#### [Java](https://www.java.com/)
+
+- Linguagem utilizada no desenvolvimento do backend.
+
+#### [Spring Boot](https://spring.io/projects/spring-boot)
+
+- Desenvolvimento da API REST e organização das regras de negócio.
+
+#### [Spring Security](https://spring.io/projects/spring-security)
+
+- Autenticação e autorização de usuários.
+- Proteção de endpoints de acordo com as roles `USER` e `ADMIN`.
+
+#### [JWT](https://jwt.io/)
+
+- Geração e validação dos tokens utilizados na autenticação.
+
+#### [Spring Data JPA](https://spring.io/projects/spring-data-jpa) e [Hibernate](https://hibernate.org/orm/)
+
+- Persistência das entidades e comunicação com o banco de dados.
+- Mapeamento dos relacionamentos entre usuários, artistas, músicas, álbuns, gêneros e playlists.
+
+#### [Jakarta Bean Validation](https://beanvalidation.org/)
+
+- Validação dos dados recebidos nos DTOs da API.
+
+### Banco de dados e infraestrutura
+
+#### [PostgreSQL](https://www.postgresql.org/)
+
+- Banco de dados relacional utilizado para persistência das informações.
+
+#### [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/)
+
+- Containerização do frontend Angular, backend Spring Boot e banco de dados PostgreSQL.
+- Construção das imagens e execução dos serviços em containers isolados.
+- Orquestração da comunicação e inicialização dos containers da aplicação.
+
+### Testes e ferramentas
+
+#### [JUnit 5](https://junit.org/junit5/), [Mockito](https://site.mockito.org/) e MockMvc
+
+- Testes unitários e de integração do backend.
+
+#### [Vitest](https://vitest.dev/) e Angular TestBed
+
+- Testes dos componentes, serviços e requisições HTTP do frontend.
 
 
 ## 🎶 » Status do Projeto
@@ -38,8 +90,7 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 
 
 ## 🎏 » Diagrama UML
-<img width="3332" height="1792" alt="Diagrama_Spotify_BD drawio" src="https://github.com/user-attachments/assets/5d18dd92-99a7-4091-8edc-ffeb6d852892" />
-
+<img width="3332" height="1792" alt="Diagrama_Spotify_BD drawio (1)" src="https://github.com/user-attachments/assets/86e71045-87ff-470c-8384-f3484625b186" />
 
 
 ## 🗄️ » Configuração do Banco de Dados
@@ -82,9 +133,10 @@ Armazena os artistas cadastrados no sistema.
 | Atributo | Tipo de Dado | Restrições | Semântica |
 |---|---|---|---|
 | id_artista | BIGINT | PK | Identificador único do artista. |
-| nome | VARCHAR(255) | NOT NULL | Nome do artista. |
+| nome | VARCHAR(255) | NOT NULL | Nome artístico do artista. |
 | descricao | TEXT | — | Descrição ou informações adicionais sobre o artista. |
 | foto_perfil_url | VARCHAR(2048) | — | URL da foto de perfil do artista. |
+| nome_completo | VARCHAR(255) | NOT NULL | Nome completo do artista. |
 
 ### USUARIO
 Armazena os usuários cadastrados, seus dados de autenticação e nível de acesso.
@@ -237,23 +289,162 @@ Registra os artistas seguidos pelos usuários.
 
 ## 🗺️ » Como executar
 
+A aplicação pode ser executada completamente com Docker ou localmente para desenvolvimento.
+
 ### Pré-requisitos
 
-- Java 21
-- Node.js
-- Docker Desktop
-- Git
+Para executar com Docker:
 
-### Banco de dados
+- [Git](https://git-scm.com/)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+Para executar localmente:
+
+- Java 21
+- Node.js e npm
+- PostgreSQL, que também pode ser iniciado pelo Docker
+
+---
+
+### Clonar o repositório
 
 ```bash
-docker compose up -d
+git clone https://github.com/projeto-gerenciador-musica/gerenciador-musica.git
+cd gerenciador-musica
 ```
 
-### Backend
+---
+
+### Executar com Docker
+
+Esta é a forma recomendada para iniciar o projeto completo.
+
+Certifique-se de que o Docker Desktop está aberto e, na raiz do projeto, execute:
 
 ```bash
-cd backend/gerenciador-musica-backend
+docker compose up -d --build
+```
+
+Esse comando constrói e inicia os containers do:
+
+- frontend Angular;
+- backend Spring Boot;
+- banco de dados PostgreSQL.
+
+Para verificar o estado dos containers:
+
+```bash
+docker compose ps
+```
+
+Após a inicialização, a aplicação estará disponível nos seguintes endereços:
+
+- Frontend: `http://localhost:4200`
+- Backend: `http://localhost:8080`
+- PostgreSQL: `localhost:5432`
+
+#### Visualizar os logs
+
+Todos os serviços:
+
+```bash
+docker compose logs -f
+```
+
+Somente o backend:
+
+```bash
+docker compose logs -f backend
+```
+
+Somente o frontend:
+
+```bash
+docker compose logs -f frontend
+```
+
+Somente o PostgreSQL:
+
+```bash
+docker compose logs -f postgres
+```
+
+Utilize `Ctrl + C` para sair da visualização dos logs. Os containers continuarão em execução.
+
+#### Reconstruir os containers
+
+Após alterações no frontend ou backend:
+
+```bash
+docker compose up -d --build backend frontend
+```
+
+Somente o frontend:
+
+```bash
+docker compose up -d --build frontend
+```
+
+Somente o backend:
+
+```bash
+docker compose up -d --build backend
+```
+
+Para reconstruir sem utilizar o cache:
+
+```bash
+docker compose build --no-cache backend frontend
+docker compose up -d --force-recreate backend frontend
+```
+
+#### Parar a aplicação
+
+Para apenas parar os containers:
+
+```bash
+docker compose stop
+```
+
+Para parar e remover os containers e a rede criada pelo Compose:
+
+```bash
+docker compose down
+```
+
+> O comando `docker compose down` mantém os dados persistidos no volume do PostgreSQL. Evite utilizar `docker compose down -v`, pois o parâmetro `-v` remove os volumes e pode apagar os dados do banco.
+
+---
+
+### Executar localmente
+
+Para desenvolvimento, é possível executar somente o PostgreSQL com Docker e iniciar o frontend e o backend nos terminais locais.
+
+#### 1. Iniciar o PostgreSQL
+
+Na raiz do projeto:
+
+```bash
+docker compose up -d postgres
+```
+
+Verifique se o banco está funcionando:
+
+```bash
+docker compose ps postgres
+```
+
+#### 2. Iniciar o backend
+
+Abra outro terminal e acesse a pasta do backend:
+
+```bash
+cd backend
+```
+
+No Linux ou macOS:
+
+```bash
 ./mvnw spring-boot:run
 ```
 
@@ -263,24 +454,142 @@ No Windows PowerShell:
 .\mvnw.cmd spring-boot:run
 ```
 
-O backend ficará disponível em `http://localhost:8080`.
+O backend ficará disponível em:
 
-### Frontend
+```text
+http://localhost:8080
+```
+
+#### 3. Iniciar o frontend
+
+Abra outro terminal e acesse a pasta do frontend:
 
 ```bash
-cd frontend/gerenciador_musica_frontend
+cd frontend
+```
+
+Na primeira execução, instale as dependências:
+
+```bash
 npm install
+```
+
+Inicie o servidor de desenvolvimento:
+
+```bash
 npm start
 ```
 
-O frontend ficará disponível em `http://localhost:4200`.
+O frontend ficará disponível em:
+
+```text
+http://localhost:4200
+```
+
+---
+
+### Executar os testes
+
+#### Backend
+
+No Linux ou macOS:
+
+```bash
+cd backend
+./mvnw test
+```
+
+No Windows PowerShell:
+
+```powershell
+cd backend
+.\mvnw.cmd test
+```
+
+#### Frontend
+
+```bash
+cd frontend
+npm test -- --watch=false
+```
+
+Para validar também o build do frontend:
+
+```bash
+npm run build
+```
+
+---
+
+### Problemas comuns
+
+#### Alterações do frontend não aparecem
+
+Reconstrua o container:
+
+```bash
+docker compose up -d --build frontend
+```
+
+Depois atualize a página utilizando `Ctrl + F5`.
+
+#### Backend indisponível ou reiniciando
+
+Consulte os logs:
+
+```bash
+docker compose logs -f backend
+```
+
+#### Banco de dados indisponível
+
+Verifique o container e seus logs:
+
+```bash
+docker compose ps postgres
+docker compose logs -f postgres
+```
+
+#### Porta já utilizada
+
+Confirme se não existe outra aplicação utilizando:
+
+- `4200`, para o frontend;
+- `8080`, para o backend;
+- `5432`, para o PostgreSQL.
+
+Evite executar localmente um serviço que já esteja ativo em um container na mesma porta.
 
 
 ## 🔗 » Endpoints principais
 
+As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
+
+`Authorization: Bearer <token>`
+
+### Autenticação
+
 | Método | Endpoint | Acesso | Descrição |
-|---|---|---|---|
-| POST | `/api/auth/register` | Público | Cadastrar usuário |
-| POST | `/api/auth/login` | Público | Realizar login |
-| POST | `/api/auth/logout` | Autenticado | Realizar logout |
+|:------:|----------|--------|-----------|
+| `POST` | `/api/auth/register` | Público | Cadastrar um novo usuário |
+| `POST` | `/api/auth/login` | Público | Autenticar o usuário e gerar o token JWT |
+| `POST` | `/api/auth/logout` | Autenticado | Encerrar a sessão do usuário |
+
+### Catálogo
+
+| Método | Endpoint | Acesso | Descrição |
+|:------:|----------|--------|-----------|
+| `GET` | `/api/artistas` | `USER` ou `ADMIN` | Listar os artistas disponíveis no catálogo |
+| `GET` | `/api/musicas` | `USER` ou `ADMIN` | Listar as músicas disponíveis no catálogo |
+
+### Administração
+
+| Método | Endpoint | Acesso | Descrição |
+|:------:|----------|--------|-----------|
+| `GET` | `/api/admin/artistas` | `ADMIN` | Listar artistas para operações administrativas |
+| `POST` | `/api/admin/artistas` | `ADMIN` | Cadastrar um novo artista |
+| `POST` | `/api/admin/musicas` | `ADMIN` | Cadastrar uma nova música |
+| `GET` | `/api/admin/banco/usuarios` | `ADMIN` | Listar os usuários cadastrados no banco de dados |
+
+> Os endpoints iniciados por `/api/admin` são protegidos e podem ser acessados somente por usuários com a role `ADMIN`. Usuários autenticados com a role `USER` recebem a resposta `403 Forbidden` ao tentar acessar essas rotas.
 
