@@ -30,6 +30,9 @@ describe('AdminMusicaNova', () => {
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
     router = TestBed.inject(Router);
+
+    vi.spyOn(router, 'navigate')
+      .mockResolvedValue(true);
   });
 
   afterEach(() => {
