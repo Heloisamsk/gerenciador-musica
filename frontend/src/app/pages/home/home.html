@@ -1,26 +1,145 @@
-<div class="home-container">
-  <h1>Olá de novo! 🎵</h1>
-  <p>Você fez o login com sucesso.</p>
+<div class="home-layout">
+  <aside class="sidebar">
+    <div class="perfil">
+      <img
+        class="perfil-foto"
+        src="/avatar-padrao.png"
+        alt="Foto padrão do usuário"
+      >
 
-  <div class="home-atalhos">
-    <a class="atalho-card" routerLink="/playlists">
-      🎵 Minhas Playlists
-    </a>
+      <span class="perfil-nome">
+        {{ nomeUsuario() }}
+      </span>
+    </div>
 
-    <a class="atalho-card" routerLink="/playlists/nova">
-      + Nova Playlist
-    </a>
+    <nav class="menu">
+      <a
+        class="menu-link"
+        routerLink="/playlists/nova"
+      >
+        Criar playlist
+      </a>
 
-    @if (isAdmin) {
-    <a class="atalho-card" routerLink="/admin/banco/musicas">
-      📀 Catálogo de Músicas
-    </a>
+      <a
+        class="menu-link"
+        routerLink="/playlists"
+      >
+        Minhas playlists
+      </a>
+    </nav>
 
-    <a class="atalho-card" routerLink="/admin/banco/usuarios">
-      👤 Usuários
-    </a>
-    }
-  </div>
+    <div class="menu-inferior">
+      @if (isAdmin()) {
+      <a
+        class="menu-link"
+        routerLink="/admin/painel"
+      >
+        Painel
+      </a>
+      }
 
-  <button (click)="fazerLogout()" class="btn-logout">Sair da Conta</button>
+      <button
+        type="button"
+        class="botao-sair"
+        (click)="logout()"
+      >
+        Sair
+      </button>
+    </div>
+  </aside>
+
+  <main class="conteudo">
+    <input
+      class="campo-busca"
+      type="search"
+      placeholder="Buscar artistas e músicas"
+      aria-label="Buscar artistas e músicas"
+      (input)="atualizarBusca($event)"
+    >
+
+    <section class="secao">
+      <h2>Artistas</h2>
+
+      @if (carregandoArtistas()) {
+      <p class="mensagem-estado">
+        Carregando artistas...
+      </p>
+      } @else if (erroArtistas()) {
+      <p class="mensagem-erro">
+        {{ erroArtistas() }}
+      </p>
+      } @else {
+      <div class="lista-artistas">
+        @for (
+        artista of artistasFiltrados();
+        track artista.idArtista
+        ) {
+        <article class="artista-card">
+          <img
+            class="artista-foto"
+            [src]="
+                  artista.fotoPerfilUrl ||
+                  '/avatar-artista.png'
+                "
+            [alt]="'Foto de ' + artista.nome"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+            (error)="substituirFotoArtista($event)"
+          >
+
+          <span class="artista-nome">
+                {{ artista.nome }}
+              </span>
+        </article>
+        } @empty {
+        <p class="mensagem-estado">
+          Nenhum artista encontrado.
+        </p>
+        }
+      </div>
+      }
+    </section>
+
+    <section class="secao">
+      <h2>Músicas</h2>
+
+      @if (carregandoMusicas()) {
+      <p class="mensagem-estado">
+        Carregando músicas...
+      </p>
+      } @else if (erroMusicas()) {
+      <p class="mensagem-erro">
+        {{ erroMusicas() }}
+      </p>
+      } @else {
+      <div class="grade-musicas">
+        @for (
+        musica of musicasFiltradas();
+        track musica.id
+        ) {
+        <article class="musica-card">
+          <img
+            class="musica-capa"
+            src="/capa-padrao.png"
+            [alt]="'Capa padrão de ' + musica.titulo"
+            loading="lazy"
+          >
+
+          <strong>
+            {{ musica.titulo }}
+          </strong>
+
+          <span>
+                {{ musica.artistaPrincipal.nome }}
+              </span>
+        </article>
+        } @empty {
+        <p class="mensagem-estado">
+          Nenhuma música encontrada.
+        </p>
+        }
+      </div>
+      }
+    </section>
+  </main>
 </div>
