@@ -28,6 +28,16 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'admin/painel',
+    loadComponent: () =>
+      import('./pages/admin-painel/admin-painel')
+        .then(modulo => modulo.AdminPainel),
+    canActivate: [authGuard],
+    data: {
+      expectedRole: 'ADMIN'
+    }
+  },
+  {
     path: 'admin',
     component: Home,
     canActivate: [authGuard],
