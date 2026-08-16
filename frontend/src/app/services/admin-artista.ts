@@ -10,8 +10,11 @@ import { ArtistaResponse } from '../models/ArtistaResponse';
 })
 export class AdminArtistaService {
 
-  private readonly apiUrl =
+  private readonly cadastroApiUrl =
     'http://localhost:8080/api/admin/artistas';
+
+  private readonly listagemApiUrl =
+    'http://localhost:8080/api/artistas';
 
   constructor(
     private readonly http: HttpClient
@@ -21,12 +24,14 @@ export class AdminArtistaService {
     artista: ArtistaRequest
   ): Observable<ArtistaResponse> {
     return this.http.post<ArtistaResponse>(
-      this.apiUrl,
+      this.cadastroApiUrl,
       artista
     );
   }
 
   listarArtistas(): Observable<ArtistaResponse[]> {
-    return this.http.get<ArtistaResponse[]>(this.apiUrl);
-    }
+    return this.http.get<ArtistaResponse[]>(
+      this.listagemApiUrl
+    );
+  }
 }

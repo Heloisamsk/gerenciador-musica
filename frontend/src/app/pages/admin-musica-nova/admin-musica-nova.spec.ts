@@ -18,7 +18,7 @@ describe('AdminMusicaNova', () => {
     'http://localhost:8080/api/admin/musicas';
 
   const apiArtistasUrl =
-    'http://localhost:8080/api/admin/artistas';
+    'http://localhost:8080/api/artistas';
 
   const artistaMock = {
     idArtista: 1,

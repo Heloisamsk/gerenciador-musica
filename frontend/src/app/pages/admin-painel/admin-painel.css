@@ -1,0 +1,229 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #ffffff;
+  background-color: #0f0f0f;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:host * {
+  box-sizing: border-box;
+}
+
+.painel-page {
+  min-height: 100vh;
+  padding: 40px;
+  background:
+    radial-gradient(circle at 50% 0, #223429 0, transparent 34rem),
+    #0f0f0f;
+}
+
+.painel-container {
+  width: min(100%, 1080px);
+  margin: 0 auto;
+}
+
+.voltar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-bottom: 44px;
+  color: #b3b3b3;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.voltar-link svg {
+  width: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.voltar-link:hover {
+  color: #ffffff;
+}
+
+.voltar-link:focus-visible,
+.acao-card:focus-visible {
+  outline: 2px solid #1ed760;
+  outline-offset: 4px;
+}
+
+.painel-cabecalho {
+  max-width: 680px;
+  margin-bottom: 56px;
+}
+
+.secao-label {
+  margin: 0 0 12px;
+  color: #1ed760;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14rem;
+  text-transform: uppercase;
+}
+
+.painel-cabecalho h1 {
+  margin: 0;
+  font-size: clamp(2.75rem, 7vw, 5rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.painel-descricao {
+  margin: 20px 0 0;
+  color: #b3b3b3;
+  font-size: 1.08rem;
+  line-height: 1.6;
+}
+
+.grupo-acoes + .grupo-acoes {
+  margin-top: 48px;
+}
+
+.grupo-cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #303030;
+}
+
+.grupo-cabecalho h2,
+.grupo-cabecalho p {
+  margin: 0;
+}
+
+.grupo-cabecalho h2 {
+  font-size: 1.35rem;
+}
+
+.grupo-cabecalho p {
+  color: #8f8f8f;
+  font-size: 0.9rem;
+}
+
+.grade-acoes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.acao-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  min-height: 136px;
+  padding: 24px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #202020, #181818);
+  border: 1px solid #343434;
+  border-radius: 14px;
+  text-decoration: none;
+  box-shadow: 0 14px 32px rgb(0 0 0 / 20%);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.acao-card:hover {
+  border-color: #1ed760;
+  transform: translateY(-3px);
+}
+
+.acao-icone {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  color: #1ed760;
+  background-color: rgb(30 215 96 / 10%);
+  border: 1px solid rgb(30 215 96 / 24%);
+  border-radius: 12px;
+}
+
+.acao-icone svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.acao-conteudo {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.acao-conteudo strong {
+  font-size: 1.08rem;
+}
+
+.acao-conteudo > span {
+  color: #a7a7a7;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.acao-seta {
+  color: #777777;
+  font-size: 1.45rem;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.acao-card:hover .acao-seta {
+  color: #1ed760;
+  transform: translateX(4px);
+}
+
+@media (max-width: 720px) {
+  .painel-page {
+    padding: 24px 18px 40px;
+  }
+
+  .voltar-link {
+    margin-bottom: 32px;
+  }
+
+  .painel-cabecalho {
+    margin-bottom: 42px;
+  }
+
+  .grupo-cabecalho {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .grade-acoes {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .acao-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    min-height: 124px;
+    padding: 20px;
+  }
+
+  .acao-seta {
+    display: none;
+  }
+}
