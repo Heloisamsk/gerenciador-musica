@@ -25,4 +25,8 @@ export class AdminArtistaService {
       artista
     );
   }
+
+  listarArtistas(): Observable<ArtistaResponse[]> {
+    return this.http.get<ArtistaResponse[]>(this.apiUrl);
+    }
 }

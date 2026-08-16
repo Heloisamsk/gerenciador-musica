@@ -39,11 +39,44 @@
         </small>
       </div>
       <div class="form-group">
-        <label>Artista</label>
-        <input type="text" class="form-input" formControlName="artista" placeholder="Ex: Queen">
-        <small class="error-message" *ngIf="formularioMusica.get('artista')?.invalid && formularioMusica.get('artista')?.touched">
+        <label for="artistaPrincipalId">Artista</label>
+
+        <select
+          id="artistaPrincipalId"
+          class="form-input"
+          formControlName="artistaPrincipalId"
+          [disabled]="carregandoArtistas()"
+        >
+          <option [ngValue]="null" disabled>
+            @if (carregandoArtistas()) {
+            Carregando artistas...
+            } @else {
+            Selecione um artista
+            }
+          </option>
+
+          @for (artista of artistas(); track artista.idArtista) {
+          <option [ngValue]="artista.idArtista">
+            {{ artista.nome }}
+          </option>
+          }
+        </select>
+
+        <small
+          class="error-message"
+          *ngIf="
+      formularioMusica.get('artistaPrincipalId')?.invalid &&
+      formularioMusica.get('artistaPrincipalId')?.touched
+    "
+        >
           O artista é obrigatório.
         </small>
+
+        @if (erroArtistas()) {
+        <small class="error-message">
+          {{ erroArtistas() }}
+        </small>
+        }
       </div>
       <div class="form-group">
         <label>Álbum</label>
@@ -58,4 +91,4 @@
       </button>
     </form>
   </div>
-</div>
+</div> //input
