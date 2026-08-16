@@ -66,6 +66,17 @@ export const routes: Routes = [
   }
   },
   {
+    path: 'admin/banco/artistas/novo',
+   loadComponent: () =>
+     import(
+        './pages/admin-artistas/cadastro-artista/cadastro-artista'
+      ).then(modulo => modulo.CadastroArtista),
+    canActivate: [authGuard],
+   data: {
+     expectedRole: 'ADMIN'
+    }
+  },
+  {
   path: 'playlists',
   component: Playlists,
   canActivate: [authGuard]
