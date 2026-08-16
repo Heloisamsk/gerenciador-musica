@@ -1,63 +1,371 @@
-.home-container {
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #ffffff;
+  background-color: #121212;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:host * {
+  box-sizing: border-box;
+}
+
+.home-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 32px 20px;
+  background-color: #090909;
+  border-right: 1px solid #282828;
+  overflow-y: auto;
+}
+
+.perfil {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 2rem 1rem;
-  background-color: #121212;
-  color: #ffffff;
-  font-family: Arial, sans-serif;
-}
-
-.home-atalhos {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
   gap: 12px;
-
-  margin-top: 24px;
+  margin-bottom: 40px;
+  text-align: center;
 }
 
-.atalho-card {
-  padding: 14px 22px;
-
-  color: #ffffff;
-  background-color: #1f1f1f;
-
-  border: 1px solid #333333;
-  border-radius: 8px;
-
-  text-decoration: none;
-  font-size: 15px;
-  font-weight: 600;
-
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.atalho-card:hover {
+.perfil-foto {
+  display: block;
+  width: 96px;
+  height: 96px;
+  border: 2px solid #333333;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
   background-color: #282828;
+}
+
+.perfil-nome {
+  max-width: 100%;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu,
+.menu-inferior {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-inferior {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.menu-link,
+.botao-sair {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 14px;
+  color: #ffffff;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+}
+
+.menu-link:hover,
+.botao-sair:hover {
+  background-color: #282828;
+  border-color: #333333;
+}
+
+.menu-link:focus-visible,
+.botao-sair:focus-visible {
+  outline: 2px solid #1db954;
+  outline-offset: 2px;
+}
+
+.botao-sair {
+  color: #ff6b6b;
+}
+
+.conteudo {
+  min-width: 0;
+  padding: 32px 40px 60px;
+  background: linear-gradient(
+    180deg,
+    #181818 0,
+    #121212 280px
+  );
+}
+
+.campo-busca {
+  display: block;
+  width: min(100%, 650px);
+  min-height: 50px;
+  margin: 0 auto 44px;
+  padding: 14px 22px;
+  color: #ffffff;
+  background-color: #282828;
+  border: 1px solid #404040;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background-color 0.2s;
+}
+
+.campo-busca::placeholder {
+  color: #a7a7a7;
+}
+
+.campo-busca:hover {
+  background-color: #303030;
+}
+
+.campo-busca:focus {
+  outline: none;
   border-color: #1db954;
+  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+}
+
+.secao {
+  margin-bottom: 48px;
+}
+
+.secao h2 {
+  margin: 0 0 22px;
+  padding-bottom: 12px;
+  color: #ffffff;
+  border-bottom: 1px solid #303030;
+  font-size: 1.7rem;
+}
+
+.lista-artistas {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  padding: 8px 0 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scrollbar-width: thin;
+  scrollbar-color: #4a4a4a #181818;
+}
+
+.artista-card {
+  display: flex;
+  flex: 0 0 160px;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+.artista-card:hover {
+  background-color: #1f1f1f;
   transform: translateY(-2px);
 }
 
-.btn-logout {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #1db954;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
+.artista-foto {
+  display: block;
+  width: 130px;
+  height: 130px;
+  border: 2px solid #303030;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  background-color: #282828;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
 }
 
-.btn-logout:hover {
-  background-color: #c0392b;
+.artista-nome,
+.artista-card span {
+  display: block;
+  width: 100%;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grade-musicas {
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.musica-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  background-color: #181818;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.musica-card:hover {
+  background-color: #282828;
+  border-color: #333333;
+  transform: translateY(-3px);
+}
+
+.musica-capa {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: 6px;
+  border-radius: 7px;
+  object-fit: cover;
+  object-position: center;
+  background-color: #282828;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.musica-card strong {
+  color: #ffffff;
+  font-size: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.musica-card span {
+  color: #b3b3b3;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mensagem-estado,
+.mensagem-erro {
+  width: 100%;
+  margin: 8px 0;
+  padding: 16px;
+  border-radius: 7px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.mensagem-estado {
+  color: #b3b3b3;
+  background-color: #181818;
+}
+
+.mensagem-erro {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.45);
+}
+
+@media (max-width: 760px) {
+  .home-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #282828;
+  }
+
+  .menu-inferior {
+    margin-top: 20px;
+    padding-top: 0;
+  }
+
+  .conteudo {
+    padding: 24px 16px 48px;
+  }
+
+  .grade-musicas {
+    grid-template-columns:
+      repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .artista-card {
+    flex-basis: 125px;
+    padding: 10px;
+  }
+
+  .artista-foto {
+    width: 105px;
+    height: 105px;
+  }
+
+  .grade-musicas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .musica-card {
+    padding: 12px;
+  }
+}
+
+.lista-artistas::-webkit-scrollbar {
+  height: 10px;
+}
+
+.lista-artistas::-webkit-scrollbar-track {
+  background-color: #181818;
+  border-radius: 999px;
+}
+
+.lista-artistas::-webkit-scrollbar-thumb {
+  background-color: #4a4a4a;
+  border: 2px solid #181818;
+  border-radius: 999px;
+}
+
+.lista-artistas::-webkit-scrollbar-thumb:hover {
+  background-color: #1db954;
+}
+
+.lista-artistas::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.lista-artistas::-webkit-scrollbar-corner {
+  background-color: #181818;
 }

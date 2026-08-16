@@ -7,8 +7,12 @@ import gerenciador_musica_backend.exception.ArtistaNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosArtistaInvalidosException;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.ArtistaRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 @Service
 public class ArtistaService {
 
@@ -57,6 +61,21 @@ public class ArtistaService {
 
 
         return converterParaResponse(artistaSalvo);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ArtistaResponseDTO> listarArtistas() {
+        return artistaRepository
+                .findAll(Sort.by(Sort.Direction.ASC, "nome"))
+                .stream()
+                .map(artista -> new ArtistaResponseDTO(
+                        artista.getIdArtista(),
+                        artista.getNome(),
+                        artista.getNomeCompleto(),
+                        artista.getDescricao(),
+                        artista.getFotoPerfilUrl()
+                ))
+                .toList();
     }
 
     private String normalizarCampoObrigatorio(String valor, String nomeDoCampo){
