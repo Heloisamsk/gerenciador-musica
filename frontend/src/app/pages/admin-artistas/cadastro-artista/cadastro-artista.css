@@ -1,0 +1,173 @@
+:host {
+  display: block;
+}
+
+.cadastro-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  padding: 2rem;
+  background-color: #121212;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.cadastro-card {
+  width: 100%;
+  max-width: 560px;
+  padding: 2.5rem;
+  background-color: #181818;
+  border: 1px solid #282828;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+}
+
+.cadastro-title {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  color: #d1d1d1;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.form-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.75rem;
+  color: #ffffff;
+  background-color: #282828;
+  border: 1px solid #3e3e3e;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.form-input::placeholder {
+  color: #8f8f8f;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #1db954;
+  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+}
+
+.form-input.input-invalido {
+  border-color: #ff6b6b;
+}
+
+.form-input.input-invalido:focus {
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.error-message {
+  display: block;
+  margin-top: 2px;
+  color: #ff6b6b;
+  font-size: 0.8rem;
+}
+
+.campo-opcional {
+  color: #8f8f8f;
+  font-size: 0.8rem;
+}
+
+.cadastro-btn {
+  width: 100%;
+  margin-top: 0.9rem;
+  padding: 0.875rem;
+  color: #000000;
+  background-color: #1db954;
+  border: none;
+  border-radius: 500px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+.cadastro-btn:hover:not(:disabled) {
+  background-color: #1ed760;
+  transform: scale(1.01);
+}
+
+.cadastro-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.cadastro-btn:disabled {
+  color: #a0a0a0;
+  background-color: #535353;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.alerta {
+  margin-bottom: 1.25rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.alerta-sucesso {
+  color: #1ed760;
+  background-color: rgba(29, 185, 84, 0.15);
+  border: 1px solid #1db954;
+}
+
+.alerta-erro {
+  color: #ff8080;
+  background-color: rgba(255, 107, 107, 0.15);
+  border: 1px solid #ff6b6b;
+}
+
+@media (max-width: 600px) {
+  .cadastro-container {
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+
+  .cadastro-card {
+    padding: 1.5rem;
+  }
+
+  .cadastro-title {
+    font-size: 1.5rem;
+  }
+}
