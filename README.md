@@ -13,6 +13,13 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 
 
 
+## 🚀 » Aplicação em Produção
+
+- **Frontend:** [gerenciador-musica.onrender.com](https://gerenciador-musica.onrender.com)
+- **Backend:** _em breve_
+
+
+
 ## 🤖 » Tecnologias
 
 ### Frontend
