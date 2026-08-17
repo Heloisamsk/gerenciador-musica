@@ -1,14 +1,5 @@
--- =====================================================================
--- Script DDL - Sistema Gerenciador de Musicas
--- Banco de dados: PostgreSQL
---
--- Este arquivo reune, em ordem, o conteudo de todas as migrations
--- Flyway do projeto (V1 a V10), que sao a fonte de verdade do schema
--- e ficam em backend/src/main/resources/db/migration/. Ele existe
--- apenas para facilitar a leitura/entrega do DDL num unico arquivo;
--- quem for rodar o projeto de verdade usa o docker-compose, que aplica
--- as migrations originais automaticamente.
--- =====================================================================
+-- Script DDL - Sistema Gerenciador de Musicas (PostgreSQL)
+-- Reune as migrations Flyway (V1 a V13, em backend/src/main/resources/db/migration/) num arquivo so, pra entrega.
 
 
 -- =====================================================================
@@ -443,9 +434,6 @@ ALTER TABLE playlist_musica
     ADD COLUMN data_criacao TIMESTAMP WITH TIME ZONE
         NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
--- (a migration original faz aqui um UPDATE pra preencher "ordem" em
--- linhas ja existentes antes de travar a coluna como NOT NULL; num
--- banco recem-criado, sem linhas ainda, isso nao e necessario)
 ALTER TABLE playlist_musica
     ALTER COLUMN ordem SET NOT NULL;
 
@@ -455,3 +443,28 @@ ALTER TABLE playlist_musica
 
     ADD CONSTRAINT uk_playlist_musica_ordem
         UNIQUE (id_playlist, ordem);
+
+
+-- =====================================================================
+-- V12 - atualizar cadastro de artista (adiciona nome_completo)
+-- =====================================================================
+ALTER TABLE artista
+    ADD COLUMN nome_completo VARCHAR(255);
+
+ALTER TABLE artista
+    ALTER COLUMN nome_completo SET NOT NULL;
+
+
+-- =====================================================================
+-- V13 - reforcar regras de artista (descricao obrigatoria)
+-- =====================================================================
+ALTER TABLE artista
+    ALTER COLUMN descricao SET NOT NULL;
+
+ALTER TABLE artista
+    ADD CONSTRAINT ck_artista_descricao_nao_vazia
+        CHECK (BTRIM(descricao) <> '');
+
+ALTER TABLE artista
+    ADD CONSTRAINT ck_artista_descricao_tamanho
+        CHECK (CHAR_LENGTH(descricao) <= 500);

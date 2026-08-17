@@ -132,7 +132,7 @@ Armazena os artistas cadastrados no sistema.
 |---|---|---|---|
 | id_artista | BIGINT | PK | Identificador único do artista. |
 | nome | VARCHAR(255) | NOT NULL | Nome artístico do artista. |
-| descricao | TEXT | — | Descrição ou informações adicionais sobre o artista. |
+| descricao | TEXT | NOT NULL, CHECK (não vazia), CHECK (até 500 caracteres) | Descrição ou informações adicionais sobre o artista. |
 | foto_perfil_url | VARCHAR(2048) | — | URL da foto de perfil do artista. |
 | nome_completo | VARCHAR(255) | NOT NULL | Nome completo do artista. |
 
