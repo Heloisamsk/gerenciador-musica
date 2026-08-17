@@ -118,8 +118,6 @@ Os dados vêm de duas fontes:
 
 Um segundo script ([`scripts/povoamento/gerar_sql.py`](scripts/povoamento/gerar_sql.py)) junta as duas fontes e gera o arquivo `V11__popular_dados_iniciais.sql`. Esse processo roda **uma única vez, offline**, para gerar o SQL — quem clona o repositório não precisa de credenciais do Spotify nem de conexão com a API para ter o banco populado, só precisa subir o Docker.
 
-Resultado final: 51 artistas, 158 álbuns, 1.426 músicas, 60 usuários, 60 playlists e todas as demais tabelas bem acima do mínimo de 50 tuplas (principais) / 15 tuplas (secundárias) exigido.
-
 Todos os usuários fictícios usam a mesma senha para testes: **`Senha@123`**.
 
 
