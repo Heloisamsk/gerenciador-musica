@@ -123,8 +123,6 @@ Todos os usuários fictícios usam a mesma senha para testes: **`Senha@123`**.
 
 ## 🔖 » Dicionário de Dados
 
-> Versão completa também disponível em [Dicionário de Dados.pdf](https://github.com/user-attachments/files/30991513/Dicionario.de.Dados.pdf).
-
 ### ARTISTA
 Armazena os artistas cadastrados no sistema.
 
