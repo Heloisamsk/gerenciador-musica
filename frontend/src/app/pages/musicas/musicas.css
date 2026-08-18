@@ -1,0 +1,168 @@
+.musicas-container {
+  background-color: #121212;
+  color: white;
+  min-height: 100vh;
+  padding: 30px;
+  font-family: 'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.voltar-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #b3b3b3;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.voltar-link:hover {
+  color: #1db954;
+}
+
+.page-title {
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.formulario-pesquisa {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  background-color: #181818;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-titulo {
+  grid-column: span 2;
+}
+
+.campo label {
+  font-size: 13px;
+  color: #b3b3b3;
+}
+
+.campo input,
+.campo select {
+  background-color: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  color: white;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.campo input:focus,
+.campo select:focus {
+  outline: 2px solid #1db954;
+  outline-offset: 1px;
+}
+
+.botoes {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  grid-column: span 2;
+}
+
+.botao-pesquisar,
+.botao-limpar {
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.botao-pesquisar {
+  background-color: #1db954;
+  color: #121212;
+}
+
+.botao-limpar {
+  background-color: transparent;
+  color: #b3b3b3;
+  border: 1px solid #727272;
+}
+
+.botao-pesquisar:hover,
+.botao-limpar:hover {
+  transform: scale(1.03);
+}
+
+.status-message {
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.error-message {
+  background-color: #e22134;
+  color: white;
+}
+
+.mensagem-estado {
+  color: #b3b3b3;
+  font-size: 14px;
+}
+
+.lista-musicas {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+}
+
+.musica-card {
+  padding: 10px 16px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.musica-card:hover {
+  background-color: #2a2a2a;
+}
+
+.musica-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.musica-titulo {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.musica-detalhe {
+  font-size: 14px;
+  color: #b3b3b3;
+}
+
+.musica-generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.genero-tag {
+  font-size: 11px;
+  color: #b3b3b3;
+  border: 1px solid #727272;
+  border-radius: 10px;
+  padding: 1px 8px;
+}
