@@ -1,8 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { AdminMusicaService } from '../../services/admin-musica';
+import { MusicaService } from '../../services/musica';
 import { PlaylistService } from '../../services/playlist';
 import { MusicaListagem } from '../../models/MusicaListagem';
+import { forkJoin } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-catalogo',
@@ -11,19 +13,16 @@ import { MusicaListagem } from '../../models/MusicaListagem';
   styleUrls: ['./catalogo.css']
 })
 export class Catalogo implements OnInit {
-  // Signals: este projeto não usa Zone.js, então propriedades comuns
-  // alteradas dentro de .subscribe(...) não avisam o Angular pra
-  // redesenhar a tela (mesmo bug corrigido em admin-musicas.ts).
+
   musicas = signal<MusicaListagem[]>([]);
   loadingAdicionar = signal<{ [musicaId: number]: boolean }>({});
   musicasAdicionadas = signal<{ [musicaId: number]: boolean }>({});
   mensagemErro = signal<string | null>(null);
   mensagemSucesso = signal<string | null>(null);
-
   playlistId!: number;
 
   constructor(
-    private musicaService: AdminMusicaService,
+    private musicaService: MusicaService,
     private playlistService: PlaylistService,
     private route: ActivatedRoute
   ) {}
@@ -33,13 +32,36 @@ export class Catalogo implements OnInit {
     this.carregarMusicas();
   }
 
-  carregarMusicas(): void {
-    this.musicaService.listarMusicas().subscribe({
-      next: (dados) => {
-        this.musicas.set(dados);
+  atualizarBusca(evento: Event): void {
+    const campo = evento.target as HTMLInputElement;
+    const termo = campo.value.trim();
+
+    this.musicaService.pesquisar({ titulo: termo }, 0, 100).subscribe({
+      next: (pagina) => {
+        this.musicas.set(pagina.itens); // Atualiza a tela com a resposta do banco
       },
-      error: (err) => {
-        this.tratarErro(err, 'Erro ao carregar o catálogo de músicas.');
+      error: (err: HttpErrorResponse) => {
+        this.tratarErro(err, 'Erro ao pesquisar músicas no catálogo.');
+      }
+    });
+  }
+
+  carregarMusicas(): void {
+    forkJoin({
+      catalogo: this.musicaService.pesquisar({}, 0, 100),
+      playlist: this.playlistService.buscarPorId(this.playlistId)
+    }).subscribe({
+      next: (resultados) => {
+        this.musicas.set(resultados.catalogo.itens);
+
+        const adicionadas: { [id: number]: boolean } = {};
+        resultados.playlist.musicas.forEach(musica => {
+          adicionadas[musica.id] = true;
+        });
+        this.musicasAdicionadas.set(adicionadas);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.tratarErro(err, 'Erro ao carregar os dados do catálogo e da playlist.');
       }
     });
   }
@@ -64,7 +86,27 @@ export class Catalogo implements OnInit {
     });
   }
 
-  private tratarErro(err: any, mensagemGenerica: string, musicaId?: number): void {
+  removerMusica(musicaId: number): void {
+    if (!this.musicasAdicionadas()[musicaId]) return;
+
+    this.definirLoading(musicaId, true);
+    this.mensagemErro.set(null);
+    this.mensagemSucesso.set(null);
+
+    this.playlistService.removerMusica(this.playlistId, musicaId).subscribe({
+      next: () => {
+        this.definirAdicionada(musicaId, false);
+        this.definirLoading(musicaId, false);
+        this.mensagemSucesso.set('Música removida da playlist com sucesso!');
+      },
+      error: (err) => {
+        this.definirLoading(musicaId, false);
+        this.tratarErro(err, 'Não foi possível remover a música.', musicaId);
+      }
+    });
+  }
+
+  private tratarErro(err: HttpErrorResponse, mensagemGenerica: string, musicaId?: number): void {
     if (err.status === 401) {
       this.mensagemErro.set('Sessão expirada ou não autenticada. Faça login novamente.');
     } else if (err.status === 403) {
@@ -81,9 +123,6 @@ export class Catalogo implements OnInit {
     }
   }
 
-  // Um signal precisa de um objeto NOVO a cada atualização (o Angular
-  // compara por referência), por isso o spread { ...atual } em vez de
-  // simplesmente mutar o objeto existente.
   private definirLoading(musicaId: number, valor: boolean): void {
     this.loadingAdicionar.update(atual => ({ ...atual, [musicaId]: valor }));
   }
