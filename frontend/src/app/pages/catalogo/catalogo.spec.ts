@@ -5,7 +5,6 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
-
 import { Catalogo } from './catalogo';
 import { MusicaListagem } from '../../models/MusicaListagem';
 
@@ -54,16 +53,27 @@ describe('Catalogo', () => {
     };
   }
 
-  it('deve carregar o catálogo de músicas usando o id da playlist da rota', () => {
-    fixture.detectChanges();
-
-    httpMock.expectOne(`${musicasUrl}?size=100`).flush({
+  // NOVA FUNÇÃO: Responde as duas requisições do forkJoin instantaneamente
+  function mockarRespostasIniciais() {
+    httpMock.expectOne(`${musicasUrl}?page=0&size=100`).flush({
       itens: [musicaDeExemplo()],
       paginaAtual: 0,
       tamanhoPagina: 100,
       totalItens: 1,
       totalPaginas: 1,
     });
+
+    httpMock.expectOne(`${playlistsUrl}/1`).flush({
+      id: 1,
+      nome: 'Playlist Teste',
+      descricao: '',
+      musicas: []
+    });
+  }
+
+  it('deve carregar o catálogo de músicas usando o id da playlist da rota', () => {
+    fixture.detectChanges();
+    mockarRespostasIniciais();
 
     expect(component.playlistId).toBe(1);
     expect(component.musicas()).toHaveLength(1);
@@ -71,16 +81,9 @@ describe('Catalogo', () => {
 
   it('deve adicionar a música na playlist e marcar como adicionada', () => {
     fixture.detectChanges();
-    httpMock.expectOne(`${musicasUrl}?size=100`).flush({
-      itens: [musicaDeExemplo()],
-      paginaAtual: 0,
-      tamanhoPagina: 100,
-      totalItens: 1,
-      totalPaginas: 1,
-    });
+    mockarRespostasIniciais();
 
     component.adicionarMusica(5);
-
     httpMock
       .expectOne(`${playlistsUrl}/1/musicas/5`)
       .flush(null, { status: 204, statusText: 'No Content' });
@@ -92,13 +95,7 @@ describe('Catalogo', () => {
 
   it('não deve enviar uma segunda requisição para uma música já adicionada', () => {
     fixture.detectChanges();
-    httpMock.expectOne(`${musicasUrl}?size=100`).flush({
-      itens: [musicaDeExemplo()],
-      paginaAtual: 0,
-      tamanhoPagina: 100,
-      totalItens: 1,
-      totalPaginas: 1,
-    });
+    mockarRespostasIniciais();
 
     component.adicionarMusica(5);
     httpMock
@@ -106,22 +103,14 @@ describe('Catalogo', () => {
       .flush(null, { status: 204, statusText: 'No Content' });
 
     component.adicionarMusica(5);
-
     httpMock.expectNone(`${playlistsUrl}/1/musicas/5`);
   });
 
   it('deve mostrar mensagem de erro e liberar o botão quando a requisição falha', () => {
     fixture.detectChanges();
-    httpMock.expectOne(`${musicasUrl}?size=100`).flush({
-      itens: [musicaDeExemplo()],
-      paginaAtual: 0,
-      tamanhoPagina: 100,
-      totalItens: 1,
-      totalPaginas: 1,
-    });
+    mockarRespostasIniciais();
 
     component.adicionarMusica(5);
-
     httpMock
       .expectOne(`${playlistsUrl}/1/musicas/5`)
       .flush({ message: 'erro' }, { status: 500, statusText: 'Internal Server Error' });
