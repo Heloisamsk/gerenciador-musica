@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http/testing';
 
 import { AdminMusicaService } from './admin-musica';
-import { MusicaResponse } from '../models/MusicaResponse';
+import { MusicaListagem } from '../models/MusicaListagem';
 
 describe('AdminMusicaService', () => {
   let service: AdminMusicaService;
@@ -55,7 +55,7 @@ describe('AdminMusicaService', () => {
           artistaPrincipal: { id: 1, nome: 'Queen' },
           album: { id: 1, titulo: 'A Night at the Opera' },
           generos: [{ id: 1, nome: 'Rock' }],
-        } as MusicaResponse,
+        } as MusicaListagem,
       ],
       paginaAtual: 0,
       tamanhoPagina: 100,

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { MusicaResponse } from '../models/MusicaResponse';
+import { MusicaListagem } from '../models/MusicaListagem';
 import { PaginaResponse } from '../models/PaginaResponse';
 
 @Injectable({
@@ -20,9 +20,9 @@ export class AdminMusicaService {
 
   constructor(private http: HttpClient) {}
 
-  listarMusicas(): Observable<MusicaResponse[]> {
+  listarMusicas(): Observable<MusicaListagem[]> {
     return this.http
-      .get<PaginaResponse<MusicaResponse>>(this.apiUrl, {
+      .get<PaginaResponse<MusicaListagem>>(this.apiUrl, {
         params: { size: this.TAMANHO_PAGINA_MAXIMO }
       })
       .pipe(map(pagina => pagina.itens));
