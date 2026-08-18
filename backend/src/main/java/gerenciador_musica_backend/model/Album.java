@@ -9,9 +9,23 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
+// Restrição de unicidade: impede o cadastro de dois álbuns com o mesmo artista, título e ano de lançamento.
 @Entity
-@Table(name = "album")
+@Table(
+        name = "album",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_album_artista_titulo_ano",
+                        columnNames = {
+                                "id_artista",
+                                "titulo",
+                                "ano_lancamento"
+                        }
+                )
+        }
+)
 public class Album {
 
     @Id

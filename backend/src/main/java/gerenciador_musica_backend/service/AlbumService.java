@@ -7,7 +7,6 @@ import gerenciador_musica_backend.exception.AlbumDuplicadoException;
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +27,7 @@ public class AlbumService {
     @Transactional
     public AlbumResponseDTO cadastrarAlbum(AlbumRequestDTO request) {
 
-        String tituloOriginal = request.titulo();
-
-        String tituloNormalizado = tituloOriginal
-                .strip()
-                .replaceAll("\\s+", " ");
+        String titulo = request.titulo().strip();
 
         Artista artista = artistaService.buscarEntidadePorId(
                 request.idArtista()
@@ -41,7 +36,7 @@ public class AlbumService {
         boolean albumJaExiste =
                 albumRepository
                         .existsByTituloIgnoreCaseAndArtistaIdArtistaAndAnoLancamento(
-                                tituloNormalizado,
+                                titulo,
                                 artista.getIdArtista(),
                                 request.anoLancamento()
                         );
@@ -49,7 +44,7 @@ public class AlbumService {
         if (albumJaExiste) {
             throw new AlbumDuplicadoException(
                     "Já existe um álbum com o título '"
-                            + tituloNormalizado
+                            + titulo
                             + "' para esse artista no ano de "
                             + request.anoLancamento()
             );
@@ -57,21 +52,14 @@ public class AlbumService {
 
         Album album = new Album(
                 artista,
-                tituloNormalizado,
+                titulo,
                 request.anoLancamento(),
                 request.capaUrl()
         );
 
-        try {
-            Album albumSalvo = albumRepository.save(album);
+        Album albumSalvo = albumRepository.save(album);
 
-            return converterParaResponse(albumSalvo);
-
-        } catch (DataIntegrityViolationException exception) {
-            throw new AlbumDuplicadoException(
-                    "O álbum já está cadastrado para esse artista e ano."
-            );
-        }
+        return converterParaResponse(albumSalvo);
     }
 
     private AlbumResponseDTO converterParaResponse(Album album) {
