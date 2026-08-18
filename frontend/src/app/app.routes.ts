@@ -109,6 +109,14 @@ export const routes: Routes = [
 },
 
 {
+  path: 'musicas',
+  loadComponent: () =>
+    import('./pages/musicas/musicas')
+      .then(modulo => modulo.Musicas),
+  canActivate: [authGuard]
+},
+
+{
   path: '**',
   redirectTo: 'login'
 }

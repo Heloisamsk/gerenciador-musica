@@ -1,0 +1,115 @@
+<div class="musicas-container">
+  <a class="voltar-link" routerLink="/home">
+    ← Voltar para a home
+  </a>
+
+  <h1 class="page-title">Pesquisar músicas</h1>
+
+  <form
+    class="formulario-pesquisa"
+    [formGroup]="formulario"
+    (ngSubmit)="pesquisar()"
+  >
+    <div class="campo campo-titulo">
+      <label for="titulo">Título</label>
+      <input
+        id="titulo"
+        type="text"
+        formControlName="titulo"
+        placeholder="Buscar por título da música"
+      />
+    </div>
+
+    <div class="campo">
+      <label for="artistaId">Artista</label>
+      <select id="artistaId" formControlName="artistaId">
+        <option [ngValue]="null">Todos os artistas</option>
+        @for (artista of artistas(); track artista.idArtista) {
+          <option [ngValue]="artista.idArtista">{{ artista.nome }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="albumId">Álbum</label>
+      <select id="albumId" formControlName="albumId">
+        <option [ngValue]="null">Todos os álbuns</option>
+        @for (album of albuns(); track album.idAlbum) {
+          <option [ngValue]="album.idAlbum">{{ album.titulo }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="generoId">Gênero</label>
+      <select id="generoId" formControlName="generoId">
+        <option [ngValue]="null">Todos os gêneros</option>
+        @for (genero of generos(); track genero.id) {
+          <option [ngValue]="genero.id">{{ genero.nome }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="campo campo-ano">
+      <label for="ano">Ano de lançamento</label>
+      <input
+        id="ano"
+        type="number"
+        formControlName="ano"
+        placeholder="Ex: 1975"
+      />
+    </div>
+
+    <div class="botoes">
+      <button class="botao-pesquisar" type="submit">
+        Pesquisar
+      </button>
+
+      <button
+        class="botao-limpar"
+        type="button"
+        (click)="limparFiltros()"
+      >
+        Limpar filtros
+      </button>
+    </div>
+  </form>
+
+  @if (mensagemErro()) {
+    <div class="status-message error-message" role="alert">
+      <p>{{ mensagemErro() }}</p>
+    </div>
+  }
+
+  <div class="resultados" aria-live="polite">
+    @if (pesquisando()) {
+      <p class="mensagem-estado">Pesquisando...</p>
+    } @else if (jaPesquisou() && musicas().length === 0 && !mensagemErro()) {
+      <p class="mensagem-estado">Nenhuma música encontrada para esses filtros.</p>
+    } @else {
+      <ul class="lista-musicas">
+        @for (musica of musicas(); track musica.id) {
+          <li class="musica-card">
+            <div class="musica-info">
+              <span class="musica-titulo">{{ musica.titulo }}</span>
+              <span class="musica-detalhe">
+                {{ musica.artistaPrincipal.nome }}
+                @if (musica.album) {
+                  · {{ musica.album.titulo }}
+                }
+                · {{ musica.anoLancamento }}
+              </span>
+              @if (musica.generos.length > 0) {
+                <span class="musica-generos">
+                  @for (genero of musica.generos; track genero.id) {
+                    <span class="genero-tag">{{ genero.nome }}</span>
+                  }
+                </span>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
-import { MusicaResponse } from '../../models/MusicaResponse';
+import { MusicaListagem } from '../../models/MusicaListagem';
 import { AdminMusicaService } from '../../services/admin-musica';
 
 @Component({
@@ -16,7 +16,7 @@ export class AdminMusicas implements OnInit {
   // então uma atribuição simples (this.musicas = dados) dentro do
   // .subscribe() não avisa o Angular pra redesenhar a tela. Um signal
   // (.set(...)) avisa automaticamente.
-  musicas = signal<MusicaResponse[]>([]);
+  musicas = signal<MusicaListagem[]>([]);
   carregando = signal(false);
   mensagemErro = signal('');
 
@@ -45,7 +45,7 @@ export class AdminMusicas implements OnInit {
       });
   }
 
-  generosTexto(musica: MusicaResponse): string {
+  generosTexto(musica: MusicaListagem): string {
     if (!musica.generos || musica.generos.length === 0) {
       return '-';
     }
