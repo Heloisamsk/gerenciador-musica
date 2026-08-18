@@ -1,6 +1,5 @@
 import {
   Component,
-  computed,
   OnInit,
   signal
 } from '@angular/core';
@@ -33,36 +32,6 @@ export class Home implements OnInit {
   erroArtistas = signal('');
   erroMusicas = signal('');
 
-  artistasFiltrados = computed(() => {
-    const termo = this.normalizar(this.termoBusca());
-
-    if (!termo) {
-      return this.artistas();
-    }
-
-    return this.artistas().filter(artista =>
-      this.normalizar(artista.nome).includes(termo)
-    );
-  });
-
-  musicasFiltradas = computed(() => {
-    const termo = this.normalizar(this.termoBusca());
-
-    if (!termo) {
-      return this.musicas();
-    }
-
-    return this.musicas().filter(musica => {
-      const titulo = this.normalizar(musica.titulo);
-      const artista = this.normalizar(
-        musica.artistaPrincipal.nome
-      );
-
-      return titulo.includes(termo) ||
-        artista.includes(termo);
-    });
-  });
-
   constructor(
     private readonly authService: AuthService,
     private readonly catalogoService: CatalogoService,
@@ -81,6 +50,16 @@ export class Home implements OnInit {
   atualizarBusca(evento: Event): void {
     const campo = evento.target as HTMLInputElement;
     this.termoBusca.set(campo.value);
+  }
+
+  // A busca da home não filtra mais localmente: ela leva o usuário até a
+  // página de pesquisa de verdade, que já usa os filtros do backend (US06).
+  pesquisar(): void {
+    const titulo = this.termoBusca().trim();
+
+    this.router.navigate(['/musicas'], {
+      queryParams: titulo ? { titulo } : {}
+    });
   }
 
   logout(): void {
@@ -155,16 +134,6 @@ export class Home implements OnInit {
           );
         }
       });
-  }
-
-  private normalizar(
-    texto: string | null | undefined
-  ): string {
-    return (texto ?? '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLocaleLowerCase('pt-BR')
-      .trim();
   }
 
   substituirFotoArtista(evento: Event): void {

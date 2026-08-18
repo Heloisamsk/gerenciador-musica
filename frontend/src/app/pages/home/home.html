@@ -49,13 +49,16 @@
   </aside>
 
   <main class="conteudo">
-    <input
-      class="campo-busca"
-      type="search"
-      placeholder="Buscar artistas e músicas"
-      aria-label="Buscar artistas e músicas"
-      (input)="atualizarBusca($event)"
-    >
+    <form (submit)="$event.preventDefault(); pesquisar()">
+      <input
+        class="campo-busca"
+        type="search"
+        name="termoBusca"
+        placeholder="Buscar músicas"
+        aria-label="Buscar músicas"
+        (input)="atualizarBusca($event)"
+      >
+    </form>
 
     <section class="secao">
       <h2>Artistas</h2>
@@ -71,7 +74,7 @@
       } @else {
       <div class="lista-artistas">
         @for (
-        artista of artistasFiltrados();
+        artista of artistas();
         track artista.idArtista
         ) {
         <article class="artista-card">
@@ -114,7 +117,7 @@
       } @else {
       <div class="grade-musicas">
         @for (
-        musica of musicasFiltradas();
+        musica of musicas();
         track musica.id
         ) {
         <article class="musica-card">
