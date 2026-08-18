@@ -5,6 +5,14 @@
 
   <h2 class="page-title">Catálogo de Músicas</h2>
 
+  <input
+    class="campo-busca"
+    type="search"
+    placeholder="Buscar artistas e músicas"
+    aria-label="Buscar artistas e músicas"
+    (input)="atualizarBusca($event)"
+  >
+
   @if (mensagemSucesso()) {
     <div class="alert success">
       {{ mensagemSucesso() }}
@@ -24,7 +32,7 @@
 
         <div class="musica-left">
           <div class="musica-cover">
-            <span class="cover-icon">🎵</span>
+            <img class="musica-cover" src="/capa-padrao.png" alt="Capa de {{ musica.titulo }}" loading="lazy">
           </div>
 
           <div class="musica-info">
@@ -41,15 +49,16 @@
 
           <button
             class="btn-add"
-            (click)="adicionarMusica(musica.id)"
-            [disabled]="loadingAdicionar()[musica.id] || musicasAdicionadas()[musica.id]"
+            (click)="musicasAdicionadas()[musica.id] ? removerMusica(musica.id) : adicionarMusica(musica.id)"
+            [disabled]="loadingAdicionar()[musica.id]"
             [class.is-added]="musicasAdicionadas()[musica.id]"
-            title="Adicionar à playlist"
+            [title]="musicasAdicionadas()[musica.id] ? 'Remover da playlist' : 'Adicionar à playlist'"
           >
             @if (loadingAdicionar()[musica.id]) {
               <span class="loading-dots">...</span>
             } @else if (musicasAdicionadas()[musica.id]) {
-              <span>✓</span>
+              <span class="icon-added">✓</span>
+              <span class="icon-remove">-</span>
             } @else {
               <span>+</span>
             }
