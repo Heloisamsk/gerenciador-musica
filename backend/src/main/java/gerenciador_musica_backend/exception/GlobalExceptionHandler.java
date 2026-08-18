@@ -307,4 +307,16 @@ public class GlobalExceptionHandler {
                 .status(status)
                 .body(resposta);
     }
+    @ExceptionHandler(AlbumDuplicadoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarAlbumDuplicado(
+            AlbumDuplicadoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
 }
