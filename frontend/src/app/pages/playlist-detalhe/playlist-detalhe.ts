@@ -76,6 +76,11 @@ export class PlaylistDetalhe implements OnInit {
       return;
     }
 
+    const confirmacao = window.confirm('Tem certeza que deseja remover esta música da playlist?');
+    if (!confirmacao) {
+      return;
+    }
+
     this.removendoMusicaId = musicaId;
     this.mensagemErro = '';
 
