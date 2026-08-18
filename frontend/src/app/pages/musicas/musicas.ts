@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 
@@ -52,6 +52,12 @@ export class Musicas implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router
   ) {}
+
+  // Usado para levar os filtros/página atuais junto no link pra cada música,
+  // pra que a página de detalhes consiga montar o link de volta com eles.
+  get queryParamsAtuais(): Params {
+    return this.route.snapshot.queryParams;
+  }
 
   ngOnInit(): void {
     this.carregarOpcoesDeFiltro();

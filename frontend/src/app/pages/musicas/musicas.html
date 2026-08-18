@@ -95,7 +95,11 @@
       <ul class="lista-musicas">
         @for (musica of musicas(); track musica.id) {
           <li class="musica-card">
-            <a class="musica-link" [routerLink]="['/musicas', musica.id]">
+            <a
+              class="musica-link"
+              [routerLink]="['/musicas', musica.id]"
+              [state]="{ queryParams: queryParamsAtuais }"
+            >
               <img
                 class="musica-capa"
                 [src]="musica.album?.capaUrl || '/capa-padrao.png'"

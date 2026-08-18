@@ -1,5 +1,5 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Params, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 
@@ -21,6 +21,11 @@ export class MusicaDetalhe implements OnInit {
   carregando = signal(false);
   mensagemErro = signal('');
 
+  // Filtros/página da pesquisa que trouxe o usuário até aqui, recebidos via
+  // router state (não vão pra URL). Se a página for aberta direto (sem vir
+  // da pesquisa), fica vazio e o link de volta cai numa pesquisa em branco.
+  voltarQueryParams = signal<Params>({});
+
   constructor(
     private readonly musicaService: MusicaService,
     private readonly route: ActivatedRoute
@@ -28,6 +33,7 @@ export class MusicaDetalhe implements OnInit {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.voltarQueryParams.set(window.history.state?.queryParams ?? {});
     this.carregarMusica(id);
   }
 
