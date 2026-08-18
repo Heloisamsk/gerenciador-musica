@@ -5,15 +5,14 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
-
 import { PlaylistDetalhe } from './playlist-detalhe';
 import { PlaylistResponse } from '../../models/PlaylistResponse';
+import { vi } from 'vitest';
 
 describe('PlaylistDetalhe', () => {
   let component: PlaylistDetalhe;
   let fixture: ComponentFixture<PlaylistDetalhe>;
   let httpMock: HttpTestingController;
-
   const apiUrl = 'http://localhost:8080/api/playlists';
 
   beforeEach(async () => {
@@ -39,6 +38,7 @@ describe('PlaylistDetalhe', () => {
 
   afterEach(() => {
     httpMock.verify();
+    vi.restoreAllMocks(); // Limpa os mocks do Vitest
   });
 
   function playlistComUmaMusica(): PlaylistResponse {
@@ -52,14 +52,15 @@ describe('PlaylistDetalhe', () => {
 
   it('deve carregar a playlist ao iniciar', () => {
     fixture.detectChanges();
-
     httpMock.expectOne(`${apiUrl}/10`).flush(playlistComUmaMusica());
-
     expect(component.playlist?.nome).toBe('Favoritas');
     expect(component.carregando).toBe(false);
   });
 
   it('deve remover a música da lista local quando a remoção tem sucesso', () => {
+    // Mocka o confirm para retornar 'true' (clicar em OK)
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
     fixture.detectChanges();
     httpMock.expectOne(`${apiUrl}/10`).flush(playlistComUmaMusica());
 
@@ -74,20 +75,22 @@ describe('PlaylistDetalhe', () => {
   });
 
   it('não deve permitir clicar em remover duas vezes para a mesma música', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
     fixture.detectChanges();
     httpMock.expectOne(`${apiUrl}/10`).flush(playlistComUmaMusica());
 
     component.removerMusica(5);
     component.removerMusica(5);
 
-    // Se o segundo clique tivesse dobrado a requisição, expectOne
-    // falharia por encontrar duas pendentes em vez de uma.
     httpMock
       .expectOne(`${apiUrl}/10/musicas/5`)
       .flush(null, { status: 204, statusText: 'No Content' });
   });
 
   it('deve mostrar mensagem de erro quando a remoção falha', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
     fixture.detectChanges();
     httpMock.expectOne(`${apiUrl}/10`).flush(playlistComUmaMusica());
 
