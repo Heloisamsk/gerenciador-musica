@@ -1,8 +1,11 @@
 package gerenciador_musica_backend.service;
 
 import gerenciador_musica_backend.dto.AlbumRequestDTO;
+import gerenciador_musica_backend.dto.MusicaFiltroDTO;
+import gerenciador_musica_backend.dto.MusicaListagemDTO;
 import gerenciador_musica_backend.dto.MusicaRequestDTO;
 import gerenciador_musica_backend.dto.MusicaResponseDTO;
+import gerenciador_musica_backend.dto.PaginaResponseDTO;
 import gerenciador_musica_backend.exception.DadosMusicaInvalidosException;
 import gerenciador_musica_backend.exception.MusicaDuplicadaException;
 import gerenciador_musica_backend.exception.MusicaNaoEncontradaException;
@@ -15,10 +18,16 @@ import gerenciador_musica_backend.repository.GeneroRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -267,5 +276,103 @@ class MusicaServiceTest {
 
         assertThatThrownBy(() -> musicaService.buscarPorId(99L))
                 .isInstanceOf(MusicaNaoEncontradaException.class);
+    }
+
+    private Musica montarMusicaCompleta() {
+        Artista artista = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                null
+        );
+        Album album = new Album(
+                artista,
+                "A Night at the Opera",
+                (short) 1975,
+                "http://capa.png"
+        );
+
+        return new Musica(
+                "Bohemian Rhapsody",
+                null,
+                354,
+                (short) 1975,
+                artista,
+                album,
+                Set.of(),
+                Set.of(new Genero("Rock"))
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void devePesquisarMusicasAplicandoPaginacaoPadraoQuandoParametrosNaoInformados() {
+        Musica musica = montarMusicaCompleta();
+        Page<Musica> pagina = new PageImpl<>(
+                List.of(musica),
+                PageRequest.of(0, 20),
+                1
+        );
+
+        when(musicaRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(pagina);
+
+        PaginaResponseDTO<MusicaListagemDTO> resultado =
+                musicaService.pesquisarMusicas(null, null, null);
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(musicaRepository).findAll(any(Specification.class), captor.capture());
+
+        Pageable pageableUsado = captor.getValue();
+        assertThat(pageableUsado.getPageNumber()).isEqualTo(0);
+        assertThat(pageableUsado.getPageSize()).isEqualTo(20);
+        assertThat(pageableUsado.getSort().getOrderFor("titulo")).isNotNull();
+
+        assertThat(resultado.totalItens()).isEqualTo(1);
+        assertThat(resultado.itens()).hasSize(1);
+
+        MusicaListagemDTO item = resultado.itens().getFirst();
+        assertThat(item.titulo()).isEqualTo("Bohemian Rhapsody");
+        assertThat(item.artistaPrincipal().nome()).isEqualTo("Queen");
+        assertThat(item.album().titulo()).isEqualTo("A Night at the Opera");
+        assertThat(item.generos()).hasSize(1);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void deveLimitarTamanhoDaPaginaAoMaximoPermitidoQuandoValorPedidoForMaior() {
+        when(musicaRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        musicaService.pesquisarMusicas(null, 0, 500);
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(musicaRepository).findAll(any(Specification.class), captor.capture());
+
+        assertThat(captor.getValue().getPageSize()).isEqualTo(100);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoPaginaForNegativa() {
+        assertThatThrownBy(() -> musicaService.pesquisarMusicas(null, -1, 10))
+                .isInstanceOf(DadosMusicaInvalidosException.class);
+
+        verify(musicaRepository, never()).findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoTamanhoDaPaginaForZeroOuNegativo() {
+        assertThatThrownBy(() -> musicaService.pesquisarMusicas(null, 0, 0))
+                .isInstanceOf(DadosMusicaInvalidosException.class);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoAnoDoFiltroForInvalido() {
+        MusicaFiltroDTO filtroComAnoFuturo = new MusicaFiltroDTO(null, null, null, null, (short) 3000);
+
+        assertThatThrownBy(() -> musicaService.pesquisarMusicas(filtroComAnoFuturo, 0, 10))
+                .isInstanceOf(DadosMusicaInvalidosException.class);
+
+        verify(musicaRepository, never()).findAll(any(Specification.class), any(Pageable.class));
     }
 }

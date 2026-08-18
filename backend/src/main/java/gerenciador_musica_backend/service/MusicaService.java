@@ -11,10 +11,15 @@ import gerenciador_musica_backend.model.Musica;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.GeneroRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
+import gerenciador_musica_backend.repository.specification.MusicaSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Year;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -427,6 +432,124 @@ public class MusicaService {
                 );
 
         return converterParaResponse(musica);
+    }
+
+    private static final int TAMANHO_PAGINA_PADRAO = 20;
+    private static final int TAMANHO_PAGINA_MAXIMO = 100;
+
+    @Transactional(readOnly = true)
+    public PaginaResponseDTO<MusicaListagemDTO> pesquisarMusicas(
+            MusicaFiltroDTO filtro,
+            Integer pagina,
+            Integer tamanhoPagina
+    ) {
+        MusicaFiltroDTO filtroNormalizado = normalizarFiltro(filtro);
+        validarAno(filtroNormalizado.anoLancamento());
+
+        Pageable pageable = PageRequest.of(
+                validarPagina(pagina),
+                validarTamanhoPagina(tamanhoPagina),
+                Sort.by(Sort.Direction.ASC, "titulo")
+        );
+
+        Page<Musica> resultado = musicaRepository.findAll(
+                MusicaSpecification.comFiltros(filtroNormalizado),
+                pageable
+        );
+
+        List<MusicaListagemDTO> itens = resultado
+                .getContent()
+                .stream()
+                .map(this::converterParaListagem)
+                .toList();
+
+        return new PaginaResponseDTO<>(
+                itens,
+                resultado.getNumber(),
+                resultado.getSize(),
+                resultado.getTotalElements(),
+                resultado.getTotalPages()
+        );
+    }
+
+    private MusicaFiltroDTO normalizarFiltro(MusicaFiltroDTO filtro) {
+        if (filtro == null) {
+            return new MusicaFiltroDTO(null, null, null, null, null);
+        }
+
+        return new MusicaFiltroDTO(
+                normalizarTextoOpcional(filtro.titulo()),
+                filtro.artistaId(),
+                filtro.albumId(),
+                filtro.generoId(),
+                filtro.anoLancamento()
+        );
+    }
+
+    private void validarAno(Short anoLancamento) {
+        if (anoLancamento == null) {
+            return;
+        }
+
+        int anoAtual = Year.now().getValue();
+
+        if (anoLancamento <= 0 || anoLancamento > anoAtual) {
+            throw new DadosMusicaInvalidosException(
+                    "O ano de lançamento informado para o filtro é inválido."
+            );
+        }
+    }
+
+    private int validarPagina(Integer pagina) {
+        if (pagina == null) {
+            return 0;
+        }
+
+        if (pagina < 0) {
+            throw new DadosMusicaInvalidosException(
+                    "O número da página não pode ser negativo."
+            );
+        }
+
+        return pagina;
+    }
+
+    private int validarTamanhoPagina(Integer tamanhoPagina) {
+        if (tamanhoPagina == null) {
+            return TAMANHO_PAGINA_PADRAO;
+        }
+
+        if (tamanhoPagina <= 0) {
+            throw new DadosMusicaInvalidosException(
+                    "O tamanho da página deve ser maior que zero."
+            );
+        }
+
+        return Math.min(tamanhoPagina, TAMANHO_PAGINA_MAXIMO);
+    }
+
+    private MusicaListagemDTO converterParaListagem(Musica musica) {
+        ArtistaResumoDTO artistaPrincipal = converterArtistaParaResumo(
+                musica.getArtistaPrincipal()
+        );
+
+        AlbumResumoDTO album = converterAlbumParaResumo(musica.getAlbum());
+
+        Set<GeneroResumoDTO> generos = musica
+                .getGeneros()
+                .stream()
+                .map(this::converterGeneroParaResumo)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        return new MusicaListagemDTO(
+                musica.getIdMusica(),
+                musica.getTitulo(),
+                musica.getDuracaoSegundos(),
+                musica.getAnoLancamento(),
+                artistaPrincipal,
+                album,
+                generos
+        );
     }
 }
 
