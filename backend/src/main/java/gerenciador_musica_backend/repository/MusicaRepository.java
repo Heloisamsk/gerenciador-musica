@@ -4,10 +4,11 @@ import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Musica;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
-public interface MusicaRepository extends JpaRepository<Musica, Long> {
+public interface MusicaRepository extends JpaRepository<Musica, Long>, JpaSpecificationExecutor<Musica> {
 
     boolean existsByAlbumAndTituloIgnoreCase(
             Album album,
