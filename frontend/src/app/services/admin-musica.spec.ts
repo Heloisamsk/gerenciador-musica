@@ -41,20 +41,26 @@ describe('AdminMusicaService', () => {
       expect(musicas[0].titulo).toBe('Bohemian Rhapsody');
     });
 
-    const requisicao = httpMock.expectOne(apiUrl);
+    const requisicao = httpMock.expectOne(`${apiUrl}?size=100`);
 
     expect(requisicao.request.method).toBe('GET');
 
-    requisicao.flush([
-      {
-        id: 1,
-        titulo: 'Bohemian Rhapsody',
-        duracaoSegundos: 354,
-        anoLancamento: 1975,
-        artistaPrincipal: { id: 1, nome: 'Queen' },
-        album: { id: 1, titulo: 'A Night at the Opera' },
-        generos: [{ id: 1, nome: 'Rock' }],
-      },
-    ] as MusicaResponse[]);
+    requisicao.flush({
+      itens: [
+        {
+          id: 1,
+          titulo: 'Bohemian Rhapsody',
+          duracaoSegundos: 354,
+          anoLancamento: 1975,
+          artistaPrincipal: { id: 1, nome: 'Queen' },
+          album: { id: 1, titulo: 'A Night at the Opera' },
+          generos: [{ id: 1, nome: 'Rock' }],
+        } as MusicaResponse,
+      ],
+      paginaAtual: 0,
+      tamanhoPagina: 100,
+      totalItens: 1,
+      totalPaginas: 1,
+    });
   });
 });

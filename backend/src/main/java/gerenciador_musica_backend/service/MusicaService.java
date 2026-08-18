@@ -415,15 +415,6 @@ public class MusicaService {
     }
 
     @Transactional(readOnly = true)
-    public List<MusicaResponseDTO> listarMusicas() {
-        return musicaRepository
-                .findAll(Sort.by(Sort.Direction.ASC, "titulo"))
-                .stream()
-                .map(this::converterParaResponse)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
     public MusicaResponseDTO buscarPorId(Long id) {
         Musica musica = musicaRepository
                 .findById(id)
@@ -436,12 +427,15 @@ public class MusicaService {
 
     private static final int TAMANHO_PAGINA_PADRAO = 20;
     private static final int TAMANHO_PAGINA_MAXIMO = 100;
+    private static final Set<String> CAMPOS_ORDENACAO_PERMITIDOS =
+            Set.of("titulo", "anoLancamento", "duracaoSegundos");
 
     @Transactional(readOnly = true)
     public PaginaResponseDTO<MusicaListagemDTO> pesquisarMusicas(
             MusicaFiltroDTO filtro,
             Integer pagina,
-            Integer tamanhoPagina
+            Integer tamanhoPagina,
+            String sort
     ) {
         MusicaFiltroDTO filtroNormalizado = normalizarFiltro(filtro);
         validarAno(filtroNormalizado.anoLancamento());
@@ -449,7 +443,7 @@ public class MusicaService {
         Pageable pageable = PageRequest.of(
                 validarPagina(pagina),
                 validarTamanhoPagina(tamanhoPagina),
-                Sort.by(Sort.Direction.ASC, "titulo")
+                resolverOrdenacao(sort)
         );
 
         Page<Musica> resultado = musicaRepository.findAll(
@@ -498,6 +492,30 @@ public class MusicaService {
                     "O ano de lançamento informado para o filtro é inválido."
             );
         }
+    }
+
+    private Sort resolverOrdenacao(String sort) {
+        if (sort == null || sort.isBlank()) {
+            return Sort.by(Sort.Direction.ASC, "titulo");
+        }
+
+        String[] partes = sort.split(",");
+        String campo = partes[0].trim();
+
+        if (!CAMPOS_ORDENACAO_PERMITIDOS.contains(campo)) {
+            throw new DadosMusicaInvalidosException(
+                    "Campo de ordenação inválido: " + campo
+            );
+        }
+
+        boolean descendente = partes.length > 1
+                && partes[1].trim().equalsIgnoreCase("desc");
+
+        Sort.Direction direcao = descendente
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        return Sort.by(direcao, campo);
     }
 
     private int validarPagina(Integer pagina) {

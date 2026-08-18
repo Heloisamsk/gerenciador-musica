@@ -216,34 +216,6 @@ class MusicaServiceTest {
     }
 
     @Test
-    void deveListarMusicasCadastradas() {
-        Artista artista = new Artista(
-                "Queen",
-                "Queen",
-                "Banda britânica de rock.",
-                null
-        );
-        Musica musica = new Musica(
-                "Bohemian Rhapsody",
-                null,
-                354,
-                (short) 1975,
-                artista,
-                null,
-                Set.of(),
-                Set.of()
-        );
-
-        when(musicaRepository.findAll(any(Sort.class)))
-                .thenReturn(List.of(musica));
-
-        List<MusicaResponseDTO> resultado = musicaService.listarMusicas();
-
-        assertThat(resultado).hasSize(1);
-        assertThat(resultado.getFirst().titulo()).isEqualTo("Bohemian Rhapsody");
-    }
-
-    @Test
     void deveBuscarMusicaPorId() {
         Artista artista = new Artista(
                 "Queen",
@@ -319,7 +291,7 @@ class MusicaServiceTest {
                 .thenReturn(pagina);
 
         PaginaResponseDTO<MusicaListagemDTO> resultado =
-                musicaService.pesquisarMusicas(null, null, null);
+                musicaService.pesquisarMusicas(null, null, null, null);
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
         verify(musicaRepository).findAll(any(Specification.class), captor.capture());
@@ -345,7 +317,7 @@ class MusicaServiceTest {
         when(musicaRepository.findAll(any(Specification.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        musicaService.pesquisarMusicas(null, 0, 500);
+        musicaService.pesquisarMusicas(null, 0, 500, null);
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
         verify(musicaRepository).findAll(any(Specification.class), captor.capture());
@@ -355,7 +327,7 @@ class MusicaServiceTest {
 
     @Test
     void deveLancarExcecaoQuandoPaginaForNegativa() {
-        assertThatThrownBy(() -> musicaService.pesquisarMusicas(null, -1, 10))
+        assertThatThrownBy(() -> musicaService.pesquisarMusicas(null, -1, 10, null))
                 .isInstanceOf(DadosMusicaInvalidosException.class);
 
         verify(musicaRepository, never()).findAll(any(Specification.class), any(Pageable.class));
@@ -363,7 +335,7 @@ class MusicaServiceTest {
 
     @Test
     void deveLancarExcecaoQuandoTamanhoDaPaginaForZeroOuNegativo() {
-        assertThatThrownBy(() -> musicaService.pesquisarMusicas(null, 0, 0))
+        assertThatThrownBy(() -> musicaService.pesquisarMusicas(null, 0, 0, null))
                 .isInstanceOf(DadosMusicaInvalidosException.class);
     }
 
@@ -371,7 +343,31 @@ class MusicaServiceTest {
     void deveLancarExcecaoQuandoAnoDoFiltroForInvalido() {
         MusicaFiltroDTO filtroComAnoFuturo = new MusicaFiltroDTO(null, null, null, null, (short) 3000);
 
-        assertThatThrownBy(() -> musicaService.pesquisarMusicas(filtroComAnoFuturo, 0, 10))
+        assertThatThrownBy(() -> musicaService.pesquisarMusicas(filtroComAnoFuturo, 0, 10, null))
+                .isInstanceOf(DadosMusicaInvalidosException.class);
+
+        verify(musicaRepository, never()).findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void deveOrdenarPorCampoEDirecaoInformadosNoSort() {
+        when(musicaRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        musicaService.pesquisarMusicas(null, 0, 10, "anoLancamento,desc");
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(musicaRepository).findAll(any(Specification.class), captor.capture());
+
+        Sort.Order ordem = captor.getValue().getSort().getOrderFor("anoLancamento");
+        assertThat(ordem).isNotNull();
+        assertThat(ordem.getDirection()).isEqualTo(Sort.Direction.DESC);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoCampoDeOrdenacaoForInvalido() {
+        assertThatThrownBy(() -> musicaService.pesquisarMusicas(null, 0, 10, "senha,asc"))
                 .isInstanceOf(DadosMusicaInvalidosException.class);
 
         verify(musicaRepository, never()).findAll(any(Specification.class), any(Pageable.class));

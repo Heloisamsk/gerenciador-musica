@@ -45,7 +45,13 @@ describe('AdminMusicas', () => {
   it('deve carregar a listagem de músicas ao iniciar', () => {
     fixture.detectChanges();
 
-    httpMock.expectOne(apiUrl).flush([musicaDeExemplo([{ id: 1, nome: 'Rock' }])]);
+    httpMock.expectOne(`${apiUrl}?size=100`).flush({
+      itens: [musicaDeExemplo([{ id: 1, nome: 'Rock' }])],
+      paginaAtual: 0,
+      tamanhoPagina: 100,
+      totalItens: 1,
+      totalPaginas: 1,
+    });
 
     expect(component.musicas()).toHaveLength(1);
     expect(component.musicas()[0].titulo).toBe('Bohemian Rhapsody');
@@ -56,7 +62,7 @@ describe('AdminMusicas', () => {
     fixture.detectChanges();
 
     httpMock
-      .expectOne(apiUrl)
+      .expectOne(`${apiUrl}?size=100`)
       .flush({ message: 'erro' }, { status: 500, statusText: 'Internal Server Error' });
 
     expect(component.mensagemErro()).toBeTruthy();
