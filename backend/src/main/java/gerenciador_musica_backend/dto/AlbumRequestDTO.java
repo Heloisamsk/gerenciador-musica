@@ -2,6 +2,7 @@ package gerenciador_musica_backend.dto;
 
 import jakarta.validation.constraints.*;
 
+
 public record AlbumRequestDTO(
 
         @NotBlank(message = "O título do álbum é obrigatório")

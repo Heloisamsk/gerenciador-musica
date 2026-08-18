@@ -51,9 +51,7 @@ public class Album {
         return idAlbum;
     }
 
-    public void setIdAlbum(Long idAlbum) {
-        this.idAlbum = idAlbum;
-    }
+    public void setIdAlbum(Long idAlbum) {this.idAlbum = idAlbum;}
 
     public Artista getArtista() {
         return artista;

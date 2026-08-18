@@ -63,6 +63,7 @@ class MusicaServiceTest {
                 Set.of(),
                 new AlbumRequestDTO(
                         "A Night at the Opera",
+                        1L,
                         (short) 1975,
                         null
                 ),
