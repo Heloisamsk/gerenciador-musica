@@ -10,6 +10,7 @@ public record AlbumRequestDTO(
                 message = "O título do álbum deve possuir no máximo 255 caracteres"
         )
         String titulo,
+
         @NotNull(message = "O ID do artista é obrigatório")
         @Positive(message = "O ID do artista deve ser positivo")
         Long idArtista,
