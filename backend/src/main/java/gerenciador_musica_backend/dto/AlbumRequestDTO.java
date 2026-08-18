@@ -1,10 +1,6 @@
 package gerenciador_musica_backend.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 public record AlbumRequestDTO(
 
@@ -14,6 +10,10 @@ public record AlbumRequestDTO(
                 message = "O título do álbum deve possuir no máximo 255 caracteres"
         )
         String titulo,
+
+        @NotNull(message = "O ID do artista é obrigatório")
+        @Positive(message = "O ID do artista deve ser positivo")
+        Long idArtista,
 
         @NotNull(message = "O ano de lançamento do álbum é obrigatório")
         @Min(
