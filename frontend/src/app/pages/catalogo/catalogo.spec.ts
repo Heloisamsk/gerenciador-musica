@@ -57,7 +57,13 @@ describe('Catalogo', () => {
   it('deve carregar o catálogo de músicas usando o id da playlist da rota', () => {
     fixture.detectChanges();
 
-    httpMock.expectOne(musicasUrl).flush([musicaDeExemplo()]);
+    httpMock.expectOne(`${musicasUrl}?size=100`).flush({
+      itens: [musicaDeExemplo()],
+      paginaAtual: 0,
+      tamanhoPagina: 100,
+      totalItens: 1,
+      totalPaginas: 1,
+    });
 
     expect(component.playlistId).toBe(1);
     expect(component.musicas()).toHaveLength(1);
@@ -65,7 +71,13 @@ describe('Catalogo', () => {
 
   it('deve adicionar a música na playlist e marcar como adicionada', () => {
     fixture.detectChanges();
-    httpMock.expectOne(musicasUrl).flush([musicaDeExemplo()]);
+    httpMock.expectOne(`${musicasUrl}?size=100`).flush({
+      itens: [musicaDeExemplo()],
+      paginaAtual: 0,
+      tamanhoPagina: 100,
+      totalItens: 1,
+      totalPaginas: 1,
+    });
 
     component.adicionarMusica(5);
 
@@ -80,7 +92,13 @@ describe('Catalogo', () => {
 
   it('não deve enviar uma segunda requisição para uma música já adicionada', () => {
     fixture.detectChanges();
-    httpMock.expectOne(musicasUrl).flush([musicaDeExemplo()]);
+    httpMock.expectOne(`${musicasUrl}?size=100`).flush({
+      itens: [musicaDeExemplo()],
+      paginaAtual: 0,
+      tamanhoPagina: 100,
+      totalItens: 1,
+      totalPaginas: 1,
+    });
 
     component.adicionarMusica(5);
     httpMock
@@ -94,7 +112,13 @@ describe('Catalogo', () => {
 
   it('deve mostrar mensagem de erro e liberar o botão quando a requisição falha', () => {
     fixture.detectChanges();
-    httpMock.expectOne(musicasUrl).flush([musicaDeExemplo()]);
+    httpMock.expectOne(`${musicasUrl}?size=100`).flush({
+      itens: [musicaDeExemplo()],
+      paginaAtual: 0,
+      tamanhoPagina: 100,
+      totalItens: 1,
+      totalPaginas: 1,
+    });
 
     component.adicionarMusica(5);
 
