@@ -3,7 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import type { AlbumResponse } from '../models/AlbumResponse';
 import type { ArtistaResponse } from '../models/ArtistaResponse';
+import type { GeneroResumo } from '../models/MusicaResponse';
 import type { MusicaListagem } from '../models/MusicaListagem';
 import type { PaginaResponse } from '../models/PaginaResponse';
 
@@ -16,7 +18,7 @@ export class CatalogoService {
     'http://localhost:8080/api';
 
   // GET /api/musicas agora devolve uma resposta paginada (US06). A home
-  // ainda filtra a lista inteira no cliente, então pedimos o tamanho
+  // mostra o catálogo completo (sem filtro), então pedimos o tamanho
   // máximo de página que o backend aceita (100) — um catálogo maior que
   // isso precisaria passar a usar a pesquisa do backend de verdade.
   private readonly TAMANHO_PAGINA_MAXIMO = 100;
@@ -28,6 +30,18 @@ export class CatalogoService {
   listarArtistas(): Observable<ArtistaResponse[]> {
     return this.http.get<ArtistaResponse[]>(
       `${this.apiUrl}/artistas`
+    );
+  }
+
+  listarAlbuns(): Observable<AlbumResponse[]> {
+    return this.http.get<AlbumResponse[]>(
+      `${this.apiUrl}/albuns`
+    );
+  }
+
+  listarGeneros(): Observable<GeneroResumo[]> {
+    return this.http.get<GeneroResumo[]>(
+      `${this.apiUrl}/generos`
     );
   }
 
