@@ -2,7 +2,11 @@ package gerenciador_musica_backend.controller;
 
 import gerenciador_musica_backend.config.JwtAuthenticationFilter;
 import gerenciador_musica_backend.dto.ArtistaResumoDTO;
+import gerenciador_musica_backend.dto.MusicaFiltroDTO;
+import gerenciador_musica_backend.dto.MusicaListagemDTO;
 import gerenciador_musica_backend.dto.MusicaResponseDTO;
+import gerenciador_musica_backend.dto.PaginaResponseDTO;
+import gerenciador_musica_backend.exception.DadosMusicaInvalidosException;
 import gerenciador_musica_backend.exception.MusicaNaoEncontradaException;
 import gerenciador_musica_backend.service.MusicaService;
 import org.junit.jupiter.api.Test;
@@ -15,6 +19,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,13 +60,61 @@ class MusicaControllerTest {
     }
 
     @Test
-    void deveListarMusicasCadastradas() throws Exception {
-        when(musicaService.listarMusicas()).thenReturn(List.of(montarMusicaResposta()));
+    void devePesquisarMusicasRetornandoRespostaPaginada() throws Exception {
+        MusicaListagemDTO item = new MusicaListagemDTO(
+                1L, "Bohemian Rhapsody", 354, (short) 1975,
+                new ArtistaResumoDTO(1L, "Queen", "Queen", null, null),
+                null, Set.of()
+        );
+
+        when(musicaService.pesquisarMusicas(any(MusicaFiltroDTO.class), isNull(), isNull(), isNull()))
+                .thenReturn(new PaginaResponseDTO<>(List.of(item), 0, 20, 1, 1));
 
         mockMvc.perform(get("/api/musicas"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].titulo").value("Bohemian Rhapsody"))
-                .andExpect(jsonPath("$[0].artistaPrincipal.nome").value("Queen"));
+                .andExpect(jsonPath("$.itens[0].titulo").value("Bohemian Rhapsody"))
+                .andExpect(jsonPath("$.itens[0].artistaPrincipal.nome").value("Queen"))
+                .andExpect(jsonPath("$.totalItens").value(1));
+    }
+
+    @Test
+    void devePesquisarMusicasRepassandoFiltrosDaQuery() throws Exception {
+        when(musicaService.pesquisarMusicas(any(MusicaFiltroDTO.class), eq(1), eq(5), eq("anoLancamento,desc")))
+                .thenReturn(new PaginaResponseDTO<>(List.of(), 1, 5, 0, 0));
+
+        mockMvc.perform(get("/api/musicas")
+                        .param("titulo", "amor")
+                        .param("page", "1")
+                        .param("size", "5")
+                        .param("sort", "anoLancamento,desc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens").isEmpty());
+    }
+
+    @Test
+    void deveRetornarListaVaziaQuandoNenhumaMusicaForEncontrada() throws Exception {
+        when(musicaService.pesquisarMusicas(any(MusicaFiltroDTO.class), isNull(), isNull(), isNull()))
+                .thenReturn(new PaginaResponseDTO<>(List.of(), 0, 20, 0, 0));
+
+        mockMvc.perform(get("/api/musicas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens").isEmpty())
+                .andExpect(jsonPath("$.totalItens").value(0));
+    }
+
+    @Test
+    void deveRetornar400QuandoFiltroForInvalido() throws Exception {
+        when(musicaService.pesquisarMusicas(any(MusicaFiltroDTO.class), isNull(), isNull(), isNull()))
+                .thenThrow(new DadosMusicaInvalidosException("O ano de lançamento informado para o filtro é inválido."));
+
+        mockMvc.perform(get("/api/musicas"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveRetornar400QuandoParametroDeQueryTiverTipoInvalido() throws Exception {
+        mockMvc.perform(get("/api/musicas").param("artistaId", "abc"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

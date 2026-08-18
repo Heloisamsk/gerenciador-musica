@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -81,6 +82,23 @@ public class GlobalExceptionHandler {
         return criarResposta(
                 HttpStatus.BAD_REQUEST,
                 "O corpo da requisição está ausente ou possui formato inválido.",
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
+    /*
+     * 400 - Parâmetro de query/URL com tipo incompatível
+     * (ex: ?ano=abc quando o campo espera um número).
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarParametroComTipoInvalido(
+            MethodArgumentTypeMismatchException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.BAD_REQUEST,
+                "O parâmetro '" + exception.getName() + "' possui um valor inválido.",
                 request.getRequestURI(),
                 Map.of()
         );
