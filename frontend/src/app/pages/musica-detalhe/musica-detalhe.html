@@ -1,0 +1,60 @@
+<div class="detalhe-container">
+  <a class="voltar-link" routerLink="/musicas">
+    ← Voltar para a pesquisa
+  </a>
+
+  @if (carregando()) {
+    <p class="mensagem-estado">Carregando...</p>
+  } @else if (mensagemErro()) {
+    <div class="status-message error-message" role="alert">
+      <p>{{ mensagemErro() }}</p>
+    </div>
+  } @else if (musica(); as musica) {
+    <div class="cabecalho">
+      <img
+        class="capa"
+        [src]="musica.album?.capaUrl || '/capa-padrao.png'"
+        [alt]="'Capa de ' + musica.titulo"
+      />
+
+      <div class="info-principal">
+        <h1 class="titulo">{{ musica.titulo }}</h1>
+
+        <p class="subtitulo">
+          {{ musica.artistaPrincipal.nome }}
+          @if (musica.album) {
+            · {{ musica.album.titulo }}
+          }
+          · {{ musica.anoLancamento }}
+          · {{ formatarDuracao(musica.duracaoSegundos) }}
+        </p>
+
+        @if (musica.generos.length > 0) {
+          <div class="generos">
+            @for (genero of musica.generos; track genero.id) {
+              <span class="genero-tag">{{ genero.nome }}</span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (musica.artistasParticipantes.length > 0) {
+      <section class="secao">
+        <h2>Participações</h2>
+        <p>
+          {{ musica.artistasParticipantes.map(a => a.nome).join(', ') }}
+        </p>
+      </section>
+    }
+
+    @if (musica.letra) {
+      <section class="secao">
+        <h2>Letra</h2>
+        <p class="letra">{{ musica.letra }}</p>
+      </section>
+    } @else {
+      <p class="mensagem-estado">Letra não disponível.</p>
+    }
+  }
+</div>

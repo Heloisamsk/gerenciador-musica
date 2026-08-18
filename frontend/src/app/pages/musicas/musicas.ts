@@ -11,6 +11,7 @@ import { MusicaListagem } from '../../models/MusicaListagem';
 import { ArtistaResponse } from '../../models/ArtistaResponse';
 import { AlbumResponse } from '../../models/AlbumResponse';
 import { GeneroResumo } from '../../models/MusicaResponse';
+import { formatarDuracao } from '../../shared/formatar-duracao';
 
 @Component({
   selector: 'app-musicas',
@@ -19,6 +20,8 @@ import { GeneroResumo } from '../../models/MusicaResponse';
   styleUrls: ['./musicas.css']
 })
 export class Musicas implements OnInit {
+
+  readonly formatarDuracao = formatarDuracao;
 
   formulario = new FormGroup({
     titulo: new FormControl(''),
@@ -35,6 +38,10 @@ export class Musicas implements OnInit {
   albuns = signal<AlbumResponse[]>([]);
   generos = signal<GeneroResumo[]>([]);
 
+  pagina = signal(0);
+  totalPaginas = signal(0);
+  totalItens = signal(0);
+
   pesquisando = signal(false);
   jaPesquisou = signal(false);
   mensagemErro = signal('');
@@ -49,37 +56,14 @@ export class Musicas implements OnInit {
   ngOnInit(): void {
     this.carregarOpcoesDeFiltro();
     this.restaurarFiltrosDaUrl();
-    this.pesquisar();
+    this.executarPesquisa();
   }
 
+  // Chamado pelo formulário (título/filtros) e por "Limpar filtros":
+  // sempre volta pra primeira página, porque o conjunto de resultados mudou.
   pesquisar(): void {
-    const filtro = this.montarFiltro();
-
-    this.atualizarQueryParamsDaUrl(filtro);
-
-    this.pesquisando.set(true);
-    this.mensagemErro.set('');
-
-    this.musicaService
-      .pesquisar(filtro)
-      .pipe(
-        finalize(() => {
-          this.pesquisando.set(false);
-          this.jaPesquisou.set(true);
-        })
-      )
-      .subscribe({
-        next: (pagina) => {
-          this.musicas.set(pagina.itens);
-        },
-        error: (erro: HttpErrorResponse) => {
-          console.error(erro);
-          this.musicas.set([]);
-          this.mensagemErro.set(
-            'Não foi possível pesquisar as músicas. Tente novamente.'
-          );
-        }
-      });
+    this.pagina.set(0);
+    this.executarPesquisa();
   }
 
   limparFiltros(): void {
@@ -92,6 +76,78 @@ export class Musicas implements OnInit {
     });
 
     this.pesquisar();
+  }
+
+  paginaAnterior(): void {
+    if (this.pesquisando() || this.pagina() <= 0) {
+      return;
+    }
+
+    this.pagina.update((atual) => atual - 1);
+    this.executarPesquisa();
+  }
+
+  proximaPagina(): void {
+    if (this.pesquisando() || this.pagina() + 1 >= this.totalPaginas()) {
+      return;
+    }
+
+    this.pagina.update((atual) => atual + 1);
+    this.executarPesquisa();
+  }
+
+  // Centraliza a chamada de pesquisa em si; paginação e busca por filtro
+  // novo só diferem em resetar (ou não) this.pagina antes de chamar isso.
+  private executarPesquisa(): void {
+    if (this.pesquisando()) {
+      return;
+    }
+
+    const filtro = this.montarFiltro();
+
+    this.atualizarQueryParamsDaUrl(filtro);
+
+    this.pesquisando.set(true);
+    this.mensagemErro.set('');
+
+    this.musicaService
+      .pesquisar(filtro, this.pagina() || undefined)
+      .pipe(
+        finalize(() => {
+          this.pesquisando.set(false);
+          this.jaPesquisou.set(true);
+        })
+      )
+      .subscribe({
+        next: (resultado) => {
+          this.musicas.set(resultado.itens);
+          this.totalPaginas.set(resultado.totalPaginas);
+          this.totalItens.set(resultado.totalItens);
+        },
+        error: (erro: HttpErrorResponse) => {
+          console.error(erro);
+          this.musicas.set([]);
+          this.totalPaginas.set(0);
+          this.totalItens.set(0);
+          this.mensagemErro.set(this.mensagemDeErroPara(erro));
+        }
+      });
+  }
+
+  private mensagemDeErroPara(erro: HttpErrorResponse): string {
+    switch (erro.status) {
+      case 0:
+        return 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.';
+      case 401:
+        // O interceptor global já limpa a sessão e redireciona pro login.
+        return 'Sua sessão expirou. Faça login novamente.';
+      case 403:
+        return 'Você não tem permissão para pesquisar músicas.';
+      case 500:
+        return 'Ocorreu um erro no servidor. Tente novamente mais tarde.';
+      default:
+        return 'Não foi possível pesquisar as músicas. Tente novamente.';
+    }
   }
 
   private carregarOpcoesDeFiltro(): void {
@@ -121,6 +177,8 @@ export class Musicas implements OnInit {
       generoId: this.paraNumeroOuNulo(params.get('generoId')),
       ano: this.paraNumeroOuNulo(params.get('ano'))
     });
+
+    this.pagina.set(this.paraNumeroOuNulo(params.get('page')) ?? 0);
   }
 
   private montarFiltro(): MusicaFiltro {
@@ -145,7 +203,8 @@ export class Musicas implements OnInit {
         artistaId: filtro.artistaId ?? null,
         albumId: filtro.albumId ?? null,
         generoId: filtro.generoId ?? null,
-        ano: filtro.ano ?? null
+        ano: filtro.ano ?? null,
+        page: this.pagina() || null
       },
       queryParamsHandling: 'merge',
       replaceUrl: true

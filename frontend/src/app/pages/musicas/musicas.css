@@ -95,9 +95,16 @@
   border: 1px solid #727272;
 }
 
-.botao-pesquisar:hover,
-.botao-limpar:hover {
+.botao-pesquisar:hover:not([disabled]),
+.botao-limpar:hover:not([disabled]) {
   transform: scale(1.03);
+}
+
+.botao-pesquisar[disabled],
+.botao-limpar[disabled],
+.botao-pagina[disabled] {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .status-message {
@@ -127,7 +134,6 @@
 }
 
 .musica-card {
-  padding: 10px 16px;
   border-radius: 6px;
   transition: background-color 0.2s ease;
 }
@@ -136,10 +142,35 @@
   background-color: #2a2a2a;
 }
 
+.musica-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.musica-link:focus-visible {
+  outline: 2px solid #1db954;
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+.musica-capa {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  object-fit: cover;
+  background-color: #282828;
+  flex-shrink: 0;
+}
+
 .musica-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .musica-titulo {
@@ -165,4 +196,70 @@
   border: 1px solid #727272;
   border-radius: 10px;
   padding: 1px 8px;
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+  padding: 12px 0;
+}
+
+.botao-pagina {
+  background-color: transparent;
+  color: #b3b3b3;
+  border: 1px solid #727272;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.botao-pagina:hover:not([disabled]) {
+  color: white;
+  border-color: white;
+  transform: scale(1.03);
+}
+
+.pagina-info {
+  font-size: 13px;
+  color: #b3b3b3;
+}
+
+@media (max-width: 640px) {
+  .musicas-container {
+    padding: 16px;
+  }
+
+  .formulario-pesquisa {
+    grid-template-columns: 1fr;
+  }
+
+  .campo-titulo,
+  .botoes {
+    grid-column: span 1;
+  }
+
+  .botoes {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .musica-link {
+    gap: 10px;
+    padding: 8px 10px;
+  }
+
+  .musica-capa {
+    width: 40px;
+    height: 40px;
+  }
+
+  .paginacao {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
