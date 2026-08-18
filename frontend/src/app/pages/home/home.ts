@@ -10,7 +10,7 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth';
 import { CatalogoService } from '../../services/catalogo';
 import type { ArtistaResponse } from '../../models/ArtistaResponse';
-import type { MusicaResponse } from '../../models/MusicaResponse';
+import type { MusicaListagem } from '../../models/MusicaListagem';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +25,7 @@ export class Home implements OnInit {
   termoBusca = signal('');
 
   artistas = signal<ArtistaResponse[]>([]);
-  musicas = signal<MusicaResponse[]>([]);
+  musicas = signal<MusicaListagem[]>([]);
 
   carregandoArtistas = signal(false);
   carregandoMusicas = signal(false);

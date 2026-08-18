@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AdminMusicaService } from '../../services/admin-musica';
 import { PlaylistService } from '../../services/playlist';
-import { MusicaResponse } from '../../models/MusicaResponse';
+import { MusicaListagem } from '../../models/MusicaListagem';
 
 @Component({
   selector: 'app-catalogo',
@@ -14,7 +14,7 @@ export class Catalogo implements OnInit {
   // Signals: este projeto não usa Zone.js, então propriedades comuns
   // alteradas dentro de .subscribe(...) não avisam o Angular pra
   // redesenhar a tela (mesmo bug corrigido em admin-musicas.ts).
-  musicas = signal<MusicaResponse[]>([]);
+  musicas = signal<MusicaListagem[]>([]);
   loadingAdicionar = signal<{ [musicaId: number]: boolean }>({});
   musicasAdicionadas = signal<{ [musicaId: number]: boolean }>({});
   mensagemErro = signal<string | null>(null);

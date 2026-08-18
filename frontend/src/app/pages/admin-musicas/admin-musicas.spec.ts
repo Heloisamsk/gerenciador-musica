@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http/testing';
 
 import { AdminMusicas } from './admin-musicas';
-import { MusicaResponse } from '../../models/MusicaResponse';
+import { MusicaListagem } from '../../models/MusicaListagem';
 
 describe('AdminMusicas', () => {
   let component: AdminMusicas;
@@ -30,7 +30,7 @@ describe('AdminMusicas', () => {
     httpMock.verify();
   });
 
-  function musicaDeExemplo(generos: { id: number; nome: string }[]): MusicaResponse {
+  function musicaDeExemplo(generos: { id: number; nome: string }[]): MusicaListagem {
     return {
       id: 1,
       titulo: 'Bohemian Rhapsody',

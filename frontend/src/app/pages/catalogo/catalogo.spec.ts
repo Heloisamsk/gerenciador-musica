@@ -7,7 +7,7 @@ import {
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 
 import { Catalogo } from './catalogo';
-import { MusicaResponse } from '../../models/MusicaResponse';
+import { MusicaListagem } from '../../models/MusicaListagem';
 
 describe('Catalogo', () => {
   let component: Catalogo;
@@ -42,7 +42,7 @@ describe('Catalogo', () => {
     httpMock.verify();
   });
 
-  function musicaDeExemplo(): MusicaResponse {
+  function musicaDeExemplo(): MusicaListagem {
     return {
       id: 5,
       titulo: 'Bohemian Rhapsody',
