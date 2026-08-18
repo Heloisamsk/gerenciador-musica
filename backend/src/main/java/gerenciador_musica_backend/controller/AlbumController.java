@@ -1,16 +1,14 @@
 package gerenciador_musica_backend.controller;
 
+import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.service.AlbumService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/albuns")
+@RequestMapping("/api/albums")
 public class AlbumController {
 
     private final AlbumService albumService;
@@ -19,10 +17,12 @@ public class AlbumController {
         this.albumService = albumService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<AlbumResponseDTO>> listarAlbuns() {
+    @PostMapping
+    public ResponseEntity<AlbumResponseDTO> cadastrarAlbum(
+            @Valid @RequestBody AlbumRequestDTO request
+    ) {
         return ResponseEntity.ok(
-                albumService.listarAlbuns()
+                albumService.cadastrarAlbum(request)
         );
     }
 }
