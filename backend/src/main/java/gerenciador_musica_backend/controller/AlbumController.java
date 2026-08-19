@@ -7,8 +7,10 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/albums")
+@RequestMapping("/api/albuns")
 public class AlbumController {
 
     private final AlbumService albumService;
@@ -23,6 +25,13 @@ public class AlbumController {
     ) {
         return ResponseEntity.ok(
                 albumService.cadastrarAlbum(request)
+        );
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AlbumResponseDTO>> listarAlbuns() {
+        return ResponseEntity.ok(
+                albumService.listarAlbuns()
         );
     }
 }
