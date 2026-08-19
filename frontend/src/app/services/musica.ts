@@ -6,6 +6,7 @@ import { MusicaFiltro } from '../models/MusicaFiltro';
 import { MusicaListagem } from '../models/MusicaListagem';
 import { MusicaResponse } from '../models/MusicaResponse';
 import { PaginaResponse } from '../models/PaginaResponse';
+import { environment } from '../../environments/environment';
 
 // Encapsula as requisições HTTP do catálogo público de músicas (US06).
 // O interceptor JWT já é aplicado globalmente (ver app.config.ts), então
@@ -15,7 +16,7 @@ import { PaginaResponse } from '../models/PaginaResponse';
 })
 export class MusicaService {
 
-  private readonly apiUrl = 'http://localhost:8080/api/musicas';
+  private readonly apiUrl = `${environment.apiUrl}/api/musicas`;
 
   constructor(private readonly http: HttpClient) {}
 

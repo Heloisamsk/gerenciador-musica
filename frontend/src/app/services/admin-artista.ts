@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { ArtistaRequest } from '../models/ArtistaRequest';
 import { ArtistaResponse } from '../models/ArtistaResponse';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +12,10 @@ import { ArtistaResponse } from '../models/ArtistaResponse';
 export class AdminArtistaService {
 
   private readonly cadastroApiUrl =
-    'http://localhost:8080/api/admin/artistas';
+    `${environment.apiUrl}/api/admin/artistas`;
 
   private readonly listagemApiUrl =
-    'http://localhost:8080/api/artistas';
+    `${environment.apiUrl}/api/artistas`;
 
   constructor(
     private readonly http: HttpClient

@@ -7,8 +7,9 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
 import { AuthService } from '../services/auth';
+import { environment } from '../../environments/environment';
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = `${environment.apiUrl}/api`;
 
 const ENDPOINTS_PUBLICOS = [
   `${API_URL}/auth/login`,

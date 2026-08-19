@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 
 import type { ArtistaResponse } from '../../models/ArtistaResponse';
 import { AdminArtistaService } from '../../services/admin-artista';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin-musica-nova',
@@ -120,7 +121,7 @@ export class AdminMusicaNova implements OnInit {
     this.carregando.set(true);
 
     const urlDaApi =
-      'http://localhost:8080/api/admin/musicas';
+      `${environment.apiUrl}/api/admin/musicas`;
 
     this.http.post(urlDaApi, dados).subscribe({
       next: () => {
