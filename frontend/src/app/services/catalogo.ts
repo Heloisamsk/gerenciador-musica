@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { environment } from '../../environments/environment';
 import type { AlbumResponse } from '../models/AlbumResponse';
 import type { ArtistaResponse } from '../models/ArtistaResponse';
 import type { GeneroResumo } from '../models/MusicaResponse';
@@ -15,7 +16,7 @@ import type { PaginaResponse } from '../models/PaginaResponse';
 export class CatalogoService {
 
   private readonly apiUrl =
-    'http://localhost:8080/api';
+    `${environment.apiUrl}/api`;
 
   // GET /api/musicas agora devolve uma resposta paginada (US06). A home
   // mostra o catálogo completo (sem filtro), então pedimos o tamanho

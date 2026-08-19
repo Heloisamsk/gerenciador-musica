@@ -4,13 +4,14 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { PlaylistRequest } from '../models/PlaylistRequest';
 import { PlaylistResponse } from '../models/PlaylistResponse';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class PlaylistService {
-  private apiUrl = 'http://localhost:8080/api/playlists';
+  private apiUrl = `${environment.apiUrl}/api/playlists`;
 
   constructor(private http: HttpClient) { }
 

@@ -4,13 +4,14 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { MusicaListagem } from '../models/MusicaListagem';
 import { PaginaResponse } from '../models/PaginaResponse';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminMusicaService {
 
-  private apiUrl = 'http://localhost:8080/api/musicas';
+  private apiUrl = `${environment.apiUrl}/api/musicas`;
 
   // GET /api/musicas agora devolve uma resposta paginada (US06). Esta tela
   // ainda não tem paginação própria, então pedimos o tamanho máximo de

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { finalize, Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export type Role = 'USER' | 'ADMIN';
 
@@ -40,7 +41,7 @@ export interface LogoutResponse {
 export class AuthService {
 
   private readonly apiBaseUrl =
-    'http://localhost:8080/api/auth';
+    `${environment.apiUrl}/api/auth`;
 
   constructor(private http: HttpClient) {}
 
