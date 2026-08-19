@@ -7,9 +7,12 @@ import gerenciador_musica_backend.exception.AlbumDuplicadoException;
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import gerenciador_musica_backend.exception.DadosMusicaInvalidosException;
+
+import java.util.List;
 
 @Service
 public class AlbumService {
@@ -61,6 +64,15 @@ public class AlbumService {
         Album albumSalvo = albumRepository.save(album);
 
         return converterParaResponse(albumSalvo);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AlbumResponseDTO> listarAlbuns() {
+        return albumRepository
+                .findAll(Sort.by(Sort.Direction.ASC, "titulo"))
+                .stream()
+                .map(this::converterParaResponse)
+                .toList();
     }
 
     private AlbumResponseDTO converterParaResponse(Album album) {

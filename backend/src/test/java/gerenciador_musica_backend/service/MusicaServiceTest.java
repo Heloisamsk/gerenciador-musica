@@ -13,7 +13,6 @@ import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Genero;
 import gerenciador_musica_backend.model.Musica;
-import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.GeneroRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import org.junit.jupiter.api.Test;
@@ -36,6 +35,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,7 +51,7 @@ class MusicaServiceTest {
     private MusicaRepository musicaRepository;
 
     @Mock
-    private AlbumRepository albumRepository;
+    private AlbumService albumService;
 
     @Mock
     private ArtistaService artistaService;
@@ -101,13 +101,7 @@ class MusicaServiceTest {
         when(artistaService.buscarEntidadePorId(1L))
                 .thenReturn(artistaExistente);
 
-        when(albumRepository.findByTituloIgnoreCaseAndArtistaAndAnoLancamento(
-                "A Night at the Opera",
-                artistaExistente,
-                (short) 1975
-        )).thenReturn(Optional.empty());
-
-        when(albumRepository.save(any(Album.class)))
+        when(albumService.buscarOuCriarAlbum(any(AlbumRequestDTO.class), eq(artistaExistente)))
                 .thenReturn(albumSalvo);
 
         when(musicaRepository.existsByAlbumAndTituloIgnoreCase(
@@ -197,11 +191,8 @@ class MusicaServiceTest {
         when(artistaService.buscarEntidadePorId(1L))
                 .thenReturn(artistaExistente);
 
-        when(albumRepository.findByTituloIgnoreCaseAndArtistaAndAnoLancamento(
-                "A Night at the Opera",
-                artistaExistente,
-                (short) 1975
-        )).thenReturn(Optional.of(albumExistente));
+        when(albumService.buscarOuCriarAlbum(any(AlbumRequestDTO.class), eq(artistaExistente)))
+                .thenReturn(albumExistente);
 
         when(musicaRepository.existsByAlbumAndTituloIgnoreCase(
                 albumExistente,
