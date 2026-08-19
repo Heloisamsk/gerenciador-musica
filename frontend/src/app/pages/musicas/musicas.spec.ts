@@ -105,7 +105,7 @@ describe('Musicas', () => {
           duracaoSegundos: 354,
           anoLancamento: 1975,
           artistaPrincipal: { id: 1, nome: 'Queen' },
-          album: { id: 1, titulo: 'A Night at the Opera' },
+          album: { id: 1, titulo: 'A Night at the Opera', anoLancamento: 1975, capaUrl: null },
           generos: [{ id: 1, nome: 'Rock' }],
         },
       ],
@@ -149,5 +149,89 @@ describe('Musicas', () => {
     expect(component.formulario.value.titulo).toBe('');
 
     httpMock.expectOne(musicasUrl).flush(paginaVazia());
+  });
+
+  it('deve restaurar a página a partir da URL e avançar/voltar preservando os filtros', () => {
+    configurarTestBed({ titulo: 'amor', page: '1' });
+    fixture.detectChanges();
+
+    httpMock.expectOne(artistasUrl).flush([]);
+    httpMock.expectOne(albunsUrl).flush([]);
+    httpMock.expectOne(generosUrl).flush([]);
+
+    httpMock.expectOne(`${musicasUrl}?titulo=amor&page=1`).flush({
+      itens: [],
+      paginaAtual: 1,
+      tamanhoPagina: 20,
+      totalItens: 25,
+      totalPaginas: 2,
+    });
+
+    expect(component.pagina()).toBe(1);
+    expect(component.totalPaginas()).toBe(2);
+
+    component.proximaPagina();
+    // já está na última página (index 1 de 2), não deve disparar requisição
+    httpMock.expectNone((req) => req.url.includes('/api/musicas') && req.params.get('page') === '2');
+
+    component.paginaAnterior();
+    httpMock.expectOne(`${musicasUrl}?titulo=amor`).flush({
+      itens: [],
+      paginaAtual: 0,
+      tamanhoPagina: 20,
+      totalItens: 25,
+      totalPaginas: 2,
+    });
+
+    expect(component.pagina()).toBe(0);
+  });
+
+  it('paginaAnterior não deve pesquisar quando já está na primeira página', () => {
+    configurarTestBed();
+    fixture.detectChanges();
+
+    httpMock.expectOne(artistasUrl).flush([]);
+    httpMock.expectOne(albunsUrl).flush([]);
+    httpMock.expectOne(generosUrl).flush([]);
+    httpMock.expectOne(musicasUrl).flush(paginaVazia());
+
+    component.paginaAnterior();
+
+    httpMock.expectNone(musicasUrl);
+  });
+
+  it.each([
+    [0, 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.'],
+    [403, 'Você não tem permissão para pesquisar músicas.'],
+    [500, 'Ocorreu um erro no servidor. Tente novamente mais tarde.'],
+  ])('deve mostrar mensagem específica para o status %s', (status, mensagemEsperada) => {
+    configurarTestBed();
+    fixture.detectChanges();
+
+    httpMock.expectOne(artistasUrl).flush([]);
+    httpMock.expectOne(albunsUrl).flush([]);
+    httpMock.expectOne(generosUrl).flush([]);
+
+    httpMock
+      .expectOne(musicasUrl)
+      .flush({ message: 'erro' }, { status, statusText: 'erro' });
+
+    expect(component.mensagemErro()).toBe(mensagemEsperada);
+  });
+
+  it('não deve disparar uma segunda pesquisa enquanto a primeira ainda está em andamento', () => {
+    configurarTestBed();
+    fixture.detectChanges();
+
+    httpMock.expectOne(artistasUrl).flush([]);
+    httpMock.expectOne(albunsUrl).flush([]);
+    httpMock.expectOne(generosUrl).flush([]);
+
+    const primeiraRequisicao = httpMock.expectOne(musicasUrl);
+
+    component.pesquisar();
+    httpMock.expectNone(musicasUrl);
+
+    primeiraRequisicao.flush(paginaVazia());
   });
 });
