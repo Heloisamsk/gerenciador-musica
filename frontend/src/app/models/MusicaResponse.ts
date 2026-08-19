@@ -23,4 +23,6 @@ export interface ArtistaResumo {
 export interface AlbumResumo {
   id: number;
   titulo: string;
+  anoLancamento: number;
+  capaUrl: string | null;
 }

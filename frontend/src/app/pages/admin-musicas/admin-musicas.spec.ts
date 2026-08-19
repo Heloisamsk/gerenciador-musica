@@ -37,7 +37,7 @@ describe('AdminMusicas', () => {
       duracaoSegundos: 354,
       anoLancamento: 1975,
       artistaPrincipal: { id: 1, nome: 'Queen' },
-      album: { id: 1, titulo: 'A Night at the Opera' },
+      album: { id: 1, titulo: 'A Night at the Opera', anoLancamento: 1975, capaUrl: null },
       generos,
     };
   }
