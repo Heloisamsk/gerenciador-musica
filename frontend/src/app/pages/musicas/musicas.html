@@ -61,13 +61,18 @@
     </div>
 
     <div class="botoes">
-      <button class="botao-pesquisar" type="submit">
+      <button
+        class="botao-pesquisar"
+        type="submit"
+        [disabled]="pesquisando()"
+      >
         Pesquisar
       </button>
 
       <button
         class="botao-limpar"
         type="button"
+        [disabled]="pesquisando()"
         (click)="limparFiltros()"
       >
         Limpar filtros
@@ -90,26 +95,67 @@
       <ul class="lista-musicas">
         @for (musica of musicas(); track musica.id) {
           <li class="musica-card">
-            <div class="musica-info">
-              <span class="musica-titulo">{{ musica.titulo }}</span>
-              <span class="musica-detalhe">
-                {{ musica.artistaPrincipal.nome }}
-                @if (musica.album) {
-                  · {{ musica.album.titulo }}
-                }
-                · {{ musica.anoLancamento }}
-              </span>
-              @if (musica.generos.length > 0) {
-                <span class="musica-generos">
-                  @for (genero of musica.generos; track genero.id) {
-                    <span class="genero-tag">{{ genero.nome }}</span>
+            <a
+              class="musica-link"
+              [routerLink]="['/musicas', musica.id]"
+              [state]="{ queryParams: queryParamsAtuais }"
+            >
+              <img
+                class="musica-capa"
+                [src]="musica.album?.capaUrl || '/capa-padrao.png'"
+                [alt]="'Capa de ' + musica.titulo"
+                loading="lazy"
+              />
+
+              <div class="musica-info">
+                <span class="musica-titulo">{{ musica.titulo }}</span>
+                <span class="musica-detalhe">
+                  {{ musica.artistaPrincipal.nome }}
+                  @if (musica.album) {
+                    · {{ musica.album.titulo }}
                   }
+                  · {{ musica.anoLancamento }}
+                  · {{ formatarDuracao(musica.duracaoSegundos) }}
                 </span>
-              }
-            </div>
+                @if (musica.generos.length > 0) {
+                  <span class="musica-generos">
+                    @for (genero of musica.generos; track genero.id) {
+                      <span class="genero-tag">{{ genero.nome }}</span>
+                    }
+                  </span>
+                }
+              </div>
+            </a>
           </li>
         }
       </ul>
+
+      @if (totalPaginas() > 1) {
+        <div class="paginacao">
+          <button
+            class="botao-pagina"
+            type="button"
+            [disabled]="pesquisando() || pagina() <= 0"
+            (click)="paginaAnterior()"
+          >
+            ← Anterior
+          </button>
+
+          <span class="pagina-info">
+            Página {{ pagina() + 1 }} de {{ totalPaginas() }}
+            ({{ totalItens() }} {{ totalItens() === 1 ? 'resultado' : 'resultados' }})
+          </span>
+
+          <button
+            class="botao-pagina"
+            type="button"
+            [disabled]="pesquisando() || pagina() + 1 >= totalPaginas()"
+            (click)="proximaPagina()"
+          >
+            Próxima →
+          </button>
+        </div>
+      }
     }
   </div>
 </div>

@@ -7,8 +7,12 @@ import gerenciador_musica_backend.exception.AlbumDuplicadoException;
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import gerenciador_musica_backend.exception.DadosMusicaInvalidosException;
+
+import java.util.List;
 
 @Service
 public class AlbumService {
@@ -62,6 +66,15 @@ public class AlbumService {
         return converterParaResponse(albumSalvo);
     }
 
+    @Transactional(readOnly = true)
+    public List<AlbumResponseDTO> listarAlbuns() {
+        return albumRepository
+                .findAll(Sort.by(Sort.Direction.ASC, "titulo"))
+                .stream()
+                .map(this::converterParaResponse)
+                .toList();
+    }
+
     private AlbumResponseDTO converterParaResponse(Album album) {
 
         Artista artista = album.getArtista();
@@ -81,5 +94,40 @@ public class AlbumService {
                 album.getCapaUrl(),
                 artistaResumo
         );
+    }
+    public Album buscarOuCriarAlbum(
+            AlbumRequestDTO dadosAlbum,
+            Artista artistaPrincipal
+    ) {
+        // A música pode não possuir álbum.
+        if (dadosAlbum == null) {
+            return null;
+        }
+
+        // O álbum deve pertencer ao mesmo artista principal da música.
+        if (!dadosAlbum.idArtista().equals(artistaPrincipal.getIdArtista())) {
+            throw new DadosMusicaInvalidosException(
+                    "O artista do álbum deve ser o mesmo artista principal da música."
+            );
+        }
+
+        String titulo = dadosAlbum.titulo().strip();
+
+        return albumRepository
+                .findByTituloIgnoreCaseAndArtistaAndAnoLancamento(
+                        titulo,
+                        artistaPrincipal,
+                        dadosAlbum.anoLancamento()
+                )
+                .orElseGet(() -> {
+                    Album novoAlbum = new Album(
+                            artistaPrincipal,
+                            titulo,
+                            dadosAlbum.anoLancamento(),
+                            dadosAlbum.capaUrl()
+                    );
+
+                    return albumRepository.save(novoAlbum);
+                });
     }
 }
