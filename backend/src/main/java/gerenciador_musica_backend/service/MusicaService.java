@@ -8,7 +8,6 @@ import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Genero;
 import gerenciador_musica_backend.model.Musica;
-import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.GeneroRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.specification.MusicaSpecification;
@@ -27,18 +26,18 @@ import java.util.stream.Collectors;
 public class MusicaService {
 
     private final MusicaRepository musicaRepository;
-    private final AlbumRepository albumRepository;
+    private final AlbumService albumService;
     private final ArtistaService artistaService;
     private final GeneroRepository generoRepository;
 
     public MusicaService(
             MusicaRepository musicaRepository,
-            AlbumRepository albumRepository,
+            AlbumService albumService,
             ArtistaService artistaService,
             GeneroRepository generoRepository
     ) {
         this.musicaRepository = musicaRepository;
-        this.albumRepository = albumRepository;
+        this.albumService = albumService;
         this.artistaService = artistaService;
         this.generoRepository = generoRepository;
     }
@@ -56,7 +55,7 @@ public class MusicaService {
                 artistaPrincipal
         );
 
-        Album album = buscarOuCriarAlbum(
+        Album album = albumService.buscarOuCriarAlbum(
                 request.album(),
                 artistaPrincipal
         );
@@ -103,7 +102,8 @@ public class MusicaService {
         );
 
         validarGeneros(request.generos());
-        validarAlbum(request.album());
+        //validarAlbum(request.album());
+        validarAlbum(request.album(), artistaPrincipalId);
     }
 
     private Set<Artista> buscarParticipantes(
@@ -135,34 +135,6 @@ public class MusicaService {
         }
 
         return participantes;
-    }
-
-    private Album buscarOuCriarAlbum(
-            AlbumRequestDTO dadosAlbum,
-            Artista artistaPrincipal
-    ) {
-        if (dadosAlbum == null) {
-            return null;
-        }
-
-        String tituloNormalizado = normalizarTexto(dadosAlbum.titulo());
-
-        return albumRepository
-                .findByTituloIgnoreCaseAndArtistaAndAnoLancamento(
-                        tituloNormalizado,
-                        artistaPrincipal,
-                        dadosAlbum.anoLancamento()
-                )
-                .orElseGet(() -> {
-                    Album novoAlbum = new Album(
-                            artistaPrincipal,
-                            tituloNormalizado,
-                            dadosAlbum.anoLancamento(),
-                            normalizarTextoOpcional(dadosAlbum.capaUrl())
-                    );
-
-                    return albumRepository.save(novoAlbum);
-                });
     }
 
     private void verificarDuplicidade(
@@ -356,12 +328,16 @@ public class MusicaService {
         }
     }
 
-    private void validarAlbum(AlbumRequestDTO album) {
+    private void validarAlbum(
+            AlbumRequestDTO album,
+            Long artistaPrincipalId
+    ) {
         if (album == null) {
             return;
         }
 
-        String tituloNormalizado = normalizarParaComparacao(album.titulo());
+        String tituloNormalizado =
+                normalizarParaComparacao(album.titulo());
 
         if (tituloNormalizado.isBlank()) {
             throw new DadosMusicaInvalidosException(
@@ -372,6 +348,19 @@ public class MusicaService {
         if (album.anoLancamento() == null) {
             throw new DadosMusicaInvalidosException(
                     "O ano de lançamento do álbum é obrigatório."
+            );
+        }
+
+        if (album.idArtista() == null
+                || album.idArtista() <= 0) {
+            throw new DadosMusicaInvalidosException(
+                    "O ID do artista do álbum deve ser válido."
+            );
+        }
+
+        if (!album.idArtista().equals(artistaPrincipalId)) {
+            throw new DadosMusicaInvalidosException(
+                    "O artista do álbum deve ser o mesmo artista principal da música."
             );
         }
     }
