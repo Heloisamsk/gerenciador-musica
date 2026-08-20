@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
           cache: maven
 
       - name: Generate temporary JWT secret for tests
@@ -59,8 +59,8 @@ jobs:
         run: |
           chmod +x mvnw
           ./mvnw -B clean verify
-          
-            - name: Setup Node.js 24
+
+      - name: Setup Node.js 24
         uses: actions/setup-node@v6
         with:
           node-version: 24
