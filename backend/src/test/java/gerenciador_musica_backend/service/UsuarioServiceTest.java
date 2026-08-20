@@ -45,7 +45,6 @@ class UsuarioServiceTest {
         request.setNome("Ana");
         request.setEmail("ana@email.com");
         request.setSenha("senha123");
-        request.setRole(Role.USER);
     }
 
     @Test
@@ -66,7 +65,10 @@ class UsuarioServiceTest {
         // Garante que a senha em texto puro nunca chegou a ser salva.
         verify(usuarioRepository).save(
                 org.mockito.ArgumentMatchers.argThat(
-                        usuario -> usuario.getSenha().equals("senha-criptografada")
+                        usuario ->
+                                usuario.getSenha()
+                                        .equals("senha-criptografada")
+                                        && usuario.getRole() == Role.USER
                 )
         );
     }

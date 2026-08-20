@@ -10,6 +10,7 @@ import gerenciador_musica_backend.dto.UsuarioResponseDTO;
 import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.UsuarioRepository;
 import gerenciador_musica_backend.exception.EmailJaCadastradoException;
+import gerenciador_musica_backend.model.Role;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +39,8 @@ public class UsuarioService {
         
         // Criptografando a senha antes de salvar!
         novoUsuario.setSenha(passwordEncoder.encode(request.getSenha()));
-        
-        novoUsuario.setRole(request.getRole());
+
+        novoUsuario.setRole(Role.USER);
 
         // 3. Salvar o usuário no banco de dados
         Usuario usuarioSalvo = usuarioRepository.save(novoUsuario);
