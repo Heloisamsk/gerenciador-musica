@@ -7,8 +7,6 @@ services:
       POSTGRES_DB: gerenciador_musica
       POSTGRES_USER: gerenciador
       POSTGRES_PASSWORD: gerenciador
-      APP_JWT_SECRET: ${APP_JWT_SECRET}
-      APP_JWT_EXPIRATION_MS: ${APP_JWT_EXPIRATION_MS:-86400000}
 
     ports:
       - "5432:5432"
@@ -39,6 +37,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/gerenciador_musica
       SPRING_DATASOURCE_USERNAME: gerenciador
       SPRING_DATASOURCE_PASSWORD: gerenciador
+      APP_JWT_SECRET: "${APP_JWT_SECRET:?APP_JWT_SECRET must be configured}"
+      APP_JWT_EXPIRATION_MS: "${APP_JWT_EXPIRATION_MS:-86400000}"
 
     ports:
       - "8080:8080"
