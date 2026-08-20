@@ -185,6 +185,16 @@
         >
           A URL deve possuir no máximo 2048 caracteres.
         </small>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.capaUrl.touched &&
+            formulario.controls.capaUrl.hasError('urlInvalida')
+          "
+        >
+          Informe uma URL válida.
+        </small>
       </div>
 
       <button
