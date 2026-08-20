@@ -15,9 +15,9 @@ RUN npm run build -- --configuration="${BUILD_CONFIGURATION}"
 
 FROM nginxinc/nginx-unprivileged:alpine
 
-COPY --chown=101:101 nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY --from=build --chown=101:101 \
+COPY --from=build \
     /app/dist/gerenciador_musica_frontend/browser/ \
     /usr/share/nginx/html/
 
