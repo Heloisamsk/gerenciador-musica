@@ -10,15 +10,17 @@ COPY . .
 
 ARG BUILD_CONFIGURATION=production
 
-RUN npm run build -- --configuration=${BUILD_CONFIGURATION}
+RUN npm run build -- --configuration="${BUILD_CONFIGURATION}"
 
 
-FROM nginx:alpine
+FROM nginxinc/nginx-unprivileged:alpine
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --chown=101:101 nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY --from=build \
+COPY --from=build --chown=101:101 \
     /app/dist/gerenciador_musica_frontend/browser/ \
     /usr/share/nginx/html/
 
-EXPOSE 80
+USER 101:101
+
+EXPOSE 8080
