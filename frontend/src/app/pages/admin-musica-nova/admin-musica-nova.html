@@ -11,29 +11,29 @@
     <form class="cadastro-form" [formGroup]="formularioMusica" (ngSubmit)="salvar()">
 
       <div class="form-group">
-        <label>Título da Música</label>
-        <input type="text" class="form-input" formControlName="titulo" placeholder="Ex: Bohemian Rhapsody">
+        <label for="titulo">Título da Música</label>
+        <input id="titulo" type="text" class="form-input" formControlName="titulo" placeholder="Ex: Bohemian Rhapsody">
         <small class="error-message" *ngIf="formularioMusica.get('titulo')?.invalid && formularioMusica.get('titulo')?.touched">
           O título é obrigatório.
         </small>
       </div>
       <div class="form-group">
-        <label>Duração (em segundos)</label>
-        <input type="text" class="form-input" formControlName="duracao" placeholder="Ex: 355">
+        <label for="duracao">Duração (em segundos)</label>
+        <input id="duracao" type="text" class="form-input" formControlName="duracao" placeholder="Ex: 355">
         <small class="error-message" *ngIf="formularioMusica.get('duracao')?.invalid && formularioMusica.get('duracao')?.touched">
           A duração é obrigatória.
         </small>
       </div>
       <div class="form-group">
-        <label>Ano de Lançamento</label>
-        <input type="number" class="form-input" formControlName="anoLancamento" placeholder="Ex: 1975">
+        <label for="anoLancamento">Ano de Lançamento</label>
+        <input id="anoLancamento" type="number" class="form-input" formControlName="anoLancamento" placeholder="Ex: 1975">
         <small class="error-message" *ngIf="formularioMusica.get('anoLancamento')?.invalid && formularioMusica.get('anoLancamento')?.touched">
           O ano é obrigatório.
         </small>
       </div>
       <div class="form-group">
-        <label>Gênero</label>
-        <input type="text" class="form-input" formControlName="genero" placeholder="Ex: Rock">
+        <label for="genero">Gênero</label>
+        <input id="genero" type="text" class="form-input" formControlName="genero" placeholder="Ex: Rock">
         <small class="error-message" *ngIf="formularioMusica.get('genero')?.invalid && formularioMusica.get('genero')?.touched">
           O gênero é obrigatório.
         </small>
@@ -79,8 +79,8 @@
         }
       </div>
       <div class="form-group">
-        <label>Álbum</label>
-        <input type="text" class="form-input" formControlName="album" placeholder="Ex: A Night at the Opera">
+        <label for="album">Álbum</label>
+        <input id="album" type="text" class="form-input" formControlName="album" placeholder="Ex: A Night at the Opera">
         <small class="error-message" *ngIf="formularioMusica.get('album')?.invalid && formularioMusica.get('album')?.touched">
           O álbum é obrigatório.
         </small>
@@ -91,4 +91,4 @@
       </button>
     </form>
   </div>
-</div> //input
+</div>
