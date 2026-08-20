@@ -1,6 +1,6 @@
 import json
 import os
-import random
+import secrets
 import re
 import unicodedata
 from datetime import timedelta
@@ -9,8 +9,8 @@ import bcrypt
 from faker import Faker
 
 fake = Faker("pt_BR")
-random.seed(42)
 Faker.seed(42)
+gerador_seguro = secrets.SystemRandom()
 
 PASTA = os.path.dirname(__file__)
 CAMINHO_JSON = os.path.join(PASTA, "dados_coletados.json")
@@ -85,7 +85,6 @@ GENEROS_POR_ARTISTA = {
     "João Gomes": ["Piseiro"],
 }
 
-ROLES = ["USER"] * 9 + ["ADMIN"]
 
 
 def esc(texto):
@@ -112,9 +111,10 @@ def gerar_username(nome, usados):
 
 
 def data_aleatoria(dias_atras_max):
-    dias = random.randint(0, dias_atras_max)
-    segundos = random.randint(0, 86399)
-    return fake.date_time_between(start_date=f"-{dias_atras_max}d", end_date="now")
+    return fake.date_time_between(
+        start_date=f"-{dias_atras_max}d",
+        end_date="now"
+    )
 
 
 def main():
@@ -218,7 +218,7 @@ def main():
         nome = fake.name()
         email = fake.unique.email()
         username = gerar_username(nome, usernames_usados)
-        role = random.choice(ROLES)
+        role = "USER"
         data_cadastro = data_aleatoria(730)
         usuarios.append({"id": i, "nome": nome})
         linhas.append(
