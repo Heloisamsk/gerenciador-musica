@@ -1,4 +1,4 @@
-import { ArtistaResumo } from './MusicaResponse';
+import { ArtistaResumo } from './ArtistaResumoModel';
 
 export interface AlbumResponse {
   idAlbum: number;
