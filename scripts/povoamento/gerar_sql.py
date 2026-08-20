@@ -1,6 +1,6 @@
 import json
 import os
-import random
+import secrets
 import re
 import unicodedata
 from datetime import timedelta
@@ -9,8 +9,8 @@ import bcrypt
 from faker import Faker
 
 fake = Faker("pt_BR")
-random.seed(42)
 Faker.seed(42)
+gerador_seguro = secrets.SystemRandom()
 
 PASTA = os.path.dirname(__file__)
 CAMINHO_JSON = os.path.join(PASTA, "dados_coletados.json")
@@ -85,7 +85,6 @@ GENEROS_POR_ARTISTA = {
     "João Gomes": ["Piseiro"],
 }
 
-ROLES = ["USER"] * 9 + ["ADMIN"]
 
 
 def esc(texto):
@@ -112,9 +111,10 @@ def gerar_username(nome, usados):
 
 
 def data_aleatoria(dias_atras_max):
-    dias = random.randint(0, dias_atras_max)
-    segundos = random.randint(0, 86399)
-    return fake.date_time_between(start_date=f"-{dias_atras_max}d", end_date="now")
+    return fake.date_time_between(
+        start_date=f"-{dias_atras_max}d",
+        end_date="now"
+    )
 
 
 def main():
@@ -218,7 +218,7 @@ def main():
         nome = fake.name()
         email = fake.unique.email()
         username = gerar_username(nome, usernames_usados)
-        role = random.choice(ROLES)
+        role = "USER"
         data_cadastro = data_aleatoria(730)
         usuarios.append({"id": i, "nome": nome})
         linhas.append(
@@ -229,11 +229,23 @@ def main():
 
     # ---------------- perfil ----------------
     linhas.append("\n-- perfil")
-    usuarios_com_perfil = random.sample(usuarios, QTD_PERFIS)
+    usuarios_com_perfil = gerador_seguro.sample(usuarios, QTD_PERFIS)
     for i, u in enumerate(usuarios_com_perfil, start=1):
-        artista_destaque = random.choice(list(id_artista.values())) if random.random() < 0.6 else None
-        album_destaque = random.choice(list(id_album.values())) if random.random() < 0.4 else None
-        musica_destaque = random.choice(musicas_inseridas_ids) if random.random() < 0.4 else None
+        artista_destaque = (
+            gerador_seguro.choice(list(id_artista.values()))
+            if gerador_seguro.random() < 0.6
+            else None
+        )
+        album_destaque = (
+            gerador_seguro.choice(list(id_album.values()))
+            if gerador_seguro.random() < 0.4
+            else None
+        )
+        musica_destaque = (
+            gerador_seguro.choice(musicas_inseridas_ids)
+            if gerador_seguro.random() < 0.4
+            else None
+        )
         linhas.append(
             "INSERT INTO perfil "
             "(id_perfil, id_usuario, biografia, frase_destaque, "
@@ -247,7 +259,7 @@ def main():
     todas_musicas_ids = musicas_inseridas_ids
     playlists = []
     for i in range(1, QTD_PLAYLISTS + 1):
-        dono = random.choice(usuarios)
+        dono = gerador_seguro.choice(usuarios)
         nome_playlist = f"{fake.word().capitalize()} {fake.word()}"
         data_criacao = data_aleatoria(600)
         playlists.append({"id": i, "usuario": dono["id"]})
@@ -260,8 +272,11 @@ def main():
     # ---------------- playlist_musica ----------------
     linhas.append("\n-- playlist_musica")
     for pl in playlists:
-        qtd = random.randint(4, 18)
-        musicas_da_playlist = random.sample(todas_musicas_ids, min(qtd, len(todas_musicas_ids)))
+        qtd = gerador_seguro.randint(4, 18)
+        musicas_da_playlist = gerador_seguro.sample(
+            todas_musicas_ids,
+            min(qtd, len(todas_musicas_ids))
+        )
         for ordem, mid in enumerate(musicas_da_playlist, start=1):
             linhas.append(
                 "INSERT INTO playlist_musica (id_playlist, id_musica, ordem) VALUES "
@@ -272,12 +287,16 @@ def main():
     linhas.append("\n-- review")
     pares_review = set()
     while len(pares_review) < QTD_REVIEWS:
-        uid = random.choice(usuarios)["id"]
-        mid = random.choice(todas_musicas_ids)
+        uid = gerador_seguro.choice(usuarios)["id"]
+        mid = gerador_seguro.choice(todas_musicas_ids)
         pares_review.add((uid, mid))
     for uid, mid in sorted(pares_review):
-        nota = random.randint(1, 5)
-        texto = fake.sentence(nb_words=15) if random.random() < 0.7 else None
+        nota = gerador_seguro.randint(1, 5)
+        texto = (
+            fake.sentence(nb_words=15)
+            if gerador_seguro.random() < 0.7
+            else None
+        )
         linhas.append(
             "INSERT INTO review (id_usuario, id_musica, nota, texto) VALUES "
             f"({uid}, {mid}, {nota}, {esc(texto)});"
@@ -287,10 +306,10 @@ def main():
     linhas.append("\n-- reproducao")
     duracao_por_musica = {id_musica[m["id"]]: m["duracao_segundos"] for m in musicas_raw}
     for _ in range(QTD_REPRODUCOES):
-        uid = random.choice(usuarios)["id"]
-        mid = random.choice(todas_musicas_ids)
+        uid = gerador_seguro.choice(usuarios)["id"]
+        mid = gerador_seguro.choice(todas_musicas_ids)
         duracao = duracao_por_musica.get(mid, 180)
-        segundos_ouvidos = random.randint(5, duracao)
+        segundos_ouvidos = gerador_seguro.randint(5, duracao)
         linhas.append(
             "INSERT INTO reproducao (id_usuario, id_musica, segundos_ouvidos) VALUES "
             f"({uid}, {mid}, {segundos_ouvidos});"
@@ -300,8 +319,8 @@ def main():
     linhas.append("\n-- curtida_musica")
     pares_curtida = set()
     while len(pares_curtida) < QTD_CURTIDAS:
-        uid = random.choice(usuarios)["id"]
-        mid = random.choice(todas_musicas_ids)
+        uid = gerador_seguro.choice(usuarios)["id"]
+        mid = gerador_seguro.choice(todas_musicas_ids)
         pares_curtida.add((uid, mid))
     for uid, mid in sorted(pares_curtida):
         linhas.append(
@@ -312,8 +331,8 @@ def main():
     linhas.append("\n-- usuario_segue_usuario")
     pares_segue_usuario = set()
     while len(pares_segue_usuario) < QTD_SEGUE_USUARIO:
-        seguidor = random.choice(usuarios)["id"]
-        seguido = random.choice(usuarios)["id"]
+        seguidor = gerador_seguro.choice(usuarios)["id"]
+        seguido = gerador_seguro.choice(usuarios)["id"]
         if seguidor != seguido:
             pares_segue_usuario.add((seguidor, seguido))
     for seguidor, seguido in sorted(pares_segue_usuario):
@@ -327,8 +346,8 @@ def main():
     pares_segue_artista = set()
     todos_artistas_ids = list(id_artista.values())
     while len(pares_segue_artista) < QTD_SEGUE_ARTISTA:
-        uid = random.choice(usuarios)["id"]
-        aid = random.choice(todos_artistas_ids)
+        uid = gerador_seguro.choice(usuarios)["id"]
+        aid = gerador_seguro.choice(todos_artistas_ids)
         pares_segue_artista.add((uid, aid))
     for uid, aid in sorted(pares_segue_artista):
         linhas.append(

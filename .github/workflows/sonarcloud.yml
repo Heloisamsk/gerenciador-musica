@@ -1,26 +1,21 @@
-name: Backend CI
+name: SonarCloud
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-ci.yml'
-
   pull_request:
     branches: [main]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-ci.yml'
+
+permissions:
+  contents: read
 
 jobs:
-  build-test-analyze:
+  analyze:
+    if: >
+      github.event_name == 'push' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+
     runs-on: ubuntu-latest
-
-
-    defaults:
-      run:
-        working-directory: backend
 
     services:
       postgres:
@@ -41,8 +36,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # O histórico completo permite que o SonarCloud
-          # compare as alterações do Pull Request com a main.
           fetch-depth: 0
 
       - name: Setup JDK 21
@@ -52,9 +45,6 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # Gera uma chave JWT temporária e segura para esta execução.
-      # A chave não é salva no repositório e deixa de existir
-      # quando o workflow termina.
       - name: Generate temporary JWT secret for tests
         shell: bash
         run: |
@@ -62,9 +52,19 @@ jobs:
           echo "::add-mask::$JWT_TEST_SECRET"
           echo "APP_JWT_SECRET=$JWT_TEST_SECRET" >> "$GITHUB_ENV"
 
-      - name: Build and run tests with coverage
+      - name: Build backend and generate coverage
+        working-directory: backend
         env:
           SPRING_PROFILES_ACTIVE: test
         run: |
           chmod +x mvnw
-          ./mvnw -B clean test
+          ./mvnw -B clean verify
+
+      - name: Analyze repository
+        uses: SonarSource/sonarqube-scan-action@c7ee0f9df90b7aa20e8dcf9695dcfe2e7da5b4f2 # v7
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: >
+            -Dsonar.qualitygate.wait=true
