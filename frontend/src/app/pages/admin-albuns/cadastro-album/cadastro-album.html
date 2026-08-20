@@ -1,0 +1,205 @@
+<div class="cadastro-container">
+  <div class="cadastro-card">
+    <h2 class="cadastro-title">
+      Cadastrar Álbum
+    </h2>
+
+    <div
+      class="alerta alerta-sucesso"
+      *ngIf="mensagemSucesso()"
+    >
+      {{ mensagemSucesso() }}
+    </div>
+
+    <div
+      class="alerta alerta-erro"
+      *ngIf="mensagemErro()"
+    >
+      {{ mensagemErro() }}
+    </div>
+
+    <form
+      class="cadastro-form"
+      [formGroup]="formulario"
+      (ngSubmit)="salvar()"
+      novalidate
+    >
+      <div class="form-group">
+        <label for="titulo">
+          Título *
+        </label>
+
+        <input
+          id="titulo"
+          type="text"
+          class="form-input"
+          formControlName="titulo"
+          maxlength="255"
+          placeholder="Ex.: A Night at the Opera"
+          [class.input-invalido]="
+            formulario.controls.titulo.invalid &&
+            formulario.controls.titulo.touched
+          "
+        >
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.titulo.touched &&
+            (
+              formulario.controls.titulo.hasError('required') ||
+              formulario.controls.titulo.hasError('apenasEspacos')
+            )
+          "
+        >
+          O título do álbum é obrigatório.
+        </small>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.titulo.touched &&
+            formulario.controls.titulo.hasError('maxlength')
+          "
+        >
+          O título deve possuir no máximo 255 caracteres.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="idArtista">
+          Artista *
+        </label>
+
+        <select
+          id="idArtista"
+          class="form-input"
+          formControlName="idArtista"
+          [class.input-invalido]="
+            formulario.controls.idArtista.invalid &&
+            formulario.controls.idArtista.touched
+          "
+          [disabled]="carregandoArtistas()"
+        >
+          <option [ngValue]="null">
+            Selecione um artista
+          </option>
+
+          <option
+            *ngFor="let artista of artistas"
+            [ngValue]="artista.idArtista"
+          >
+            {{ artista.nome }}
+          </option>
+        </select>
+
+        <small
+          class="campo-opcional"
+          *ngIf="carregandoArtistas()"
+        >
+          Carregando artistas...
+        </small>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.idArtista.touched &&
+            formulario.controls.idArtista.hasError('required')
+          "
+        >
+          Selecione um artista.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="anoLancamento">
+          Ano de lançamento *
+        </label>
+
+        <input
+          id="anoLancamento"
+          type="number"
+          class="form-input"
+          formControlName="anoLancamento"
+          placeholder="Ex.: 1975"
+          [class.input-invalido]="
+            formulario.controls.anoLancamento.invalid &&
+            formulario.controls.anoLancamento.touched
+          "
+        >
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.anoLancamento.touched &&
+            formulario.controls.anoLancamento.hasError('required')
+          "
+        >
+          O ano de lançamento é obrigatório.
+        </small>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.anoLancamento.touched &&
+            (
+              formulario.controls.anoLancamento.hasError('min') ||
+              formulario.controls.anoLancamento.hasError('max')
+            )
+          "
+        >
+          O ano deve estar entre 1800 e 2100.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="capaUrl">
+          URL da capa
+        </label>
+
+        <input
+          id="capaUrl"
+          type="url"
+          class="form-input"
+          formControlName="capaUrl"
+          maxlength="2048"
+          placeholder="https://exemplo.com/capa.jpg"
+          [class.input-invalido]="
+            formulario.controls.capaUrl.invalid &&
+            formulario.controls.capaUrl.touched
+          "
+        >
+
+        <small
+          class="campo-opcional"
+        >
+          Campo opcional.
+        </small>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.capaUrl.touched &&
+            formulario.controls.capaUrl.hasError('maxlength')
+          "
+        >
+          A URL deve possuir no máximo 2048 caracteres.
+        </small>
+      </div>
+
+      <button
+        type="submit"
+        class="cadastro-btn"
+        [disabled]="formulario.invalid || carregando()"
+      >
+        <span *ngIf="!carregando()">
+          Salvar álbum
+        </span>
+
+        <span *ngIf="carregando()">
+          Salvando...
+        </span>
+      </button>
+    </form>
+  </div>
+</div>
