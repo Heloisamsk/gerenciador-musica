@@ -35,6 +35,23 @@ const naoPermitirApenasEspacos: ValidatorFn = (
     : null;
 };
 
+const urlValida: ValidatorFn = (
+  control: AbstractControl
+): ValidationErrors | null => {
+  const valor = control.value;
+
+  if (typeof valor !== 'string' || valor.trim().length === 0) {
+    return null;
+  }
+
+  try {
+    new URL(valor.trim());
+    return null;
+  } catch {
+    return { urlInvalida: true };
+  }
+};
+
 @Component({
   selector: 'app-cadastro-album',
   standalone: true,
@@ -87,7 +104,8 @@ export class CadastroAlbum implements OnInit {
     capaUrl: [
       '',
       [
-        Validators.maxLength(2048)
+        Validators.maxLength(2048),
+        urlValida
       ]
     ]
   });
@@ -107,11 +125,14 @@ export class CadastroAlbum implements OnInit {
   }
 
   salvar(): void {
-    if (this.formulario.invalid) {
-      this.formulario.markAllAsTouched();
-      return;
-    }
+    if (this.carregando()) {
+        return;
+      }
 
+      if (this.formulario.invalid) {
+        this.formulario.markAllAsTouched();
+        return;
+      }
     this.carregando.set(true);
     this.mensagemSucesso.set('');
     this.mensagemErro.set('');
