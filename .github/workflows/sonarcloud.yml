@@ -45,6 +45,13 @@ jobs:
           java-version: '21'
           cache: maven
 
+      - name: Generate temporary JWT secret for tests
+        shell: bash
+        run: |
+          JWT_TEST_SECRET="$(openssl rand -base64 48 | tr -d '\n')"
+          echo "::add-mask::$JWT_TEST_SECRET"
+          echo "APP_JWT_SECRET=$JWT_TEST_SECRET" >> "$GITHUB_ENV"
+
       - name: Build backend and generate coverage
         working-directory: backend
         env:
@@ -54,7 +61,7 @@ jobs:
           ./mvnw -B clean verify
 
       - name: Analyze repository
-        uses: SonarSource/sonarqube-scan-action@v7
+        uses: SonarSource/sonarqube-scan-action@c7ee0f9df90b7aa20e8dcf9695dcfe2e7da5b4f2 # v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

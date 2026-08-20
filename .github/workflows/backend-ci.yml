@@ -17,9 +17,6 @@ jobs:
   build-test-analyze:
     runs-on: ubuntu-latest
 
-    # Permite verificar no "if" se o SONAR_TOKEN está configurado.
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     defaults:
       run:
@@ -71,15 +68,3 @@ jobs:
         run: |
           chmod +x mvnw
           ./mvnw -B clean test
-
-      # Executa a análise somente quando o SONAR_TOKEN
-      # estiver configurado nos secrets do repositório.
-      - name: SonarCloud analysis
-        if: ${{ env.SONAR_TOKEN != '' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: >
-          ./mvnw -B sonar:sonar
-          -Dsonar.projectKey=projeto-gerenciador-musica_gerenciador-musica
-          -Dsonar.organization=projeto-gerenciador-musica
-          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
