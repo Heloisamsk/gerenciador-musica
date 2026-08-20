@@ -5,4 +5,11 @@
 scripts/povoamento/.env
 scripts/povoamento/venv/
 scripts/povoamento/.cache
-scripts/povoamento/__pycache__/
+scripts/povoamento/__pycache__/.env
+
+# Segredos locais
+/.env
+
+# Arquivos gerados pelo Python
+__pycache__/
+*.py[cod]
