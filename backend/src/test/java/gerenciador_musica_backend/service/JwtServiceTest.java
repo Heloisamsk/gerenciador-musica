@@ -5,6 +5,8 @@ import gerenciador_musica_backend.model.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -62,5 +64,60 @@ class JwtServiceTest {
                         "token-invalido"
                 )
         ).isInstanceOf(JwtException.class);
+    }
+
+    @Test
+    void deveRejeitarChaveNula() {
+        assertThatThrownBy(() ->
+                new JwtService(
+                        null,
+                        EXPIRACAO_TESTE_MS
+                )
+        )
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("A chave JWT não foi configurada.");
+    }
+
+    @Test
+    void deveRejeitarChaveVazia() {
+        assertThatThrownBy(() ->
+                new JwtService(
+                        "   ",
+                        EXPIRACAO_TESTE_MS
+                )
+        )
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("A chave JWT não foi configurada.");
+    }
+
+    @Test
+    void deveRejeitarChaveComMenosDeTrintaEDoisBytes() {
+        assertThatThrownBy(() ->
+                new JwtService(
+                        "chave-curta",
+                        EXPIRACAO_TESTE_MS
+                )
+        )
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(
+                        "A chave JWT deve possuir pelo menos 32 bytes."
+                );
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {0L, -1L})
+    void deveRejeitarTempoDeExpiracaoNaoPositivo(
+            long expirationMs
+    ) {
+        assertThatThrownBy(() ->
+                new JwtService(
+                        gerarChaveTeste(),
+                        expirationMs
+                )
+        )
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(
+                        "O tempo de expiração do JWT deve ser positivo."
+                );
     }
 }
