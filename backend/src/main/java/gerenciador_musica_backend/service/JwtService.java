@@ -1,30 +1,62 @@
 package gerenciador_musica_backend.service;
 
-import java.util.Date;
-
-import org.springframework.stereotype.Service;
-
 import gerenciador_musica_backend.model.Usuario;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import io.jsonwebtoken.Claims;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY =
-            "minha-chave-secreta-super-segura-com-mais-de-32-caracteres";
+    private static final int TAMANHO_MINIMO_CHAVE = 32;
 
-    private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private final SecretKey key;
+    private final long expirationMs;
+
+    public JwtService(
+            @Value("${app.jwt.secret}") String secretKey,
+            @Value("${app.jwt.expiration-ms:86400000}") long expirationMs
+    ) {
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new IllegalStateException(
+                    "A chave JWT não foi configurada."
+            );
+        }
+
+        byte[] keyBytes =
+                secretKey.getBytes(StandardCharsets.UTF_8);
+
+        if (keyBytes.length < TAMANHO_MINIMO_CHAVE) {
+            throw new IllegalStateException(
+                    "A chave JWT deve possuir pelo menos 32 bytes."
+            );
+        }
+
+        if (expirationMs <= 0) {
+            throw new IllegalStateException(
+                    "O tempo de expiração do JWT deve ser positivo."
+            );
+        }
+
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.expirationMs = expirationMs;
+    }
 
     public String gerarToken(Usuario usuario) {
+        long instanteAtual = System.currentTimeMillis();
+
         return Jwts.builder()
                 .subject(usuario.getEmail())
                 .claim("role", usuario.getRole().name())
                 .claim("nome", usuario.getNome())
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .issuedAt(new Date(instanteAtual))
+                .expiration(new Date(instanteAtual + expirationMs))
                 .signWith(key)
                 .compact();
     }
