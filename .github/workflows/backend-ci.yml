@@ -6,6 +6,7 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/backend-ci.yml'
+
   pull_request:
     branches: [main]
     paths:
@@ -15,6 +16,11 @@ on:
 jobs:
   build-test-analyze:
     runs-on: ubuntu-latest
+
+    # Permite verificar no "if" se o SONAR_TOKEN está configurado.
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
     defaults:
       run:
         working-directory: backend
@@ -38,8 +44,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # historico completo: o SonarCloud usa isso pra comparar com o main
-          # e mostrar o que mudou no Pull Request.
+          # O histórico completo permite que o SonarCloud
+          # compare as alterações do Pull Request com a main.
           fetch-depth: 0
 
       - name: Setup JDK 21
@@ -49,6 +55,16 @@ jobs:
           java-version: '21'
           cache: maven
 
+      # Gera uma chave JWT temporária e segura para esta execução.
+      # A chave não é salva no repositório e deixa de existir
+      # quando o workflow termina.
+      - name: Generate temporary JWT secret for tests
+        shell: bash
+        run: |
+          JWT_TEST_SECRET="$(openssl rand -base64 48 | tr -d '\n')"
+          echo "::add-mask::$JWT_TEST_SECRET"
+          echo "APP_JWT_SECRET=$JWT_TEST_SECRET" >> "$GITHUB_ENV"
+
       - name: Build and run tests with coverage
         env:
           SPRING_PROFILES_ACTIVE: test
@@ -56,16 +72,12 @@ jobs:
           chmod +x mvnw
           ./mvnw -B clean test
 
-      # Roda a analise de qualidade no SonarCloud (issues de seguranca,
-      # manutenibilidade, duplicacao) usando o relatorio de cobertura do
-      # JaCoCo gerado no passo anterior. So executa se o secret SONAR_TOKEN
-      # ja tiver sido configurado nas settings do repositorio no GitHub -
-      # ate la, o workflow continua verde com build + testes.
+      # Executa a análise somente quando o SONAR_TOKEN
+      # estiver configurado nos secrets do repositório.
       - name: SonarCloud analysis
-        if: env.SONAR_TOKEN != ''
+        if: ${{ env.SONAR_TOKEN != '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
           ./mvnw -B sonar:sonar
           -Dsonar.projectKey=projeto-gerenciador-musica_gerenciador-musica
