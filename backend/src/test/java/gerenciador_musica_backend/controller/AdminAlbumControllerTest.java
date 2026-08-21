@@ -70,7 +70,7 @@ class AdminAlbumControllerTest {
                         "http://localhost/api/albuns/10"
                 ))
                 .andExpect(jsonPath("$.idAlbum").value(10))
-                .andExpect(jsonPath("$.artista.idArtista").value(1));
+                .andExpect(jsonPath("$.artista.id").value(1));
     }
 
     @Test

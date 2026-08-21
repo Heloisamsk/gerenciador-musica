@@ -59,7 +59,7 @@ class AlbumControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].titulo")
                         .value("A Night at the Opera"))
-                .andExpect(jsonPath("$[0].artista.idArtista")
+                .andExpect(jsonPath("$[0].artista.id")
                         .value(1));
 
         verify(albumService).listarAlbunsPorArtista(1L);
