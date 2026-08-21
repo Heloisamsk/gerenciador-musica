@@ -7,6 +7,7 @@ import {
 
 import { CadastroAlbum } from './cadastro-album';
 import { AlbumResponse } from '../../../models/AlbumResponse';
+import { ArtistaResponse } from '../../../models/ArtistaResponse';
 import { ArtistaResumo } from '../../../models/ArtistaResumoModel';
 
 describe('CadastroAlbum', () => {
@@ -20,8 +21,16 @@ describe('CadastroAlbum', () => {
   const apiAlbunsUrl =
     'http://localhost:8080/api/admin/albuns';
 
-  const artistaMock: ArtistaResumo = {
+  const artistaMock: ArtistaResponse = {
     idArtista: 1,
+    nome: 'Queen',
+    nomeCompleto: 'Queen',
+    descricao: 'Banda britânica de rock.',
+    fotoPerfilUrl: null
+  };
+
+  const artistaResumoMock: ArtistaResumo = {
+    id: 1,
     nome: 'Queen',
     nomeCompleto: 'Queen',
     descricao: 'Banda britânica de rock.',
@@ -33,7 +42,7 @@ describe('CadastroAlbum', () => {
     titulo: 'A Night at the Opera',
     anoLancamento: 1975,
     capaUrl: 'https://example.com/capa.jpg',
-    artista: artistaMock
+    artista: artistaResumoMock
   };
 
   beforeEach(async () => {
@@ -55,7 +64,7 @@ describe('CadastroAlbum', () => {
   });
 
   function carregarArtistas(
-    artistas: ArtistaResumo[] = [artistaMock]
+    artistas: ArtistaResponse[] = [artistaMock]
   ): void {
     fixture.detectChanges();
 
@@ -130,7 +139,10 @@ describe('CadastroAlbum', () => {
 
   it('deve rejeitar título apenas com espaços e URL inválida', () => {
     component.formulario.controls.titulo.setValue('   ');
-    component.formulario.controls.capaUrl.setValue('url-invalida');
+
+    component.formulario.controls.capaUrl.setValue(
+      'url-invalida'
+    );
 
     expect(
       component.formulario.controls.titulo
@@ -209,14 +221,17 @@ describe('CadastroAlbum', () => {
     {
       status: 400,
       statusText: 'Bad Request',
-      corpo: { message: 'Título inválido.' },
+      corpo: {
+        message: 'Título inválido.'
+      },
       mensagemEsperada: 'Título inválido.'
     },
     {
       status: 400,
       statusText: 'Bad Request',
       corpo: {},
-      mensagemEsperada: 'Existem dados inválidos no formulário.'
+      mensagemEsperada:
+        'Existem dados inválidos no formulário.'
     },
     {
       status: 401,
@@ -243,13 +258,15 @@ describe('CadastroAlbum', () => {
       status: 409,
       statusText: 'Conflict',
       corpo: {},
-      mensagemEsperada: 'Esse álbum já está cadastrado.'
+      mensagemEsperada:
+        'Esse álbum já está cadastrado.'
     },
     {
       status: 500,
       statusText: 'Internal Server Error',
       corpo: {},
-      mensagemEsperada: 'Ocorreu um erro ao cadastrar o álbum.'
+      mensagemEsperada:
+        'Ocorreu um erro ao cadastrar o álbum.'
     }
   ];
 

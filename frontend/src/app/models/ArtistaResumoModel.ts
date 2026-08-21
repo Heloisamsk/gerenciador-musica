@@ -1,5 +1,5 @@
 export interface ArtistaResumo {
-  idArtista: number;
+  id: number;
   nome: string;
   nomeCompleto: string;
   descricao: string;

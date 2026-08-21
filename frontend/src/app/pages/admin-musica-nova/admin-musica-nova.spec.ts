@@ -8,6 +8,8 @@ import { provideRouter, Router } from '@angular/router';
 
 import { AdminMusicaNova } from './admin-musica-nova';
 import { AlbumResponse } from '../../models/AlbumResponse';
+import { ArtistaResponse } from '../../models/ArtistaResponse';
+import { ArtistaResumo } from '../../models/ArtistaResumoModel';
 
 describe('AdminMusicaNova', () => {
   let component: AdminMusicaNova;
@@ -24,7 +26,7 @@ describe('AdminMusicaNova', () => {
   const apiAlbunsUrl =
     'http://localhost:8080/api/albuns';
 
-  const artistaMock = {
+  const artistaMock: ArtistaResponse = {
     idArtista: 1,
     nome: 'Queen',
     nomeCompleto: 'Queen',
@@ -32,11 +34,19 @@ describe('AdminMusicaNova', () => {
     fotoPerfilUrl: null
   };
 
-  const outroArtistaMock = {
+  const outroArtistaMock: ArtistaResponse = {
     idArtista: 2,
     nome: 'David Bowie',
     nomeCompleto: 'David Bowie',
     descricao: 'Cantor britânico.',
+    fotoPerfilUrl: null
+  };
+
+  const artistaResumoMock: ArtistaResumo = {
+    id: 1,
+    nome: 'Queen',
+    nomeCompleto: 'Queen',
+    descricao: 'Banda britânica de rock.',
     fotoPerfilUrl: null
   };
 
@@ -45,7 +55,7 @@ describe('AdminMusicaNova', () => {
     titulo: 'A Night at the Opera',
     anoLancamento: 1975,
     capaUrl: null,
-    artista: artistaMock
+    artista: artistaResumoMock
   };
 
   beforeEach(async () => {
@@ -86,7 +96,8 @@ describe('AdminMusicaNova', () => {
   function selecionarArtistaECarregarAlbuns(
     albuns: AlbumResponse[] = [albumMock]
   ): void {
-    component.formularioMusica.controls['artistaPrincipalId']
+    component.formularioMusica
+      .controls['artistaPrincipalId']
       .setValue(artistaMock.idArtista);
 
     const requisicaoAlbuns = httpMock.expectOne(
@@ -94,6 +105,7 @@ describe('AdminMusicaNova', () => {
     );
 
     expect(requisicaoAlbuns.request.method).toBe('GET');
+
     requisicaoAlbuns.flush(albuns);
   }
 
@@ -122,7 +134,8 @@ describe('AdminMusicaNova', () => {
   });
 
   it('deve carregar somente os álbuns do artista selecionado', () => {
-    component.formularioMusica.controls['artistaPrincipalId']
+    component.formularioMusica
+      .controls['artistaPrincipalId']
       .setValue(artistaMock.idArtista);
 
     expect(component.carregandoAlbuns()).toBe(true);
@@ -140,15 +153,18 @@ describe('AdminMusicaNova', () => {
   it('deve limpar o álbum ao trocar o artista', () => {
     selecionarArtistaECarregarAlbuns();
 
-    component.formularioMusica.controls['albumId']
+    component.formularioMusica
+      .controls['albumId']
       .setValue(albumMock.idAlbum);
 
-    component.formularioMusica.controls['artistaPrincipalId']
+    component.formularioMusica
+      .controls['artistaPrincipalId']
       .setValue(outroArtistaMock.idArtista);
 
     expect(
       component.formularioMusica.controls['albumId'].value
     ).toBeNull();
+
     expect(component.albuns()).toEqual([]);
 
     httpMock
@@ -164,6 +180,7 @@ describe('AdminMusicaNova', () => {
     const requisicao = httpMock.expectOne(apiMusicasUrl);
 
     expect(requisicao.request.method).toBe('POST');
+
     expect(requisicao.request.body).toEqual({
       titulo: 'Bohemian Rhapsody',
       duracaoSegundos: 354,
@@ -185,6 +202,7 @@ describe('AdminMusicaNova', () => {
     const requisicao = httpMock.expectOne(apiMusicasUrl);
 
     expect(requisicao.request.body.albumId).toBeNull();
+
     requisicao.flush({ id: 1 });
   });
 
@@ -194,6 +212,7 @@ describe('AdminMusicaNova', () => {
     component.salvar();
 
     httpMock.expectNone(apiMusicasUrl);
+
     expect(component.mensagemErro()).toContain('válidos');
   });
 
@@ -231,7 +250,9 @@ describe('AdminMusicaNova', () => {
         }
       );
 
-    expect(component.mensagemErro()).toContain('já está cadastrada');
+    expect(component.mensagemErro())
+      .toContain('já está cadastrada');
+
     expect(component.carregando()).toBe(false);
   });
 });

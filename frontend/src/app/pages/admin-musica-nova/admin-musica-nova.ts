@@ -267,7 +267,7 @@ export class AdminMusicaNova implements OnInit {
       || this.albuns().some(
         album =>
           album.idAlbum === albumId
-          && album.artista.idArtista === artistaPrincipalId
+          && album.artista.id === artistaPrincipalId
       );
 
     if (!albumValido) {
