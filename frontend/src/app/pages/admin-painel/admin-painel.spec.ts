@@ -20,16 +20,17 @@ describe('AdminPainel', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('deve exibir as quatro opções administrativas', () => {
+  it('deve exibir as cinco opções administrativas', () => {
     const elemento = fixture.nativeElement as HTMLElement;
     const opcoes = Array.from(
       elemento.querySelectorAll<HTMLAnchorElement>('.acao-card')
     );
 
-    expect(opcoes).toHaveLength(4);
+    expect(opcoes).toHaveLength(5);
     expect(opcoes.map(opcao => opcao.textContent?.trim())).toEqual([
       expect.stringContaining('Cadastrar música'),
       expect.stringContaining('Cadastrar artista'),
+      expect.stringContaining('Cadastrar álbum'),
       expect.stringContaining('Listar músicas'),
       expect.stringContaining('Listar usuários')
     ]);
@@ -44,6 +45,7 @@ describe('AdminPainel', () => {
     expect(destinos).toEqual([
       '/admin/banco/musicas/nova',
       '/admin/banco/artistas/novo',
+      '/admin/banco/albuns/novo',
       '/admin/banco/musicas',
       '/admin/banco/usuarios'
     ]);
