@@ -1,13 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  provideHttpClient
+} from '@angular/common/http';
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
+import { throwError } from 'rxjs';
 
 import { Playlists } from './playlists';
 import { PlaylistResponse } from '../../models/PlaylistResponse';
+import { PlaylistService } from '../../services/playlist';
 
 describe('Playlists', () => {
   let component: Playlists;
@@ -33,6 +38,7 @@ describe('Playlists', () => {
 
   afterEach(() => {
     httpMock.verify();
+    vi.restoreAllMocks();
   });
 
   it('deve carregar as playlists do usuário ao iniciar', () => {
@@ -58,4 +64,44 @@ describe('Playlists', () => {
     expect(component.mensagemErro).toBeTruthy();
     expect(component.carregando).toBe(false);
   });
+
+  const cenariosDeAutorizacao = [
+    {
+      status: 401,
+      statusText: 'Unauthorized',
+      mensagemEsperada:
+        'Sua sessão expirou. Faça login novamente.'
+    },
+    {
+      status: 403,
+      statusText: 'Forbidden',
+      mensagemEsperada:
+        'Você não tem permissão para ver essas playlists.'
+    }
+  ];
+
+  for (const cenario of cenariosDeAutorizacao) {
+    it(`deve tratar erro ${cenario.status} ao listar playlists`, () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const playlistService = TestBed.inject(PlaylistService);
+
+      vi.spyOn(playlistService, 'listarMinhas').mockReturnValue(
+        throwError(
+          () => new HttpErrorResponse({
+            status: cenario.status,
+            statusText: cenario.statusText
+          })
+        )
+      );
+
+      fixture.detectChanges();
+
+      httpMock.expectNone(apiUrl);
+
+      expect(component.mensagemErro).toBe(
+        cenario.mensagemEsperada
+      );
+      expect(component.carregando).toBe(false);
+    });
+  }
 });
