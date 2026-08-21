@@ -7,12 +7,15 @@ import {
 
 import { AdminMusicaService } from './admin-musica';
 import { MusicaListagem } from '../models/MusicaListagem';
+import { MusicaRequest } from '../models/MusicaRequest';
 
 describe('AdminMusicaService', () => {
   let service: AdminMusicaService;
   let httpMock: HttpTestingController;
 
   const apiUrl = 'http://localhost:8080/api/musicas';
+  const apiAdminUrl =
+    'http://localhost:8080/api/admin/musicas';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -61,6 +64,42 @@ describe('AdminMusicaService', () => {
       tamanhoPagina: 100,
       totalItens: 1,
       totalPaginas: 1,
+    });
+  });
+
+  it('deve cadastrar música pelo endpoint administrativo', () => {
+    const request: MusicaRequest = {
+      titulo: 'Bohemian Rhapsody',
+      duracaoSegundos: 354,
+      anoLancamento: 1975,
+      artistaPrincipalId: 1,
+      artistasParticipantesIds: [],
+      albumId: 10,
+      generos: ['Rock']
+    };
+
+    service.cadastrarMusica(request).subscribe();
+
+    const requisicao = httpMock.expectOne(apiAdminUrl);
+
+    expect(requisicao.request.method).toBe('POST');
+    expect(requisicao.request.body).toEqual(request);
+
+    requisicao.flush({
+      id: 1,
+      titulo: request.titulo,
+      letra: null,
+      duracaoSegundos: request.duracaoSegundos,
+      anoLancamento: request.anoLancamento,
+      artistaPrincipal: { id: 1, nome: 'Queen' },
+      album: {
+        id: 10,
+        titulo: 'A Night at the Opera',
+        anoLancamento: 1975,
+        capaUrl: null
+      },
+      artistasParticipantes: [],
+      generos: [{ id: 1, nome: 'Rock' }]
     });
   });
 });

@@ -79,13 +79,65 @@
         }
       </div>
       <div class="form-group">
-        <label for="album">Álbum</label>
-        <input id="album" type="text" class="form-input" formControlName="album" placeholder="Ex: A Night at the Opera">
-        <small class="error-message" *ngIf="formularioMusica.get('album')?.invalid && formularioMusica.get('album')?.touched">
-          O álbum é obrigatório.
-        </small>
+        <label for="albumId">Álbum</label>
+
+        <select
+          id="albumId"
+          class="form-input"
+          formControlName="albumId"
+          [attr.disabled]="
+            !formularioMusica.controls['artistaPrincipalId'].value ||
+            carregandoAlbuns()
+              ? true
+              : null
+          "
+        >
+          <option [ngValue]="null">
+            @if (carregandoAlbuns()) {
+              Carregando álbuns...
+            } @else if (!formularioMusica.controls['artistaPrincipalId'].value) {
+              Selecione um artista primeiro
+            } @else {
+              Sem álbum (single)
+            }
+          </option>
+
+          @for (album of albuns(); track album.idAlbum) {
+            <option [ngValue]="album.idAlbum">
+              {{ album.titulo }} ({{ album.anoLancamento }})
+            </option>
+          }
+        </select>
+
+        @if (erroAlbuns()) {
+          <small class="error-message">
+            {{ erroAlbuns() }}
+          </small>
+        } @else if (
+          formularioMusica.controls['artistaPrincipalId'].value &&
+          !carregandoAlbuns() &&
+          albuns().length === 0
+        ) {
+          <small class="campo-opcional">
+            Esse artista não possui álbuns cadastrados. A música pode ser salva como single.
+          </small>
+        } @else {
+          <small class="campo-opcional">
+            Campo opcional. A lista exibe somente os álbuns do artista escolhido.
+          </small>
+        }
       </div>
-      <button type="submit" class="cadastro-btn" [disabled]="formularioMusica.invalid || carregando()">
+      <button
+        type="submit"
+        class="cadastro-btn"
+        [disabled]="
+          formularioMusica.invalid ||
+          carregando() ||
+          carregandoArtistas() ||
+          carregandoAlbuns() ||
+          artistas().length === 0
+        "
+      >
         <span *ngIf="!carregando()">Salvar Música</span>
         <span *ngIf="carregando()">Salvando...</span>
       </button>

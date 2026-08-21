@@ -1,5 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import {
+  HttpTestingController,
+  provideHttpClientTesting
+} from '@angular/common/http/testing';
 import { AdminAlbumService } from './admin-album.service';
 import { AlbumRequest } from '../models/AlbumRequestModel';
 import { AlbumResponse } from '../models/AlbumResponse';
@@ -8,7 +12,8 @@ import { environment } from '../../environments/environment';
 describe('AdminAlbumService', () => {
   let service: AdminAlbumService;
   let httpMock: HttpTestingController;
-  const apiUrl = `${environment.apiUrl}/api/admin/albuns`;
+  const apiCadastroUrl = `${environment.apiUrl}/api/admin/albuns`;
+  const apiCatalogoUrl = `${environment.apiUrl}/api/albuns`;
 
   const requestValido: AlbumRequest = {
     titulo: 'A Night at the Opera',
@@ -19,8 +24,11 @@ describe('AdminAlbumService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [AdminAlbumService]
+      providers: [
+        AdminAlbumService,
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     });
 
     service = TestBed.inject(AdminAlbumService);
@@ -48,7 +56,7 @@ describe('AdminAlbumService', () => {
       expect(resposta).toEqual(respostaEsperada);
     });
 
-    const req = httpMock.expectOne(apiUrl);
+    const req = httpMock.expectOne(apiCadastroUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(requestValido);
     req.flush(respostaEsperada);
@@ -60,7 +68,7 @@ describe('AdminAlbumService', () => {
       error: (erro) => expect(erro.status).toBe(400)
     });
 
-    const req = httpMock.expectOne(apiUrl);
+    const req = httpMock.expectOne(apiCadastroUrl);
     req.flush({ fieldErrors: { titulo: 'obrigatório' } }, { status: 400, statusText: 'Bad Request' });
   });
 
@@ -70,7 +78,7 @@ describe('AdminAlbumService', () => {
       error: (erro) => expect(erro.status).toBe(401)
     });
 
-    const req = httpMock.expectOne(apiUrl);
+    const req = httpMock.expectOne(apiCadastroUrl);
     req.flush({}, { status: 401, statusText: 'Unauthorized' });
   });
 
@@ -80,7 +88,7 @@ describe('AdminAlbumService', () => {
       error: (erro) => expect(erro.status).toBe(403)
     });
 
-    const req = httpMock.expectOne(apiUrl);
+    const req = httpMock.expectOne(apiCadastroUrl);
     req.flush({}, { status: 403, statusText: 'Forbidden' });
   });
 
@@ -90,7 +98,7 @@ describe('AdminAlbumService', () => {
       error: (erro) => expect(erro.status).toBe(404)
     });
 
-    const req = httpMock.expectOne(apiUrl);
+    const req = httpMock.expectOne(apiCadastroUrl);
     req.flush({}, { status: 404, statusText: 'Not Found' });
   });
 
@@ -100,7 +108,36 @@ describe('AdminAlbumService', () => {
       error: (erro) => expect(erro.status).toBe(409)
     });
 
-    const req = httpMock.expectOne(apiUrl);
+    const req = httpMock.expectOne(apiCadastroUrl);
     req.flush({ message: 'Esse álbum já está cadastrado.' }, { status: 409, statusText: 'Conflict' });
+  });
+
+  it('deve listar somente os álbuns do artista informado', () => {
+    const respostaEsperada: AlbumResponse[] = [
+      {
+        idAlbum: 1,
+        titulo: 'A Night at the Opera',
+        anoLancamento: 1975,
+        capaUrl: null,
+        artista: {
+          idArtista: 1,
+          nome: 'Queen',
+          nomeCompleto: 'Queen',
+          descricao: 'Banda britânica de rock.',
+          fotoPerfilUrl: null
+        }
+      }
+    ];
+
+    service.listarAlbunsPorArtista(1).subscribe(resposta => {
+      expect(resposta).toEqual(respostaEsperada);
+    });
+
+    const req = httpMock.expectOne(
+      `${apiCatalogoUrl}?artistaId=1`
+    );
+
+    expect(req.request.method).toBe('GET');
+    req.flush(respostaEsperada);
   });
 });

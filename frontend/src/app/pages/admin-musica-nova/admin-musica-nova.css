@@ -75,6 +75,13 @@
   font-size: 0.8rem;
 }
 
+.campo-opcional {
+  display: block;
+  margin-top: 2px;
+  color: #b3b3b3;
+  font-size: 0.8rem;
+}
+
 .cadastro-btn {
   width: 100%;
   margin-top: 15px;
