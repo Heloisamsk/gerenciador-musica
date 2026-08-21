@@ -174,9 +174,13 @@ Armazena os álbuns cadastrados, com artista responsável, título e ano de lan�
 |---|---|---|---|
 | id_album | BIGINT | PK | Identificador único do álbum. |
 | id_artista | BIGINT | NOT NULL, FK → artista | Artista responsável pelo álbum. |
-| titulo | VARCHAR(255) | NOT NULL | Título do álbum. |
+| titulo | VARCHAR(255) | NOT NULL, não vazio | Título do álbum. |
 | ano_lancamento | SMALLINT | NOT NULL, CHECK (entre 1800 e 2100) | Ano de lançamento do álbum. |
 | capa_url | VARCHAR(2048) | — | URL da capa do álbum. |
+
+A combinação de artista, título e ano é única, sem diferenciar letras
+maiúsculas e minúsculas. No cadastro de música, `albumId` é opcional; quando
+informado, a API valida se o álbum pertence ao artista principal selecionado.
 
 ### GENERO
 Armazena os gêneros musicais cadastrados no sistema.
@@ -583,6 +587,8 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 | Método | Endpoint | Acesso | Descrição |
 |:------:|----------|--------|-----------|
 | `GET` | `/api/artistas` | `USER` ou `ADMIN` | Listar os artistas disponíveis no catálogo |
+| `GET` | `/api/albuns` | `USER` ou `ADMIN` | Listar álbuns; aceita o filtro `?artistaId={id}` |
+| `GET` | `/api/albuns/{id}` | `USER` ou `ADMIN` | Consultar um álbum por ID |
 | `GET` | `/api/musicas` | `USER` ou `ADMIN` | Listar as músicas disponíveis no catálogo |
 
 ### Administração
@@ -591,8 +597,8 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 |:------:|----------|--------|-----------|
 | `GET` | `/api/admin/artistas` | `ADMIN` | Listar artistas para operações administrativas |
 | `POST` | `/api/admin/artistas` | `ADMIN` | Cadastrar um novo artista |
+| `POST` | `/api/admin/albuns` | `ADMIN` | Cadastrar um álbum vinculado a um artista |
 | `POST` | `/api/admin/musicas` | `ADMIN` | Cadastrar uma nova música |
 | `GET` | `/api/admin/banco/usuarios` | `ADMIN` | Listar os usuários cadastrados no banco de dados |
 
 > Os endpoints iniciados por `/api/admin` são protegidos e podem ser acessados somente por usuários com a role `ADMIN`. Usuários autenticados com a role `USER` recebem a resposta `403 Forbidden` ao tentar acessar essas rotas.
-
