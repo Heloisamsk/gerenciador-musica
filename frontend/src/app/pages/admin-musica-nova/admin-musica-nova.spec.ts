@@ -7,6 +7,9 @@ import {
 import { provideRouter, Router } from '@angular/router';
 
 import { AdminMusicaNova } from './admin-musica-nova';
+import { AlbumResponse } from '../../models/AlbumResponse';
+import { ArtistaResponse } from '../../models/ArtistaResponse';
+import { ArtistaResumo } from '../../models/ArtistaResumoModel';
 
 describe('AdminMusicaNova', () => {
   let component: AdminMusicaNova;
@@ -20,12 +23,39 @@ describe('AdminMusicaNova', () => {
   const apiArtistasUrl =
     'http://localhost:8080/api/artistas';
 
-  const artistaMock = {
+  const apiAlbunsUrl =
+    'http://localhost:8080/api/albuns';
+
+  const artistaMock: ArtistaResponse = {
     idArtista: 1,
     nome: 'Queen',
     nomeCompleto: 'Queen',
-    descricao: '',
-    fotoPerfilUrl: ''
+    descricao: 'Banda britânica de rock.',
+    fotoPerfilUrl: null
+  };
+
+  const outroArtistaMock: ArtistaResponse = {
+    idArtista: 2,
+    nome: 'David Bowie',
+    nomeCompleto: 'David Bowie',
+    descricao: 'Cantor britânico.',
+    fotoPerfilUrl: null
+  };
+
+  const artistaResumoMock: ArtistaResumo = {
+    id: 1,
+    nome: 'Queen',
+    nomeCompleto: 'Queen',
+    descricao: 'Banda britânica de rock.',
+    fotoPerfilUrl: null
+  };
+
+  const albumMock: AlbumResponse = {
+    idAlbum: 10,
+    titulo: 'A Night at the Opera',
+    anoLancamento: 1975,
+    capaUrl: null,
+    artista: artistaResumoMock
   };
 
   beforeEach(async () => {
@@ -53,25 +83,47 @@ describe('AdminMusicaNova', () => {
 
     expect(requisicaoArtistas.request.method).toBe('GET');
 
-    requisicaoArtistas.flush([artistaMock]);
+    requisicaoArtistas.flush([
+      artistaMock,
+      outroArtistaMock
+    ]);
   });
 
   afterEach(() => {
     httpMock.verify();
   });
 
-  function preencherFormularioValido(): void {
-    component.formularioMusica.setValue({
+  function selecionarArtistaECarregarAlbuns(
+    albuns: AlbumResponse[] = [albumMock]
+  ): void {
+    component.formularioMusica
+      .controls['artistaPrincipalId']
+      .setValue(artistaMock.idArtista);
+
+    const requisicaoAlbuns = httpMock.expectOne(
+      `${apiAlbunsUrl}?artistaId=${artistaMock.idArtista}`
+    );
+
+    expect(requisicaoAlbuns.request.method).toBe('GET');
+
+    requisicaoAlbuns.flush(albuns);
+  }
+
+  function preencherFormularioValido(
+    albumId: number | null = albumMock.idAlbum
+  ): void {
+    selecionarArtistaECarregarAlbuns();
+
+    component.formularioMusica.patchValue({
       titulo: 'Bohemian Rhapsody',
       duracao: '354',
       genero: 'Rock',
       anoLancamento: '1975',
-      artistaPrincipalId: artistaMock.idArtista,
-      album: 'A Night at the Opera'
+      albumId
     });
   }
 
-  it('should create', () => {
+  it('deve criar o componente', () => {
     expect(component).toBeTruthy();
   });
 
@@ -81,13 +133,51 @@ describe('AdminMusicaNova', () => {
     httpMock.expectNone(apiMusicasUrl);
   });
 
-  it('deve montar o payload aninhado esperado pelo backend', () => {
+  it('deve carregar somente os álbuns do artista selecionado', () => {
+    component.formularioMusica
+      .controls['artistaPrincipalId']
+      .setValue(artistaMock.idArtista);
+
+    expect(component.carregandoAlbuns()).toBe(true);
+
+    const requisicaoAlbuns = httpMock.expectOne(
+      `${apiAlbunsUrl}?artistaId=1`
+    );
+
+    requisicaoAlbuns.flush([albumMock]);
+
+    expect(component.albuns()).toEqual([albumMock]);
+    expect(component.carregandoAlbuns()).toBe(false);
+  });
+
+  it('deve limpar o álbum ao trocar o artista', () => {
+    selecionarArtistaECarregarAlbuns();
+
+    component.formularioMusica
+      .controls['albumId']
+      .setValue(albumMock.idAlbum);
+
+    component.formularioMusica
+      .controls['artistaPrincipalId']
+      .setValue(outroArtistaMock.idArtista);
+
+    expect(
+      component.formularioMusica.controls['albumId'].value
+    ).toBeNull();
+
+    expect(component.albuns()).toEqual([]);
+
+    httpMock
+      .expectOne(`${apiAlbunsUrl}?artistaId=2`)
+      .flush([]);
+  });
+
+  it('deve montar o payload com o ID de um álbum existente', () => {
     preencherFormularioValido();
 
     component.salvar();
 
-    const requisicao =
-      httpMock.expectOne(apiMusicasUrl);
+    const requisicao = httpMock.expectOne(apiMusicasUrl);
 
     expect(requisicao.request.method).toBe('POST');
 
@@ -97,14 +187,33 @@ describe('AdminMusicaNova', () => {
       anoLancamento: 1975,
       artistaPrincipalId: 1,
       artistasParticipantesIds: [],
-      album: {
-        titulo: 'A Night at the Opera',
-        anoLancamento: 1975
-      },
+      albumId: 10,
       generos: ['Rock']
     });
 
     requisicao.flush({ id: 1 });
+  });
+
+  it('deve permitir cadastrar uma música sem álbum', () => {
+    preencherFormularioValido(null);
+
+    component.salvar();
+
+    const requisicao = httpMock.expectOne(apiMusicasUrl);
+
+    expect(requisicao.request.body.albumId).toBeNull();
+
+    requisicao.flush({ id: 1 });
+  });
+
+  it('não deve enviar álbum que não pertença à lista do artista', () => {
+    preencherFormularioValido(999);
+
+    component.salvar();
+
+    httpMock.expectNone(apiMusicasUrl);
+
+    expect(component.mensagemErro()).toContain('válidos');
   });
 
   it('deve navegar para a listagem quando o cadastro tem sucesso', () => {
@@ -141,7 +250,9 @@ describe('AdminMusicaNova', () => {
         }
       );
 
-    expect(component.mensagemErro()).toContain('409');
+    expect(component.mensagemErro())
+      .toContain('já está cadastrada');
+
     expect(component.carregando()).toBe(false);
   });
 });

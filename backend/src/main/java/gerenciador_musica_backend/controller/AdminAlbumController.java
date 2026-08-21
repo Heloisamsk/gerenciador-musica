@@ -4,9 +4,11 @@ import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.service.AlbumService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/admin/albuns")
@@ -25,8 +27,14 @@ public class AdminAlbumController {
         AlbumResponseDTO response =
                 albumService.cadastrarAlbum(request);
 
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/api/albuns/{id}")
+                .buildAndExpand(response.idAlbum())
+                .toUri();
+
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .created(location)
                 .body(response);
     }
 }

@@ -1,6 +1,5 @@
 package gerenciador_musica_backend.dto;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -47,8 +46,8 @@ public record MusicaRequestDTO(
                         Long
                 > artistasParticipantesIds,
 
-        @Valid
-        AlbumRequestDTO album,
+        @Positive(message = "O ID do álbum deve ser positivo")
+        Long albumId,
 
         @NotNull(message = "Informe os gêneros da música")
         @Size(

@@ -10,8 +10,11 @@ import { AlbumResponse } from '../models/AlbumResponse';
 })
 export class AdminAlbumService {
 
-  private readonly apiUrl =
+  private readonly apiCadastroUrl =
     `${environment.apiUrl}/api/admin/albuns`;
+
+  private readonly apiCatalogoUrl =
+    `${environment.apiUrl}/api/albuns`;
 
   constructor(
     private readonly http: HttpClient
@@ -21,8 +24,21 @@ export class AdminAlbumService {
     album: AlbumRequest
   ): Observable<AlbumResponse> {
     return this.http.post<AlbumResponse>(
-      this.apiUrl,
+      this.apiCadastroUrl,
       album
+    );
+  }
+
+  listarAlbunsPorArtista(
+    idArtista: number
+  ): Observable<AlbumResponse[]> {
+    return this.http.get<AlbumResponse[]>(
+      this.apiCatalogoUrl,
+      {
+        params: {
+          artistaId: idArtista
+        }
+      }
     );
   }
 }

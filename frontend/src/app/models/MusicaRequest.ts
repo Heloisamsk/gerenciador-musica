@@ -1,8 +1,10 @@
 export interface MusicaRequest {
   titulo: string;
-  duracao: number;
-  generoId: number;
+  letra?: string | null;
+  duracaoSegundos: number;
   anoLancamento: number;
-  artistaId: number;
-  albumId: number;
+  artistaPrincipalId: number;
+  artistasParticipantesIds: number[];
+  albumId: number | null;
+  generos: string[];
 }

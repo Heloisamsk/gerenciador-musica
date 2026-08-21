@@ -12,7 +12,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { finalize } from 'rxjs';
 
 import { AlbumRequest } from '../../../models/AlbumRequestModel';
-import { ArtistaResumo } from '../../../models/ArtistaResumoModel';
+import { ArtistaResponse } from '../../../models/ArtistaResponse';
 import { AdminAlbumService } from '../../../services/admin-album.service';
 import { AdminArtistaService } from '../../../services/admin-artista';
 
@@ -70,10 +70,11 @@ export class CadastroAlbum implements OnInit {
 
   readonly carregando = signal(false);
   readonly carregandoArtistas = signal(false);
+  readonly erroArtistas = signal('');
   readonly mensagemSucesso = signal('');
   readonly mensagemErro = signal('');
 
-  artistas: ArtistaResumo[] = [];
+  artistas: ArtistaResponse[] = [];
 
   readonly formulario = this.formBuilder.nonNullable.group({
     titulo: [
@@ -112,6 +113,7 @@ export class CadastroAlbum implements OnInit {
 
   ngOnInit(): void {
     this.carregandoArtistas.set(true);
+    this.erroArtistas.set('');
 
     this.artistaService
       .listarArtistas()
@@ -119,20 +121,34 @@ export class CadastroAlbum implements OnInit {
         finalize(() => this.carregandoArtistas.set(false))
       )
       .subscribe({
-        next: (artistas) => this.artistas = artistas,
-        error: () => this.artistas = []
+        next: (artistas) => {
+          this.artistas = artistas;
+
+          if (artistas.length === 0) {
+            this.erroArtistas.set(
+              'Nenhum artista cadastrado. Cadastre um artista primeiro.'
+            );
+          }
+        },
+        error: () => {
+          this.artistas = [];
+          this.erroArtistas.set(
+            'Não foi possível carregar a lista de artistas.'
+          );
+        }
       });
   }
 
   salvar(): void {
     if (this.carregando()) {
-        return;
-      }
+      return;
+    }
 
-      if (this.formulario.invalid) {
-        this.formulario.markAllAsTouched();
-        return;
-      }
+    if (this.formulario.invalid) {
+      this.formulario.markAllAsTouched();
+      return;
+    }
+
     this.carregando.set(true);
     this.mensagemSucesso.set('');
     this.mensagemErro.set('');

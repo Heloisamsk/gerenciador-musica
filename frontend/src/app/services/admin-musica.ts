@@ -5,6 +5,8 @@ import { map } from 'rxjs/operators';
 
 import { MusicaListagem } from '../models/MusicaListagem';
 import { PaginaResponse } from '../models/PaginaResponse';
+import { MusicaRequest } from '../models/MusicaRequest';
+import { MusicaResponse } from '../models/MusicaResponse';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -14,6 +16,9 @@ export class AdminMusicaService {
 
   private readonly apiUrl =
     `${environment.apiUrl}/api/musicas`;
+
+  private readonly apiAdminUrl =
+    `${environment.apiUrl}/api/admin/musicas`;
 
   private readonly TAMANHO_PAGINA_MAXIMO = 100;
 
@@ -34,5 +39,14 @@ export class AdminMusicaService {
       .pipe(
         map(pagina => pagina.itens)
       );
+  }
+
+  cadastrarMusica(
+    request: MusicaRequest
+  ): Observable<MusicaResponse> {
+    return this.http.post<MusicaResponse>(
+      this.apiAdminUrl,
+      request
+    );
   }
 }

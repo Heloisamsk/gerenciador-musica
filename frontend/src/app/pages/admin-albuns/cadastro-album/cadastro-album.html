@@ -109,6 +109,13 @@
         >
           Selecione um artista.
         </small>
+
+        <small
+          class="error-message"
+          *ngIf="erroArtistas()"
+        >
+          {{ erroArtistas() }}
+        </small>
       </div>
 
       <div class="form-group">
@@ -200,7 +207,12 @@
       <button
         type="submit"
         class="cadastro-btn"
-        [disabled]="formulario.invalid || carregando()"
+        [disabled]="
+          formulario.invalid ||
+          carregando() ||
+          carregandoArtistas() ||
+          artistas.length === 0
+        "
       >
         <span *ngIf="!carregando()">
           Salvar álbum
