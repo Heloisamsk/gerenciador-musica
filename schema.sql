@@ -1,5 +1,5 @@
 -- Script DDL - Sistema Gerenciador de Musicas (PostgreSQL)
--- Reune as migrations Flyway (V1 a V13, em backend/src/main/resources/db/migration/) num arquivo so, pra entrega.
+-- Reune a estrutura das migrations Flyway num arquivo so, pra entrega.
 
 
 -- =====================================================================
@@ -47,8 +47,18 @@ CREATE TABLE IF NOT EXISTS album (
         REFERENCES artista (id_artista),
 
     CONSTRAINT ck_album_ano
-        CHECK (ano_lancamento BETWEEN 1800 AND 2100)
+        CHECK (ano_lancamento BETWEEN 1800 AND 2100),
+
+    CONSTRAINT ck_album_titulo_nao_vazio
+        CHECK (BTRIM(titulo) <> '')
 );
+
+CREATE UNIQUE INDEX uk_album_artista_titulo_ano_ci
+    ON album (
+        id_artista,
+        LOWER(BTRIM(titulo)),
+        ano_lancamento
+    );
 
 
 CREATE TABLE IF NOT EXISTS genero (
