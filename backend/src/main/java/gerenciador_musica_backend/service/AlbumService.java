@@ -34,13 +34,16 @@ public class AlbumService {
     }
 
     @Transactional
-    public AlbumResponseDTO cadastrarAlbum(AlbumRequestDTO request) {
+    public AlbumResponseDTO cadastrarAlbum(
+            AlbumRequestDTO request
+    ) {
         validarRequest(request);
 
         String tituloNormalizado = normalizarCampoObrigatorio(
                 request.titulo(),
                 "O título do álbum"
         );
+
         String capaUrlNormalizada = normalizarCampoOpcional(
                 request.capaUrl()
         );
@@ -62,23 +65,29 @@ public class AlbumService {
                 capaUrlNormalizada
         );
 
-        return converterParaResponse(albumRepository.save(album));
+        Album albumSalvo = albumRepository.save(album);
+
+        return converterParaResponse(albumSalvo);
     }
 
     @Transactional(readOnly = true)
     public List<AlbumResponseDTO> listarAlbuns() {
         return albumRepository
-                .findAll(Sort.by(
-                        Sort.Order.asc("titulo"),
-                        Sort.Order.asc("anoLancamento")
-                ))
+                .findAll(
+                        Sort.by(
+                                Sort.Order.asc("titulo"),
+                                Sort.Order.asc("anoLancamento")
+                        )
+                )
                 .stream()
                 .map(this::converterParaResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<AlbumResponseDTO> listarAlbunsPorArtista(Long idArtista) {
+    public List<AlbumResponseDTO> listarAlbunsPorArtista(
+            Long idArtista
+    ) {
         validarIdPositivo(
                 idArtista,
                 "O ID do artista deve ser válido."
@@ -97,21 +106,14 @@ public class AlbumService {
 
     @Transactional(readOnly = true)
     public AlbumResponseDTO buscarPorId(Long idAlbum) {
-        return converterParaResponse(buscarEntidadePorId(idAlbum));
+        Album album = obterEntidadePorId(idAlbum);
+
+        return converterParaResponse(album);
     }
 
     @Transactional(readOnly = true)
     public Album buscarEntidadePorId(Long idAlbum) {
-        validarIdPositivo(
-                idAlbum,
-                "O ID do álbum deve ser válido."
-        );
-
-        return albumRepository
-                .findById(idAlbum)
-                .orElseThrow(
-                        () -> new AlbumNaoEncontradoException(idAlbum)
-                );
+        return obterEntidadePorId(idAlbum);
     }
 
     @Transactional(readOnly = true)
@@ -131,7 +133,7 @@ public class AlbumService {
             );
         }
 
-        Album album = buscarEntidadePorId(idAlbum);
+        Album album = obterEntidadePorId(idAlbum);
 
         boolean pertenceAoArtista = Objects.equals(
                 album.getArtista().getIdArtista(),
@@ -140,11 +142,34 @@ public class AlbumService {
 
         if (!pertenceAoArtista) {
             throw new DadosAlbumInvalidosException(
-                    "O álbum selecionado não pertence ao artista principal da música."
+                    "O álbum selecionado não pertence ao "
+                            + "artista principal da música."
             );
         }
 
         return album;
+    }
+
+    /*
+     * Método interno sem @Transactional.
+     *
+     * Os métodos públicos acima possuem a configuração transacional
+     * necessária e utilizam este método para compartilhar a busca.
+     * Isso evita chamadas internas entre métodos @Transactional.
+     */
+    private Album obterEntidadePorId(Long idAlbum) {
+        validarIdPositivo(
+                idAlbum,
+                "O ID do álbum deve ser válido."
+        );
+
+        return albumRepository
+                .findById(idAlbum)
+                .orElseThrow(
+                        () -> new AlbumNaoEncontradoException(
+                                idAlbum
+                        )
+                );
     }
 
     private void validarRequest(AlbumRequestDTO request) {
@@ -193,7 +218,10 @@ public class AlbumService {
         }
     }
 
-    private void validarIdPositivo(Long id, String mensagem) {
+    private void validarIdPositivo(
+            Long id,
+            String mensagem
+    ) {
         if (id == null || id <= 0) {
             throw new DadosAlbumInvalidosException(mensagem);
         }
@@ -230,7 +258,9 @@ public class AlbumService {
         return valor.strip();
     }
 
-    private AlbumResponseDTO converterParaResponse(Album album) {
+    private AlbumResponseDTO converterParaResponse(
+            Album album
+    ) {
         Artista artista = album.getArtista();
 
         ArtistaResumoDTO artistaResumo = new ArtistaResumoDTO(
