@@ -10,11 +10,19 @@ import { AlbumResponse } from '../models/AlbumResponse';
 })
 export class AdminAlbumService {
 
-  private readonly apiUrl = `${environment.apiUrl}/api/admin/albuns`;
+  private readonly apiUrl =
+    `${environment.apiUrl}/api/admin/albuns`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient
+  ) {}
 
-  cadastrarAlbum(album: AlbumRequest): Observable<AlbumResponse> {
-    return this.http.post<AlbumResponse>(this.apiUrl, album);
+  cadastrarAlbum(
+    album: AlbumRequest
+  ): Observable<AlbumResponse> {
+    return this.http.post<AlbumResponse>(
+      this.apiUrl,
+      album
+    );
   }
 }

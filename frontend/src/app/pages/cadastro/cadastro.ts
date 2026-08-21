@@ -52,8 +52,8 @@ export class Cadastro {
   }
 
   constructor(
-    private authService: AuthService,
-    private router: Router
+    private readonly authService: AuthService,
+    private readonly router: Router
   ) {}
 
   cadastrar(): void {
@@ -62,8 +62,7 @@ export class Cadastro {
       return;
     }
 
-    const dadosCadastro =
-      this.cadastroForm.getRawValue();
+    const dadosCadastro = this.cadastroForm.getRawValue();
 
     this.authService.cadastrar(dadosCadastro).subscribe({
       next: () => {

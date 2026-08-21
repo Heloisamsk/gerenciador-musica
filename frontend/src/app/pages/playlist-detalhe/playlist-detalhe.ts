@@ -24,9 +24,9 @@ export class PlaylistDetalhe implements OnInit {
   removendoMusicaId: number | null = null;
 
   constructor(
-    private route: ActivatedRoute,
-    private playlistService: PlaylistService,
-    private changeDetectorRef: ChangeDetectorRef
+    private readonly route: ActivatedRoute,
+    private readonly playlistService: PlaylistService,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -65,7 +65,8 @@ export class PlaylistDetalhe implements OnInit {
           } else if (erro.status === 404) {
             this.mensagemErro = 'Essa playlist não existe ou foi removida.';
           } else {
-            this.mensagemErro = 'Não foi possível carregar a playlist. Tente novamente mais tarde.';
+            this.mensagemErro =
+              'Não foi possível carregar a playlist. Tente novamente mais tarde.';
           }
         }
       });
@@ -76,7 +77,10 @@ export class PlaylistDetalhe implements OnInit {
       return;
     }
 
-    const confirmacao = window.confirm('Tem certeza que deseja remover esta música da playlist?');
+    const confirmacao = window.confirm(
+      'Tem certeza que deseja remover esta música da playlist?'
+    );
+
     if (!confirmacao) {
       return;
     }
@@ -104,7 +108,8 @@ export class PlaylistDetalhe implements OnInit {
         },
         error: (erro: HttpErrorResponse) => {
           console.error(erro);
-          this.mensagemErro = 'Não foi possível remover a música. Tente novamente.';
+          this.mensagemErro =
+            'Não foi possível remover a música. Tente novamente.';
         }
       });
   }

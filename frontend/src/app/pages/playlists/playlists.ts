@@ -23,8 +23,8 @@ export class Playlists implements OnInit {
   mensagemErro = '';
 
   constructor(
-    private playlistService: PlaylistService,
-    private changeDetectorRef: ChangeDetectorRef
+    private readonly playlistService: PlaylistService,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -50,11 +50,14 @@ export class Playlists implements OnInit {
           console.error(erro);
 
           if (erro.status === 401) {
-            this.mensagemErro = 'Sua sessão expirou. Faça login novamente.';
+            this.mensagemErro =
+              'Sua sessão expirou. Faça login novamente.';
           } else if (erro.status === 403) {
-            this.mensagemErro = 'Você não tem permissão para ver essas playlists.';
+            this.mensagemErro =
+              'Você não tem permissão para ver essas playlists.';
           } else {
-            this.mensagemErro = 'Não foi possível carregar suas playlists. Tente novamente mais tarde.';
+            this.mensagemErro =
+              'Não foi possível carregar suas playlists. Tente novamente mais tarde.';
           }
         }
       });
