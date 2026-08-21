@@ -13,6 +13,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
@@ -33,7 +34,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         HttpStatus status = HttpStatus.FORBIDDEN;
 
         ErrorResponseDTO erro = new ErrorResponseDTO(
-                OffsetDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.UTC),
                 status.value(),
                 status.getReasonPhrase(),
                 "Você não possui permissão para acessar este recurso.",

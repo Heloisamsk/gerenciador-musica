@@ -3,6 +3,7 @@ name: SonarCloud
 on:
   push:
     branches: [main]
+
   pull_request:
     branches: [main]
 
@@ -58,7 +59,9 @@ jobs:
           SPRING_PROFILES_ACTIVE: test
         run: |
           chmod +x mvnw
-          ./mvnw -B clean verify
+          ./mvnw -B clean verify dependency:copy-dependencies \
+            -DincludeScope=test \
+            -DoutputDirectory=target/dependency
 
       - name: Setup Node.js 24
         uses: actions/setup-node@v6
@@ -74,6 +77,10 @@ jobs:
       - name: Generate frontend coverage
         working-directory: frontend
         run: npm test -- --coverage --coverage-reporters=lcov
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
 
       - name: Analyze repository
         uses: SonarSource/sonarqube-scan-action@c7ee0f9df90b7aa20e8dcf9695dcfe2e7da5b4f2 # v7
