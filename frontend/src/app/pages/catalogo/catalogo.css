@@ -1,9 +1,14 @@
 .spotify-container {
-  background-color: #121212;
-  color: white;
   min-height: 100vh;
   padding: 30px;
-  font-family: 'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: white;
+  background-color: #121212;
+  font-family:
+    'Circular',
+    'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 .campo-busca {
@@ -11,7 +16,7 @@
   width: 100%;
   max-width: 650px;
   min-height: 50px;
-  margin: 0 0 32px 0;
+  margin: 0 0 32px;
   padding: 14px 22px;
   color: #ffffff;
   background-color: #282828;
@@ -19,7 +24,10 @@
   border-radius: 999px;
   font-family: inherit;
   font-size: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background-color 0.2s;
 }
 
 .campo-busca::placeholder {
@@ -40,8 +48,8 @@
   display: inline-block;
   margin-bottom: 16px;
   color: #b3b3b3;
-  text-decoration: none;
   font-size: 14px;
+  text-decoration: none;
   transition: color 0.2s ease;
 }
 
@@ -82,11 +90,11 @@
 .musica-cover {
   width: 48px;
   height: 48px;
-  border-radius: 4px;
-  background-color: #282828;
   object-fit: cover;
   object-position: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  background-color: #282828;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .musica-info {
@@ -96,27 +104,27 @@
 }
 
 .musica-title {
-  font-size: 16px;
-  color: #ffffff;
-  font-weight: 500;
   margin-bottom: 4px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .musica-subtitle {
-  font-size: 14px;
-  color: #b3b3b3;
   display: flex;
   align-items: center;
   gap: 6px;
+  color: #b3b3b3;
+  font-size: 14px;
 }
 
 .badge-explicit {
-  background-color: #b3b3b3;
+  padding: 1px 4px;
   color: #121212;
+  background-color: #b3b3b3;
+  border-radius: 2px;
   font-size: 10px;
   font-weight: bold;
-  padding: 1px 4px;
-  border-radius: 2px;
 }
 
 .musica-right {
@@ -126,40 +134,40 @@
 }
 
 .musica-badge {
-  background-color: transparent;
-  color: #b3b3b3;
   padding: 4px 8px;
+  color: #b3b3b3;
+  background-color: transparent;
+  border: 1px solid #727272;
   border-radius: 4px;
   font-size: 12px;
-  border: 1px solid #727272;
 }
 
 .btn-add {
-  background: transparent;
-  border: 1px solid #727272;
-  color: #727272;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #727272;
+  background: transparent;
+  border: 1px solid #727272;
+  border-radius: 50%;
+  outline: none;
   cursor: pointer;
   font-size: 20px;
   transition: all 0.2s ease;
-  outline: none;
 }
 
 .btn-add:hover:not([disabled]) {
-  border-color: #ffffff;
   color: #ffffff;
+  border-color: #ffffff;
   transform: scale(1.05);
 }
 
 .btn-add.is-added {
-  border-color: #1db954;
   color: #1db954;
   background-color: transparent;
+  border-color: #1db954;
 }
 
 .btn-add[disabled] {
@@ -172,18 +180,20 @@
 }
 
 .alert {
-  padding: 12px 16px;
   margin-bottom: 20px;
+  padding: 12px 16px;
   border-radius: 4px;
   font-size: 14px;
 }
+
 .success {
+  color: #121212;
   background-color: #1db954;
-  color: white;
 }
+
 .error {
-  background-color: #e22134;
   color: white;
+  background-color: #e22134;
 }
 
 .icon-remove {
@@ -191,8 +201,8 @@
 }
 
 .btn-add.is-added:hover:not([disabled]) {
-  border-color: #e22134;
   color: #e22134;
+  border-color: #e22134;
 }
 
 .btn-add.is-added:hover:not([disabled]) .icon-added {

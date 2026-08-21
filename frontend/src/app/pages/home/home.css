@@ -41,11 +41,11 @@
   display: block;
   width: 96px;
   height: 96px;
-  border: 2px solid #333333;
-  border-radius: 50%;
   object-fit: cover;
   object-position: center;
   background-color: #282828;
+  border: 2px solid #333333;
+  border-radius: 50%;
 }
 
 .perfil-nome {
@@ -81,11 +81,11 @@
   background-color: transparent;
   border: 1px solid transparent;
   border-radius: 7px;
+  cursor: pointer;
   font: inherit;
   font-weight: 600;
   text-align: left;
   text-decoration: none;
-  cursor: pointer;
   transition:
     background-color 0.2s,
     border-color 0.2s;
@@ -110,11 +110,12 @@
 .conteudo {
   min-width: 0;
   padding: 32px 40px 60px;
-  background: linear-gradient(
-    180deg,
-    #181818 0,
-    #121212 280px
-  );
+  background:
+    linear-gradient(
+      180deg,
+      #181818 0,
+      #121212 280px
+    );
 }
 
 .campo-busca {
@@ -168,9 +169,8 @@
   padding: 8px 0 18px;
   overflow-x: auto;
   overflow-y: hidden;
-
-  scrollbar-width: thin;
   scrollbar-color: #4a4a4a #181818;
+  scrollbar-width: thin;
 }
 
 .artista-card {
@@ -196,11 +196,11 @@
   display: block;
   width: 130px;
   height: 130px;
-  border: 2px solid #303030;
-  border-radius: 50%;
   object-fit: cover;
   object-position: center;
   background-color: #282828;
+  border: 2px solid #303030;
+  border-radius: 50%;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
 }
 
@@ -249,10 +249,10 @@
   width: 100%;
   aspect-ratio: 1;
   margin-bottom: 6px;
-  border-radius: 7px;
   object-fit: cover;
   object-position: center;
   background-color: #282828;
+  border-radius: 7px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
@@ -289,7 +289,7 @@
 
 .mensagem-erro {
   color: #ff6b6b;
-  background-color: rgba(255, 107, 107, 0.1);
+  background-color: #2f2020;
   border: 1px solid rgba(255, 107, 107, 0.45);
 }
 
@@ -333,7 +333,8 @@
   }
 
   .grade-musicas {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
   .musica-card {
