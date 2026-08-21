@@ -67,4 +67,26 @@ jobs:
           SPRING_PROFILES_ACTIVE: test
         run: |
           chmod +x mvnw
-          ./mvnw -B clean test
+          ./mvnw -B clean verify
+
+      - name: Upload backend test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: backend/target/surefire-reports/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Validate JaCoCo reports
+        run: |
+          test -f target/site/jacoco/jacoco.xml
+          test -f target/site/jacoco/index.html
+
+      - name: Upload JaCoCo report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-backend-report
+          path: backend/target/site/jacoco/
+          if-no-files-found: error
+          retention-days: 14
