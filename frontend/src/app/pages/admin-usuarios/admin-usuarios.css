@@ -133,7 +133,7 @@
 }
 
 .atualizar-button:disabled {
-  color: #777777;
+  color: #b3b3b3;
   background-color: #333333;
   cursor: not-allowed;
 }

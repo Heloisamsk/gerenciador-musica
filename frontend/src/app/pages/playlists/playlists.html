@@ -5,15 +5,20 @@
     </a>
 
     <header class="playlists-header">
-      <div class="playlists-title-wrapper" style="display: flex; align-items: center; gap: 1.5rem;">
-        <img 
-          src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" 
-          alt="Logo do Spotify" 
+      <div
+        class="playlists-title-wrapper"
+        style="display: flex; align-items: center; gap: 1.5rem;"
+      >
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg"
+          alt="Logo do Spotify"
           style="width: 45px; height: auto;"
         />
+
         <div class="playlists-title">
           <p class="section-label">Minha biblioteca</p>
           <h1>Minhas Playlists</h1>
+
           <p>
             Veja as playlists que você criou.
           </p>
@@ -26,13 +31,12 @@
     </header>
 
     @if (carregando) {
-    <div
+    <output
       class="status-message loading-message"
-      role="status"
       aria-live="polite"
     >
       <p>Carregando playlists...</p>
-    </div>
+    </output>
     }
 
     @else if (mensagemErro) {
@@ -55,9 +59,9 @@
     }
 
     @else if (playlists.length === 0) {
-    <div
+    <output
       class="status-message empty-message"
-      role="status"
+      aria-live="polite"
     >
       <h2>Nenhuma playlist criada ainda</h2>
 
@@ -68,13 +72,13 @@
       <a class="nova-playlist-button" routerLink="/playlists/nova">
         + Nova playlist
       </a>
-    </div>
+    </output>
     }
 
     @else {
     <div class="playlists-grid">
       @for (playlist of playlists; track playlist.id) {
-      <a 
+      <a
         class="playlist-card"
         [routerLink]="['/playlists', playlist.id]"
       >

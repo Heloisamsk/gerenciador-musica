@@ -129,7 +129,7 @@
 }
 
 .cadastro-btn:disabled {
-  color: #a0a0a0;
+  color: #c7c7c7;
   background-color: #535353;
   cursor: not-allowed;
   transform: none;
@@ -146,13 +146,13 @@
 
 .alerta-sucesso {
   color: #1ed760;
-  background-color: rgba(29, 185, 84, 0.15);
+  background-color: #193021;
   border: 1px solid #1db954;
 }
 
 .alerta-erro {
   color: #ff8080;
-  background-color: rgba(255, 107, 107, 0.15);
+  background-color: #3b2424;
   border: 1px solid #ff6b6b;
 }
 

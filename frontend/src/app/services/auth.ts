@@ -42,12 +42,13 @@ export class AuthService {
   private readonly apiBaseUrl =
     `${environment.apiUrl}/api/auth`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient
+  ) {}
 
   login(
     credenciais: LoginRequest
   ): Observable<LoginResponse> {
-
     return this.http
       .post<LoginResponse>(
         `${this.apiBaseUrl}/login`,
@@ -75,7 +76,6 @@ export class AuthService {
   cadastrar(
     dados: CadastroRequest
   ): Observable<CadastroResponse> {
-
     return this.http.post<CadastroResponse>(
       `${this.apiBaseUrl}/register`,
       dados

@@ -6,13 +6,12 @@
     </a>
 
     @if (carregando) {
-    <div
+    <output
       class="status-message loading-message"
-      role="status"
       aria-live="polite"
     >
       <p>Carregando playlist...</p>
-    </div>
+    </output>
     }
 
     @else if (mensagemErro) {
@@ -56,17 +55,16 @@
     </header>
 
     @if (playlist.musicas.length === 0) {
-    <div
+    <output
       class="status-message empty-message"
-      role="status"
+      aria-live="polite"
     >
       <h2>Essa playlist ainda não tem músicas</h2>
 
       <p>
         Adicione músicas ao catálogo para começar a montar sua playlist.
       </p>
-
-    </div>
+    </output>
     }
 
     @else {
@@ -96,7 +94,9 @@
         @for (musica of playlist.musicas; track musica.id; let i = $index) {
         <tr>
           <td data-label="#">{{ i + 1 }}</td>
-          <td data-label="Título"><strong>{{ musica.titulo }}</strong></td>
+          <td data-label="Título">
+            <strong>{{ musica.titulo }}</strong>
+          </td>
           <td data-label="Artista">{{ musica.artista }}</td>
           <td data-label="Ações">
             <button

@@ -14,8 +14,8 @@ import { AuthService } from '../../services/auth';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-
 export class Login {
+
   loginForm = new FormGroup({
     email: new FormControl('', {
       nonNullable: true,
@@ -25,30 +25,29 @@ export class Login {
       ]
     }),
 
-  senha: new FormControl('', {
-    nonNullable: true,
-    validators: [
-      Validators.required,
-      Validators.minLength(6)
+    senha: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.required,
+        Validators.minLength(6)
       ]
     })
   });
 
-get email() {
-  return this.loginForm.controls.email;
+  get email() {
+    return this.loginForm.controls.email;
   }
 
-get senha() {
-  return this.loginForm.controls.senha;
+  get senha() {
+    return this.loginForm.controls.senha;
   }
 
-
-constructor(
-  private authService: AuthService,
-  private router: Router
+  constructor(
+    private readonly authService: AuthService,
+    private readonly router: Router
   ) {}
 
-entrar(): void {
+  entrar(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -57,18 +56,22 @@ entrar(): void {
     const credenciais = this.loginForm.getRawValue();
 
     this.authService.login(credenciais).subscribe({
-
       next: (resposta) => {
-        console.log('Login feito com sucesso!', resposta);
+        console.log(
+          'Login feito com sucesso!',
+          resposta
+        );
+
         void this.router.navigate(['/home']);
       },
 
       error: (erro) => {
         console.error('Erro no login', erro);
-        alert('E-mail ou senha incorretos. Tente novamente!');
+
+        alert(
+          'E-mail ou senha incorretos. Tente novamente!'
+        );
       }
     });
   }
 }
-
-

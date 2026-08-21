@@ -3,34 +3,34 @@
   justify-content: center;
   align-items: center;
   min-height: 90vh;
+  padding: 2rem;
   background-color: #121212;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 2rem;
 }
 
 .cadastro-card {
-  background-color: #181818;
-  border: 1px solid #282828;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
   width: 100%;
   max-width: 500px;
+  padding: 40px;
+  background-color: #181818;
+  border: 1px solid #282828;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
 }
 
 .login-logo {
-  width: 45px; /* Controla o tamanho da logo*/
-  height: auto;
   display: block;
-  margin: 0 auto 20px auto;
+  width: 45px;
+  height: auto;
+  margin: 0 auto 20px;
 }
 
 .cadastro-title {
-  text-align: center;
   margin-top: 0;
   margin-bottom: 24px;
   color: #ffffff;
   font-size: 1.8rem;
+  text-align: center;
 }
 
 .cadastro-form {
@@ -53,14 +53,14 @@
 }
 
 .form-input {
+  box-sizing: border-box;
+  width: 100%;
   padding: 12px;
-  background-color: #282828;
   color: white;
+  background-color: #282828;
   border: 1px solid #3e3e3e;
   border-radius: 6px;
   font-size: 1rem;
-  width: 100%;
-  box-sizing: border-box; /* Garante que o padding não estoure a largura */
 }
 
 .form-input:focus {
@@ -69,25 +69,25 @@
 }
 
 .error-message {
-  color: #ff6b6b;
   display: block;
-  font-size: 0.8rem;
   margin-top: 2px;
+  color: #ff6b6b;
+  font-size: 0.8rem;
 }
 
 .cadastro-btn {
-  background-color: #1db954;
-  color: #000000;
-  font-weight: bold;
+  width: 100%;
+  margin-top: 15px;
   padding: 14px;
+  color: #000000;
+  background-color: #1db954;
   border: none;
   border-radius: 500px;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 15px;
-  text-transform: uppercase;
+  font-weight: bold;
   letter-spacing: 1px;
-  width: 100%;
+  text-transform: uppercase;
+  transition: all 0.2s;
 }
 
 .cadastro-btn:hover:not([disabled]) {
@@ -96,30 +96,31 @@
 }
 
 .cadastro-btn[disabled] {
+  color: #c7c7c7;
   background-color: #535353;
-  color: #a0a0a0;
   cursor: not-allowed;
 }
 
 /* Alertas */
+
 .alerta {
+  margin-bottom: 20px;
   padding: 12px;
   border-radius: 6px;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: bold;
   font-size: 0.9rem;
+  font-weight: bold;
+  text-align: center;
 }
 
 .alerta-sucesso {
-  background-color: rgba(29, 185, 84, 0.15);
   color: #1db954;
+  background-color: #193021;
   border: 1px solid #1db954;
 }
 
 .alerta-erro {
-  background-color: rgba(255, 107, 107, 0.15);
   color: #ff6b6b;
+  background-color: #3b2424;
   border: 1px solid #ff6b6b;
 }
 

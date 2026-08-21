@@ -11,10 +11,10 @@ import { environment } from '../../environments/environment';
 
 const API_URL = `${environment.apiUrl}/api`;
 
-const ENDPOINTS_PUBLICOS = [
+const ENDPOINTS_PUBLICOS = new Set([
   `${API_URL}/auth/login`,
   `${API_URL}/auth/register`
-];
+]);
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
@@ -24,7 +24,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const urlSemParametros = request.url.split('?')[0];
 
   const requisicaoDoBackend = request.url.startsWith(API_URL);
-  const endpointPublico = ENDPOINTS_PUBLICOS.includes(urlSemParametros);
+  const endpointPublico = ENDPOINTS_PUBLICOS.has(urlSemParametros);
 
   let requisicaoAutenticada = request;
 

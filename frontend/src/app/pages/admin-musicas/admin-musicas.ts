@@ -1,6 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  signal
+} from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
+
 import { MusicaListagem } from '../../models/MusicaListagem';
 import { AdminMusicaService } from '../../services/admin-musica';
 
@@ -12,15 +17,13 @@ import { AdminMusicaService } from '../../services/admin-musica';
 })
 export class AdminMusicas implements OnInit {
 
-  // Signals em vez de propriedades comuns: este projeto não usa Zone.js,
-  // então uma atribuição simples (this.musicas = dados) dentro do
-  // .subscribe() não avisa o Angular pra redesenhar a tela. Um signal
-  // (.set(...)) avisa automaticamente.
   musicas = signal<MusicaListagem[]>([]);
   carregando = signal(false);
   mensagemErro = signal('');
 
-  constructor(private adminMusicaService: AdminMusicaService) {}
+  constructor(
+    private readonly adminMusicaService: AdminMusicaService
+  ) {}
 
   ngOnInit(): void {
     this.carregarCatalogo();
@@ -40,16 +43,26 @@ export class AdminMusicas implements OnInit {
         },
         error: (erro: HttpErrorResponse) => {
           console.error(erro);
-          this.mensagemErro.set('Não foi possível carregar o catálogo de músicas. Tente novamente mais tarde.');
+
+          this.mensagemErro.set(
+            'Não foi possível carregar o catálogo de músicas. Tente novamente mais tarde.'
+          );
         }
       });
   }
 
-  generosTexto(musica: MusicaListagem): string {
-    if (!musica.generos || musica.generos.length === 0) {
+  generosTexto(
+    musica: MusicaListagem
+  ): string {
+    if (
+      !musica.generos ||
+      musica.generos.length === 0
+    ) {
       return '-';
     }
 
-    return musica.generos.map(genero => genero.nome).join(', ');
+    return musica.generos
+      .map(genero => genero.nome)
+      .join(', ');
   }
 }

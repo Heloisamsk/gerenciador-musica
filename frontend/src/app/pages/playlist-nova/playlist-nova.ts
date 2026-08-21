@@ -1,6 +1,11 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 
@@ -24,9 +29,9 @@ export class PlaylistNova {
   mensagemErro = '';
 
   constructor(
-    private playlistService: PlaylistService,
-    private router: Router,
-    private changeDetectorRef: ChangeDetectorRef
+    private readonly playlistService: PlaylistService,
+    private readonly router: Router,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {}
 
   enviar(): void {
@@ -52,15 +57,20 @@ export class PlaylistNova {
       )
       .subscribe({
         next: (playlistCriada) => {
-          this.router.navigate(['/playlists', playlistCriada.id]);
+          this.router.navigate([
+            '/playlists',
+            playlistCriada.id
+          ]);
         },
         error: (erro: HttpErrorResponse) => {
           console.error(erro);
 
           if (erro.status === 401) {
-            this.mensagemErro = 'Sua sessão expirou. Faça login novamente.';
+            this.mensagemErro =
+              'Sua sessão expirou. Faça login novamente.';
           } else {
-            this.mensagemErro = 'Não foi possível criar a playlist. Tente novamente.';
+            this.mensagemErro =
+              'Não foi possível criar a playlist. Tente novamente.';
           }
         }
       });
