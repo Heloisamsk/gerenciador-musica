@@ -78,7 +78,7 @@ class AlbumServiceTest {
         assertThat(response.idAlbum()).isEqualTo(10L);
         assertThat(response.titulo()).isEqualTo("A Night at the Opera");
         assertThat(response.capaUrl()).isNull();
-        assertThat(response.artista().idArtista()).isEqualTo(1L);
+        assertThat(response.artista().id()).isEqualTo(1L);
         verify(albumRepository).save(any(Album.class));
     }
 
