@@ -139,6 +139,80 @@ def paginar_faixas(album_id, limit=None):
             return faixas
 
 
+def mapear_artista(artista):
+    return {
+        "id": artista["id"],
+        "nome": artista["name"],
+        "generos": artista.get("genres") or [],
+        "foto_url": artista["images"][0]["url"] if artista["images"] else None,
+    }
+
+
+def mapear_album(album, artista_id):
+    return {
+        "id": album["id"],
+        "titulo": album["name"],
+        "ano_lancamento": int(album["release_date"][:4]),
+        "capa_url": album["images"][0]["url"] if album["images"] else None,
+        "id_artista": artista_id,
+    }
+
+
+def mapear_faixa(faixa, album):
+    return {
+        "id": faixa["id"],
+        "titulo": faixa["name"],
+        "duracao_segundos": faixa["duration_ms"] // 1000,
+        "id_album": album["id"],
+        "ano_lancamento": int(album["release_date"][:4]),
+        "artistas": [
+            {"id": artista["id"], "nome": artista["name"]}
+            for artista in faixa["artists"]
+        ],
+    }
+
+
+def coletar_faixas_do_album(album, track_limit, musicas):
+    total_novas = 0
+
+    for faixa in paginar_faixas(album["id"], track_limit):
+        if faixa["id"] in musicas:
+            continue
+
+        musicas[faixa["id"]] = mapear_faixa(faixa, album)
+        total_novas += 1
+
+    return total_novas
+
+
+def coletar_albuns_do_artista(artista, config, albuns, musicas):
+    albuns_encontrados = paginar_albuns(
+        artista["id"],
+        artista["name"],
+        config["album_limit"],
+    )
+    print(f"  {len(albuns_encontrados)} albuns encontrados", flush=True)
+
+    vistos = set()
+    total_faixas = 0
+
+    for album in albuns_encontrados:
+        album_id = album["id"]
+        if album_id in vistos or album_id in albuns:
+            continue
+
+        vistos.add(album_id)
+        albuns[album_id] = mapear_album(album, artista["id"])
+        total_faixas += coletar_faixas_do_album(
+            album,
+            config["track_limit"],
+            musicas,
+        )
+        time.sleep(0.1)
+
+    return len(albuns_encontrados), total_faixas
+
+
 def coletar():
     artistas = {}
     albuns = {}
@@ -152,57 +226,17 @@ def coletar():
             print(f"[aviso] artista nao encontrado: {nome}", flush=True)
             continue
 
-        artistas[artista["id"]] = {
-            "id": artista["id"],
-            "nome": artista["name"],
-            "generos": artista.get("genres") or [],
-            "foto_url": (artista["images"][0]["url"] if artista["images"] else None),
-        }
-
-        albuns_do_artista = paginar_albuns(
-            artista["id"], artista["name"], config["album_limit"]
+        artistas[artista["id"]] = mapear_artista(artista)
+        total_albuns, total_faixas = coletar_albuns_do_artista(
+            artista,
+            config,
+            albuns,
+            musicas,
         )
-        print(f"  {len(albuns_do_artista)} albuns encontrados", flush=True)
-        total_faixas_artista = 0
-
-        vistos_nesse_artista = set()
-        for album in albuns_do_artista:
-            if album["id"] in vistos_nesse_artista:
-                continue
-            vistos_nesse_artista.add(album["id"])
-
-            if album["id"] in albuns:
-                continue
-
-            albuns[album["id"]] = {
-                "id": album["id"],
-                "titulo": album["name"],
-                "ano_lancamento": int(album["release_date"][:4]),
-                "capa_url": (album["images"][0]["url"] if album["images"] else None),
-                "id_artista": artista["id"],
-            }
-
-            faixas = paginar_faixas(album["id"], config["track_limit"])
-            for faixa in faixas:
-                if faixa["id"] in musicas:
-                    continue
-                musicas[faixa["id"]] = {
-                    "id": faixa["id"],
-                    "titulo": faixa["name"],
-                    "duracao_segundos": faixa["duration_ms"] // 1000,
-                    "id_album": album["id"],
-                    "ano_lancamento": int(album["release_date"][:4]),
-                    "artistas": [
-                        {"id": a["id"], "nome": a["name"]} for a in faixa["artists"]
-                    ],
-                }
-                total_faixas_artista += 1
-
-            time.sleep(0.1)
 
         print(
             f"artista ok: {artista['name']} "
-            f"({len(albuns_do_artista)} albuns, {total_faixas_artista} faixas)",
+            f"({total_albuns} albuns, {total_faixas} faixas)",
             flush=True,
         )
 
