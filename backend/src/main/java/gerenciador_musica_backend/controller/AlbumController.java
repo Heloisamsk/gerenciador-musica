@@ -1,9 +1,7 @@
 package gerenciador_musica_backend.controller;
 
-import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.service.AlbumService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,19 +17,26 @@ public class AlbumController {
         this.albumService = albumService;
     }
 
-    @PostMapping
-    public ResponseEntity<AlbumResponseDTO> cadastrarAlbum(
-            @Valid @RequestBody AlbumRequestDTO request
+    @GetMapping
+    public ResponseEntity<List<AlbumResponseDTO>> listarAlbuns(
+            @RequestParam(
+                    name = "artistaId",
+                    required = false
+            ) Long artistaId
     ) {
-        return ResponseEntity.ok(
-                albumService.cadastrarAlbum(request)
-        );
+        List<AlbumResponseDTO> albuns = artistaId == null
+                ? albumService.listarAlbuns()
+                : albumService.listarAlbunsPorArtista(artistaId);
+
+        return ResponseEntity.ok(albuns);
     }
 
-    @GetMapping
-    public ResponseEntity<List<AlbumResponseDTO>> listarAlbuns() {
+    @GetMapping("/{idAlbum}")
+    public ResponseEntity<AlbumResponseDTO> buscarPorId(
+            @PathVariable("idAlbum") Long idAlbum
+    ) {
         return ResponseEntity.ok(
-                albumService.listarAlbuns()
+                albumService.buscarPorId(idAlbum)
         );
     }
 }

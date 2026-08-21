@@ -320,6 +320,33 @@ public class GlobalExceptionHandler {
                 Map.of()
         );
     }
+
+    @ExceptionHandler(AlbumNaoEncontradoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarAlbumNaoEncontrado(
+            AlbumNaoEncontradoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
+    @ExceptionHandler(DadosAlbumInvalidosException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarDadosAlbumInvalidos(
+            DadosAlbumInvalidosException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponseDTO> tratarConflitoBanco(
             DataIntegrityViolationException exception,
@@ -327,7 +354,7 @@ public class GlobalExceptionHandler {
     ) {
         return criarResposta(
                 HttpStatus.CONFLICT,
-                "O álbum já está cadastrado.",
+                "A operação viola uma restrição de integridade dos dados.",
                 request.getRequestURI(),
                 Map.of()
         );

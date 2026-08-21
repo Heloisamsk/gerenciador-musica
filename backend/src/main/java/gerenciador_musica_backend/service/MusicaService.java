@@ -59,8 +59,8 @@ public class MusicaService {
                 artistaPrincipal
         );
 
-        Album album = albumService.buscarOuCriarAlbum(
-                request.album(),
+        Album album = albumService.buscarAlbumDoArtista(
+                request.albumId(),
                 artistaPrincipal
         );
 
@@ -106,7 +106,6 @@ public class MusicaService {
         );
 
         validarGeneros(request.generos());
-        validarAlbum(request.album(), artistaPrincipalId);
     }
 
     private Set<Artista> buscarParticipantes(
@@ -334,43 +333,6 @@ public class MusicaService {
         }
     }
 
-    private void validarAlbum(
-            AlbumRequestDTO album,
-            Long artistaPrincipalId
-    ) {
-        if (album == null) {
-            return;
-        }
-
-        String tituloNormalizado =
-                normalizarParaComparacao(album.titulo());
-
-        if (tituloNormalizado.isBlank()) {
-            throw new DadosMusicaInvalidosException(
-                    "O título do álbum é obrigatório."
-            );
-        }
-
-        if (album.anoLancamento() == null) {
-            throw new DadosMusicaInvalidosException(
-                    "O ano de lançamento do álbum é obrigatório."
-            );
-        }
-
-        if (album.idArtista() == null
-                || album.idArtista() <= 0) {
-            throw new DadosMusicaInvalidosException(
-                    "O ID do artista do álbum deve ser válido."
-            );
-        }
-
-        if (!album.idArtista().equals(artistaPrincipalId)) {
-            throw new DadosMusicaInvalidosException(
-                    "O artista do álbum deve ser o mesmo artista principal da música."
-            );
-        }
-    }
-
     private String normalizarLetra(String letra) {
         if (letra == null || letra.isBlank()) {
             return null;
@@ -565,5 +527,4 @@ public class MusicaService {
         );
     }
 }
-
 

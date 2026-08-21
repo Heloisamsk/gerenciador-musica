@@ -1,6 +1,5 @@
 package gerenciador_musica_backend.service;
 
-import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.MusicaFiltroDTO;
 import gerenciador_musica_backend.dto.MusicaListagemDTO;
 import gerenciador_musica_backend.dto.MusicaRequestDTO;
@@ -35,14 +34,13 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /*
- * Teste de UNIDADE do MusicaService: os 4 repositórios são mockados,
- * então nada disso toca um banco de dados de verdade.
+ * Teste de UNIDADE do MusicaService: as dependências são mockadas,
+ * portanto os testes não acessam um banco de dados real.
  */
 @ExtendWith(MockitoExtension.class)
 class MusicaServiceTest {
@@ -70,18 +68,13 @@ class MusicaServiceTest {
                 (short) 1975,
                 1L,
                 Set.of(),
-                new AlbumRequestDTO(
-                        "A Night at the Opera",
-                        1L,
-                        (short) 1975,
-                        null
-                ),
+                1L,
                 Set.of("Rock")
         );
     }
 
     @Test
-    void deveCadastrarMusicaComSucessoUsandoArtistaExistenteECriandoAlbumEGenero() {
+    void deveCadastrarMusicaComSucessoUsandoArtistaAlbumEGenero() {
         MusicaRequestDTO request = montarRequestValida();
 
         Artista artistaExistente = new Artista(
@@ -101,7 +94,7 @@ class MusicaServiceTest {
         when(artistaService.buscarEntidadePorId(1L))
                 .thenReturn(artistaExistente);
 
-        when(albumService.buscarOuCriarAlbum(any(AlbumRequestDTO.class), eq(artistaExistente)))
+        when(albumService.buscarAlbumDoArtista(1L, artistaExistente))
                 .thenReturn(albumSalvo);
 
         when(musicaRepository.existsByAlbumAndTituloIgnoreCase(
@@ -191,7 +184,7 @@ class MusicaServiceTest {
         when(artistaService.buscarEntidadePorId(1L))
                 .thenReturn(artistaExistente);
 
-        when(albumService.buscarOuCriarAlbum(any(AlbumRequestDTO.class), eq(artistaExistente)))
+        when(albumService.buscarAlbumDoArtista(1L, artistaExistente))
                 .thenReturn(albumExistente);
 
         when(musicaRepository.existsByAlbumAndTituloIgnoreCase(

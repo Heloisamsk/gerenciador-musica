@@ -47,11 +47,7 @@ class AdminMusicaControllerTest {
                 "anoLancamento": 1975,
                 "artistaPrincipalId": 1,
                 "artistasParticipantesIds": [],
-                "album": {
-                    "titulo": "A Night at the Opera",
-                    "idArtista": 1,
-                    "anoLancamento": 1975
-                },
+                "albumId": 1,
                 "generos": ["Rock"]
             }
             """;
