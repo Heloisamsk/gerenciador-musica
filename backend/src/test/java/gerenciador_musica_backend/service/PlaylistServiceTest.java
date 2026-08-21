@@ -156,7 +156,7 @@ class PlaylistServiceTest {
         );
         Musica musica = new Musica(
                 "Bohemian Rhapsody", null, 354, (short) 1975,
-                artista, null, java.util.Set.of(), java.util.Set.of()
+                artista, null
         );
 
         when(playlistRepository.buscarComMusicasPorId(10L))
@@ -181,7 +181,7 @@ class PlaylistServiceTest {
         );
         Musica musica = new Musica(
                 "Bohemian Rhapsody", null, 354, (short) 1975,
-                artista, null, java.util.Set.of(), java.util.Set.of()
+                artista, null
         );
         ReflectionTestUtils.setField(musica, "idMusica", 5L);
         playlist.adicionarMusica(musica);
@@ -208,7 +208,7 @@ class PlaylistServiceTest {
         );
         Musica musica = new Musica(
                 "Bohemian Rhapsody", null, 354, (short) 1975,
-                artista, null, java.util.Set.of(), java.util.Set.of()
+                artista, null
         );
         ReflectionTestUtils.setField(musica, "idMusica", 5L);
         playlist.adicionarMusica(musica);

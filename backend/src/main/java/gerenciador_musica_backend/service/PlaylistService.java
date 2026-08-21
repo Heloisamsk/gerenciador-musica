@@ -23,6 +23,9 @@ import java.util.List;
 @Service
 public class PlaylistService {
 
+    private static final String PLAYLIST_NAO_ENCONTRADA =
+            "Playlist não encontrada.";
+
     private final PlaylistRepository playlistRepository;
     private final MusicaRepository musicaRepository;
 
@@ -67,7 +70,7 @@ public class PlaylistService {
         Playlist playlist = playlistRepository.buscarComMusicasPorId(id)
                 .orElseThrow(() ->
                         new PlaylistNaoEncontradaException(
-                                "Playlist não encontrada."
+                                PLAYLIST_NAO_ENCONTRADA
                         )
                 );
 
@@ -84,7 +87,7 @@ public class PlaylistService {
                 .buscarComMusicasPorId(playlistId)
                 .orElseThrow(() ->
                         new PlaylistNaoEncontradaException(
-                                "Playlist não encontrada."
+                                PLAYLIST_NAO_ENCONTRADA
                         )
                 );
 
@@ -120,7 +123,7 @@ public class PlaylistService {
                 .buscarComMusicasPorId(playlistId)
                 .orElseThrow(() ->
                         new PlaylistNaoEncontradaException(
-                                "Playlist não encontrada."
+                                PLAYLIST_NAO_ENCONTRADA
                         )
                 );
 

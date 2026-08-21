@@ -1,8 +1,6 @@
 package gerenciador_musica_backend.service;
 
 import gerenciador_musica_backend.dto.LogoutResponseDTO;
-import gerenciador_musica_backend.model.Role;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

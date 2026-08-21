@@ -9,9 +9,6 @@ public class PlaylistRequestDTO {
 
     private String descricao;
 
-    public PlaylistRequestDTO() {
-    }
-
     public String getNome() {
         return nome;
     }

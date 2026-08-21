@@ -106,7 +106,6 @@ public class MusicaService {
         );
 
         validarGeneros(request.generos());
-        //validarAlbum(request.album());
         validarAlbum(request.album(), artistaPrincipalId);
     }
 
@@ -210,16 +209,19 @@ public class MusicaService {
         String tituloNormalizado = normalizarTexto(request.titulo());
         String letraNormalizada = normalizarLetra(request.letra());
 
-        return new Musica(
+        Musica musica = new Musica(
                 tituloNormalizado,
                 letraNormalizada,
                 request.duracaoSegundos(),
                 request.anoLancamento(),
                 artistaPrincipal,
-                album,
-                artistasParticipantes,
-                generos
+                album
         );
+
+        musica.setArtistasParticipantes(artistasParticipantes);
+        musica.setGeneros(generos);
+
+        return musica;
     }
 
     private MusicaResponseDTO converterParaResponse(Musica musica) {
@@ -563,6 +565,5 @@ public class MusicaService {
         );
     }
 }
-
 
 

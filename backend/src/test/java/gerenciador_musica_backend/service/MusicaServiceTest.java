@@ -220,9 +220,7 @@ class MusicaServiceTest {
                 354,
                 (short) 1975,
                 artista,
-                null,
-                Set.of(),
-                Set.of()
+                null
         );
 
         when(musicaRepository.findById(1L))
@@ -256,16 +254,17 @@ class MusicaServiceTest {
                 "http://capa.png"
         );
 
-        return new Musica(
+        Musica musica = new Musica(
                 "Bohemian Rhapsody",
                 null,
                 354,
                 (short) 1975,
                 artista,
-                album,
-                Set.of(),
-                Set.of(new Genero("Rock"))
+                album
         );
+        musica.setGeneros(Set.of(new Genero("Rock")));
+
+        return musica;
     }
 
     @SuppressWarnings("unchecked")
@@ -288,7 +287,7 @@ class MusicaServiceTest {
         verify(musicaRepository).findAll(any(Specification.class), captor.capture());
 
         Pageable pageableUsado = captor.getValue();
-        assertThat(pageableUsado.getPageNumber()).isEqualTo(0);
+        assertThat(pageableUsado.getPageNumber()).isZero();
         assertThat(pageableUsado.getPageSize()).isEqualTo(20);
         assertThat(pageableUsado.getSort().getOrderFor("titulo")).isNotNull();
 

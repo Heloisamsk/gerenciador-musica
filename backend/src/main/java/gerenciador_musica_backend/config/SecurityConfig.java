@@ -44,16 +44,19 @@ public class SecurityConfig {
     }
 
     @Bean
+    @SuppressWarnings("java:S4502")
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             CorsConfigurationSource corsConfigurationSource
-    ) throws Exception {
+    ) {
 
         http
                 .cors(cors ->
                         cors.configurationSource(corsConfigurationSource)
                 )
 
+                // Seguro neste caso: a API é stateless e recebe o JWT somente
+                // no cabeçalho Authorization, nunca em cookie de autenticação.
                 .csrf(csrf -> csrf.disable())
 
                 .formLogin(form -> form.disable())
