@@ -1,7 +1,6 @@
 package gerenciador_musica_backend.service;
 
 import gerenciador_musica_backend.dto.UsuarioListagemDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +17,16 @@ import java.util.List;
 @Service
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UsuarioService(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder
+    ) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public UsuarioResponseDTO cadastrarUsuario(UsuarioRequestDTO request) {
         

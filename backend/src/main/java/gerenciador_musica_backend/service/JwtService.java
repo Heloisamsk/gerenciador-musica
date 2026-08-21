@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.time.Instant;
 
 @Service
 public class JwtService {
@@ -49,14 +49,15 @@ public class JwtService {
     }
 
     public String gerarToken(Usuario usuario) {
-        long instanteAtual = System.currentTimeMillis();
+        Instant instanteAtual = Instant.now();
+        Instant instanteExpiracao = instanteAtual.plusMillis(expirationMs);
 
         return Jwts.builder()
                 .subject(usuario.getEmail())
                 .claim("role", usuario.getRole().name())
                 .claim("nome", usuario.getNome())
-                .issuedAt(new Date(instanteAtual))
-                .expiration(new Date(instanteAtual + expirationMs))
+                .claim(Claims.ISSUED_AT, instanteAtual.getEpochSecond())
+                .claim(Claims.EXPIRATION, instanteExpiracao.getEpochSecond())
                 .signWith(key)
                 .compact();
     }

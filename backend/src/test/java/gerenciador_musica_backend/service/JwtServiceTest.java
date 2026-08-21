@@ -55,6 +55,10 @@ class JwtServiceTest {
 
         assertThat(claims.get("nome", String.class))
                 .isEqualTo("João");
+
+        assertThat(claims.getIssuedAt()).isNotNull();
+        assertThat(claims.getExpiration())
+                .isAfter(claims.getIssuedAt());
     }
 
     @Test
@@ -109,9 +113,11 @@ class JwtServiceTest {
     void deveRejeitarTempoDeExpiracaoNaoPositivo(
             long expirationMs
     ) {
+        String chaveTeste = gerarChaveTeste();
+
         assertThatThrownBy(() ->
                 new JwtService(
-                        gerarChaveTeste(),
+                        chaveTeste,
                         expirationMs
                 )
         )
