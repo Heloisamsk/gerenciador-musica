@@ -1,5 +1,6 @@
 package gerenciador_musica_backend.controller;
 
+import org.springframework.test.context.ActiveProfiles;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import gerenciador_musica_backend.dto.MusicaListagemDTO;
@@ -49,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @AfterEach para não sujar o banco compartilhado.
  */
 @SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 class MusicaPesquisaIntegrationTest {
 
