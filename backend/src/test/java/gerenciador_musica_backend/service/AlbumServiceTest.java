@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Optional;
@@ -203,5 +204,230 @@ class AlbumServiceTest {
 
         assertThatThrownBy(() -> albumService.buscarEntidadePorId(99L))
                 .isInstanceOf(AlbumNaoEncontradoException.class);
+    }
+
+    @Test
+    void deveListarTodosOsAlbunsOrdenados() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "A Night at the Opera",
+                (short) 1975,
+                null
+        );
+        album.setIdAlbum(10L);
+
+        when(albumRepository.findAll(any(Sort.class)))
+                .thenReturn(List.of(album));
+
+        List<AlbumResponseDTO> resultado = albumService.listarAlbuns();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().idAlbum()).isEqualTo(10L);
+        assertThat(resultado.getFirst().titulo())
+                .isEqualTo("A Night at the Opera");
+        verify(albumRepository)
+                .findAll(any(Sort.class));
+    }
+
+    @Test
+    void deveBuscarAlbumPorIdConvertendoParaResponse() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "A Night at the Opera",
+                (short) 1975,
+                null
+        );
+        album.setIdAlbum(10L);
+
+        when(albumRepository.findById(10L))
+                .thenReturn(Optional.of(album));
+
+        AlbumResponseDTO resultado = albumService.buscarPorId(10L);
+
+        assertThat(resultado.idAlbum()).isEqualTo(10L);
+        assertThat(resultado.artista().id()).isEqualTo(1L);
+    }
+
+    @Test
+    void deveBuscarEntidadePorIdQuandoAlbumExistir() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "A Night at the Opera",
+                (short) 1975,
+                null
+        );
+
+        when(albumRepository.findById(10L))
+                .thenReturn(Optional.of(album));
+
+        Album resultado = albumService.buscarEntidadePorId(10L);
+
+        assertThat(resultado).isSameAs(album);
+    }
+
+    @Test
+    void deveRejeitarAlbumQuandoArtistaPrincipalForNull() {
+        assertThatThrownBy(
+                () -> albumService.buscarAlbumDoArtista(10L, null)
+        )
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage(
+                        "O artista principal da música é obrigatório."
+                );
+
+        verify(albumRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveRejeitarAlbumQuandoArtistaPrincipalNaoTiverId() {
+        Artista artistaSemId = montarArtista(null, "Queen");
+
+        assertThatThrownBy(
+                () -> albumService.buscarAlbumDoArtista(
+                        10L,
+                        artistaSemId
+                )
+        )
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage(
+                        "O artista principal da música é obrigatório."
+                );
+
+        verify(albumRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveRejeitarCadastroQuandoIdDoArtistaForNull() {
+        AlbumRequestDTO request = new AlbumRequestDTO(
+                "A Night at the Opera",
+                null,
+                (short) 1975,
+                null
+        );
+
+        assertThatThrownBy(() -> albumService.cadastrarAlbum(request))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage("O ID do artista deve ser válido.");
+    }
+
+    @Test
+    void deveRejeitarCadastroQuandoIdDoArtistaNaoForPositivo() {
+        AlbumRequestDTO request = new AlbumRequestDTO(
+                "A Night at the Opera",
+                0L,
+                (short) 1975,
+                null
+        );
+
+        assertThatThrownBy(() -> albumService.cadastrarAlbum(request))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage("O ID do artista deve ser válido.");
+    }
+
+    @Test
+    void deveRejeitarCadastroQuandoAnoForNull() {
+        AlbumRequestDTO request = new AlbumRequestDTO(
+                "A Night at the Opera",
+                1L,
+                null,
+                null
+        );
+
+        assertThatThrownBy(() -> albumService.cadastrarAlbum(request))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage(
+                        "O ano do álbum deve estar entre 1800 e 2100."
+                );
+    }
+
+    @Test
+    void deveRejeitarCadastroQuandoAnoForMenorQueOMinimo() {
+        AlbumRequestDTO request = new AlbumRequestDTO(
+                "A Night at the Opera",
+                1L,
+                (short) 1799,
+                null
+        );
+
+        assertThatThrownBy(() -> albumService.cadastrarAlbum(request))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage(
+                        "O ano do álbum deve estar entre 1800 e 2100."
+                );
+    }
+
+    @Test
+    void deveRejeitarCadastroQuandoAnoForMaiorQueOMaximo() {
+        AlbumRequestDTO request = new AlbumRequestDTO(
+                "A Night at the Opera",
+                1L,
+                (short) 2101,
+                null
+        );
+
+        assertThatThrownBy(() -> albumService.cadastrarAlbum(request))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage(
+                        "O ano do álbum deve estar entre 1800 e 2100."
+                );
+    }
+
+    @Test
+    void deveRejeitarCadastroQuandoTituloForNull() {
+        AlbumRequestDTO request = new AlbumRequestDTO(
+                null,
+                1L,
+                (short) 1975,
+                null
+        );
+
+        assertThatThrownBy(() -> albumService.cadastrarAlbum(request))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage("O título do álbum é obrigatório.");
+    }
+
+    @Test
+    void deveRejeitarCadastroQuandoTituloTiverApenasEspacos() {
+        AlbumRequestDTO request = new AlbumRequestDTO(
+                "   ",
+                1L,
+                (short) 1975,
+                null
+        );
+
+        assertThatThrownBy(() -> albumService.cadastrarAlbum(request))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage("O título do álbum não pode ficar vazio.");
+    }
+
+    @Test
+    void deveNormalizarUrlDeCapaInformada() {
+        Artista artista = montarArtista(1L, "Queen");
+        AlbumRequestDTO request = new AlbumRequestDTO(
+                "A Night at the Opera",
+                1L,
+                (short) 1975,
+                "  https://example.com/capa.jpg  "
+        );
+
+        when(artistaService.buscarEntidadePorId(1L))
+                .thenReturn(artista);
+        when(albumRepository
+                .existsByTituloIgnoreCaseAndArtistaIdArtistaAndAnoLancamento(
+                        "A Night at the Opera",
+                        1L,
+                        (short) 1975
+                ))
+                .thenReturn(false);
+        when(albumRepository.save(any(Album.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        AlbumResponseDTO resultado = albumService.cadastrarAlbum(request);
+
+        assertThat(resultado.capaUrl())
+                .isEqualTo("https://example.com/capa.jpg");
     }
 }

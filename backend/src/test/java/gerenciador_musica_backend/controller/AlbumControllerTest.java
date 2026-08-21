@@ -50,6 +50,21 @@ class AlbumControllerTest {
     }
 
     @Test
+    void deveListarTodosOsAlbunsQuandoFiltroNaoForInformado()
+            throws Exception {
+        when(albumService.listarAlbuns())
+                .thenReturn(List.of(montarResposta()));
+
+        mockMvc.perform(get("/api/albuns"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].idAlbum").value(10))
+                .andExpect(jsonPath("$[0].titulo")
+                        .value("A Night at the Opera"));
+
+        verify(albumService).listarAlbuns();
+    }
+
+    @Test
     void deveListarAlbunsFiltradosPorArtista() throws Exception {
         when(albumService.listarAlbunsPorArtista(1L))
                 .thenReturn(List.of(montarResposta()));

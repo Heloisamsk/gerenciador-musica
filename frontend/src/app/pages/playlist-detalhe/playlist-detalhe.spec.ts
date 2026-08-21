@@ -57,6 +57,27 @@ describe('PlaylistDetalhe', () => {
     expect(component.carregando).toBe(false);
   });
 
+  it('deve informar erro inesperado ao carregar a playlist', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    fixture.detectChanges();
+
+    httpMock
+      .expectOne(`${apiUrl}/10`)
+      .flush(
+        {},
+        {
+          status: 500,
+          statusText: 'Internal Server Error'
+        }
+      );
+
+    expect(component.mensagemErro).toBe(
+      'Não foi possível carregar a playlist. Tente novamente mais tarde.'
+    );
+    expect(component.carregando).toBe(false);
+  });
+
   it('deve remover a música da lista local quando a remoção tem sucesso', () => {
     // Mocka o confirm para retornar 'true' (clicar em OK)
     vi.spyOn(window, 'confirm').mockReturnValue(true);

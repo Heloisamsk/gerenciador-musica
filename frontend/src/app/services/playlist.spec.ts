@@ -104,6 +104,33 @@ describe('PlaylistService', () => {
     expect(erroCapturado?.message).toContain('404');
   });
 
+  it('deve propagar a mensagem de um erro de rede', () => {
+    let erroCapturado: Error | undefined;
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    service.buscarPorId(1).subscribe({
+      error: erro => {
+        erroCapturado = erro;
+      }
+    });
+
+    httpMock
+      .expectOne(`${apiUrl}/1`)
+      .error(
+        new ErrorEvent(
+          'NetworkError',
+          {
+            message: 'Falha de conexão'
+          }
+        )
+      );
+
+    expect(erroCapturado).toBeInstanceOf(Error);
+    expect(erroCapturado?.message).toBe(
+      'Erro: Falha de conexão'
+    );
+  });
+
   it('deve enviar POST para adicionar uma música na playlist', () => {
     service.adicionarMusica(1, 5).subscribe();
 

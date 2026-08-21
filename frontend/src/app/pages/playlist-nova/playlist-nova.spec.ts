@@ -1,12 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  provideHttpClient
+} from '@angular/common/http';
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
+import { throwError } from 'rxjs';
 
 import { PlaylistNova } from './playlist-nova';
+import { PlaylistService } from '../../services/playlist';
 
 describe('PlaylistNova', () => {
   let component: PlaylistNova;
@@ -36,6 +41,7 @@ describe('PlaylistNova', () => {
 
   afterEach(() => {
     httpMock.verify();
+    vi.restoreAllMocks();
   });
 
   it('should create', () => {
@@ -78,6 +84,34 @@ describe('PlaylistNova', () => {
       .flush({ message: 'erro' }, { status: 500, statusText: 'Internal Server Error' });
 
     expect(component.mensagemErro).toBeTruthy();
+    expect(component.enviando).toBe(false);
+  });
+
+  it('deve informar quando a sessão expirar ao criar playlist', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const playlistService = TestBed.inject(PlaylistService);
+
+    vi.spyOn(playlistService, 'criar').mockReturnValue(
+      throwError(
+        () => new HttpErrorResponse({
+          status: 401,
+          statusText: 'Unauthorized'
+        })
+      )
+    );
+
+    component.formulario.setValue({
+      nome: 'Favoritas',
+      descricao: ''
+    });
+
+    component.enviar();
+
+    httpMock.expectNone(apiUrl);
+
+    expect(component.mensagemErro).toBe(
+      'Sua sessão expirou. Faça login novamente.'
+    );
     expect(component.enviando).toBe(false);
   });
 });

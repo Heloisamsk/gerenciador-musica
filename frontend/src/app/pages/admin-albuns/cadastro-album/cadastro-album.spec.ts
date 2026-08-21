@@ -103,6 +103,16 @@ describe('CadastroAlbum', () => {
     expect(component.carregandoArtistas()).toBe(false);
   });
 
+  it('deve informar quando não houver artistas cadastrados', () => {
+    carregarArtistas([]);
+
+    expect(component.artistas).toEqual([]);
+    expect(component.erroArtistas()).toBe(
+      'Nenhum artista cadastrado. Cadastre um artista primeiro.'
+    );
+    expect(component.carregandoArtistas()).toBe(false);
+  });
+
   it('deve liberar o carregamento quando a busca de artistas falhar', () => {
     fixture.detectChanges();
 

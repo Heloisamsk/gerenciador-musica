@@ -166,6 +166,77 @@ describe('Cadastro (integração com AuthService)', () => {
     expect(navigateSpy).not.toHaveBeenCalled();
   });
 
+  it('deve mostrar a mensagem do backend para dados inválidos', () => {
+    const alertSpy =
+      vi.spyOn(window, 'alert').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    preencherFormularioValido();
+    component.cadastrar();
+
+    httpMock
+      .expectOne(`${apiBaseUrl}/register`)
+      .flush(
+        {
+          message: 'O e-mail informado é inválido.'
+        },
+        {
+          status: 400,
+          statusText: 'Bad Request'
+        }
+      );
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Erro de validação: O e-mail informado é inválido.'
+    );
+  });
+
+  it('deve usar mensagem padrão para erro 400 sem mensagem', () => {
+    const alertSpy =
+      vi.spyOn(window, 'alert').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    preencherFormularioValido();
+    component.cadastrar();
+
+    httpMock
+      .expectOne(`${apiBaseUrl}/register`)
+      .flush(
+        {},
+        {
+          status: 400,
+          statusText: 'Bad Request'
+        }
+      );
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Erro de validação: Dados inválidos. Verifique as informações digitadas.'
+    );
+  });
+
+  it('deve informar o status para erro inesperado', () => {
+    const alertSpy =
+      vi.spyOn(window, 'alert').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    preencherFormularioValido();
+    component.cadastrar();
+
+    httpMock
+      .expectOne(`${apiBaseUrl}/register`)
+      .flush(
+        {},
+        {
+          status: 500,
+          statusText: 'Internal Server Error'
+        }
+      );
+
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Erro ao realizar o cadastro. Status: 500'
+    );
+  });
+
   it('deve rejeitar uma senha com menos de seis caracteres', () => {
     component.cadastroForm.setValue({
       nome: 'Maria',

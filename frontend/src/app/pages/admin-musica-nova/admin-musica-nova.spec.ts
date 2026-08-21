@@ -150,6 +150,45 @@ describe('AdminMusicaNova', () => {
     expect(component.carregandoAlbuns()).toBe(false);
   });
 
+  it('deve informar erro quando não conseguir carregar os álbuns', () => {
+    component.formularioMusica
+      .controls['artistaPrincipalId']
+      .setValue(artistaMock.idArtista);
+
+    httpMock
+      .expectOne(`${apiAlbunsUrl}?artistaId=1`)
+      .flush(
+        {},
+        {
+          status: 500,
+          statusText: 'Internal Server Error'
+        }
+      );
+
+    expect(component.albuns()).toEqual([]);
+    expect(component.erroAlbuns()).toBe(
+      'Não foi possível carregar os álbuns desse artista.'
+    );
+    expect(component.carregandoAlbuns()).toBe(false);
+  });
+
+  it('não deve salvar enquanto música ou álbuns estiverem carregando', () => {
+    component.carregando.set(true);
+
+    component.salvar();
+
+    httpMock.expectNone(apiMusicasUrl);
+
+    component.carregando.set(false);
+    component.carregandoAlbuns.set(true);
+
+    component.salvar();
+
+    httpMock.expectNone(apiMusicasUrl);
+
+    component.carregandoAlbuns.set(false);
+  });
+
   it('deve limpar o álbum ao trocar o artista', () => {
     selecionarArtistaECarregarAlbuns();
 
@@ -255,4 +294,82 @@ describe('AdminMusicaNova', () => {
 
     expect(component.carregando()).toBe(false);
   });
+
+  const cenariosDeErro = [
+    {
+      status: 400,
+      statusText: 'Bad Request',
+      corpo: {
+        message: 'Dados da música inválidos.'
+      },
+      mensagemEsperada: 'Dados da música inválidos.'
+    },
+    {
+      status: 400,
+      statusText: 'Bad Request',
+      corpo: null,
+      mensagemEsperada:
+        'Dados inválidos. Verifique os campos.'
+    },
+    {
+      status: 401,
+      statusText: 'Unauthorized',
+      corpo: {},
+      mensagemEsperada:
+        'Não autorizado. Faça login novamente.'
+    },
+    {
+      status: 403,
+      statusText: 'Forbidden',
+      corpo: {},
+      mensagemEsperada:
+        'Acesso negado. Você não tem permissão.'
+    },
+    {
+      status: 404,
+      statusText: 'Not Found',
+      corpo: {
+        message: 'O álbum informado não foi encontrado.'
+      },
+      mensagemEsperada:
+        'O álbum informado não foi encontrado.'
+    },
+    {
+      status: 404,
+      statusText: 'Not Found',
+      corpo: null,
+      mensagemEsperada:
+        'O artista ou o álbum selecionado não foi encontrado.'
+    },
+    {
+      status: 500,
+      statusText: 'Internal Server Error',
+      corpo: {},
+      mensagemEsperada:
+        'Erro inesperado ao cadastrar a música.'
+    }
+  ];
+
+  for (const cenario of cenariosDeErro) {
+    it(`deve tratar resposta de erro ${cenario.status}: ${cenario.mensagemEsperada}`, () => {
+      preencherFormularioValido();
+
+      component.salvar();
+
+      httpMock
+        .expectOne(apiMusicasUrl)
+        .flush(
+          cenario.corpo,
+          {
+            status: cenario.status,
+            statusText: cenario.statusText
+          }
+        );
+
+      expect(component.mensagemErro()).toBe(
+        cenario.mensagemEsperada
+      );
+      expect(component.carregando()).toBe(false);
+    });
+  }
 });
