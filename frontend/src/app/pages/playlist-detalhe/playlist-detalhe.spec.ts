@@ -66,9 +66,9 @@ describe('PlaylistDetalhe', () => {
 
     component.removerMusica(5);
 
-    httpMock
-      .expectOne(`${apiUrl}/10/musicas/5`)
-      .flush(null, { status: 204, statusText: 'No Content' });
+    const requisicao = httpMock.expectOne(`${apiUrl}/10/musicas/5`);
+    expect(requisicao.request.method).toBe('DELETE');
+    requisicao.flush(null, { status: 204, statusText: 'No Content' });
 
     expect(component.playlist?.musicas).toHaveLength(0);
     expect(component.removendoMusicaId).toBeNull();
@@ -83,9 +83,9 @@ describe('PlaylistDetalhe', () => {
     component.removerMusica(5);
     component.removerMusica(5);
 
-    httpMock
-      .expectOne(`${apiUrl}/10/musicas/5`)
-      .flush(null, { status: 204, statusText: 'No Content' });
+    const requisicao = httpMock.expectOne(`${apiUrl}/10/musicas/5`);
+    expect(requisicao.request.method).toBe('DELETE');
+    requisicao.flush(null, { status: 204, statusText: 'No Content' });
   });
 
   it('deve mostrar mensagem de erro quando a remoção falha', () => {
