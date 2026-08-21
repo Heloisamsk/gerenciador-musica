@@ -21,9 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Year;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.time.ZoneId;
 
 @Service
 public class MusicaService {
+
+    private static final ZoneId FUSO_APLICACAO =
+            ZoneId.of("America/Recife");
 
     private final MusicaRepository musicaRepository;
     private final AlbumService albumService;
@@ -474,7 +478,7 @@ public class MusicaService {
             return;
         }
 
-        int anoAtual = Year.now().getValue();
+        int anoAtual = Year.now(FUSO_APLICACAO).getValue();
 
         if (anoLancamento <= 0 || anoLancamento > anoAtual) {
             throw new DadosMusicaInvalidosException(
