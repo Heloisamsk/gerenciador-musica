@@ -85,7 +85,8 @@ public class SecurityConfig {
                         // Cadastro e login não exigem autenticação
                         .requestMatchers(
                                 "/api/auth/register",
-                                "/api/auth/login"
+                                "/api/auth/login",
+                                "/actuator/health"
                         )
                         .permitAll()
 
