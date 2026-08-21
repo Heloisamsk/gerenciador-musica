@@ -111,20 +111,27 @@ class MusicaPesquisaIntegrationTest {
         rock = generoRepository.save(new Genero("Rock Teste " + sufixo));
         pop = generoRepository.save(new Genero("Pop Teste " + sufixo));
 
-        amorEterno = musicaRepository.save(new Musica(
+        amorEterno = new Musica(
                 "Amor Eterno " + sufixo, "Letra de Amor Eterno", 200, (short) 2020,
-                artistaA, album, Set.of(), Set.of(rock)
-        ));
+                artistaA, album
+        );
+        amorEterno.setGeneros(Set.of(rock));
+        amorEterno = musicaRepository.save(amorEterno);
 
-        outraCancao = musicaRepository.save(new Musica(
+        outraCancao = new Musica(
                 "Outra Cancao " + sufixo, null, 180, (short) 2021,
-                artistaB, null, Set.of(artistaA), Set.of(pop)
-        ));
+                artistaB, null
+        );
+        outraCancao.setArtistasParticipantes(Set.of(artistaA));
+        outraCancao.setGeneros(Set.of(pop));
+        outraCancao = musicaRepository.save(outraCancao);
 
-        amorDeVerao = musicaRepository.save(new Musica(
+        amorDeVerao = new Musica(
                 "Amor de Verao " + sufixo, null, 190, (short) 2020,
-                artistaB, null, Set.of(), new LinkedHashSet<>(Set.of(rock, pop))
-        ));
+                artistaB, null
+        );
+        amorDeVerao.setGeneros(new LinkedHashSet<>(Set.of(rock, pop)));
+        amorDeVerao = musicaRepository.save(amorDeVerao);
 
         usuarioComum = usuarioRepository.save(new Usuario(
                 "Usuario Teste " + sufixo,
@@ -223,8 +230,6 @@ class MusicaPesquisaIntegrationTest {
 
     @Test
     void deveFiltrarPorArtistaParticipante() throws Exception {
-        // artistaA é o artista PRINCIPAL de amorEterno e PARTICIPANTE de outraCancao;
-        // o filtro por artistaId deve considerar os dois casos.
         var resultado = pesquisar(params("artistaId", artistaA.getIdArtista().toString()));
 
         assertThat(resultado.itens())
@@ -366,13 +371,11 @@ class MusicaPesquisaIntegrationTest {
 
     @Test
     void naoDeveSerializarEntidadesJpaDiretamente() throws Exception {
-        // A entidade Musica usa "idMusica"/"idArtista"/"idAlbum"/"idGenero";
-        // os DTOs usam "id". Se um endpoint um dia passar a devolver a
-        // entidade direto, esses nomes de campo vazariam na resposta.
         var resposta = get("/api/musicas", tokenUsuarioComum, params("titulo", sufixo));
         String corpo = resposta.getContentAsString();
 
-        assertThat(corpo).doesNotContain("idMusica", "idArtista", "idAlbum", "idGenero");
-        assertThat(corpo).contains("\"id\":", "\"artistaPrincipal\":", "\"generos\":");
+        assertThat(corpo)
+                .doesNotContain("idMusica", "idArtista", "idAlbum", "idGenero")
+                .contains("\"id\":", "\"artistaPrincipal\":", "\"generos\":");
     }
 }

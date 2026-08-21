@@ -12,7 +12,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -84,9 +83,7 @@ public class Musica {
             Integer duracaoSegundos,
             Short anoLancamento,
             Artista artistaPrincipal,
-            Album album,
-            Set<Artista> participantes,
-            Set<Genero> generos
+            Album album
     ) {
         this.titulo = titulo;
         this.letra = letra;
@@ -94,16 +91,6 @@ public class Musica {
         this.anoLancamento = anoLancamento;
         this.artistaPrincipal = artistaPrincipal;
         this.album = album;
-
-        this.artistasParticipantes =
-                participantes == null
-                        ? new LinkedHashSet<>()
-                        : new LinkedHashSet<>(participantes);
-
-        this.generos =
-                generos == null
-                        ? new LinkedHashSet<>()
-                        : new LinkedHashSet<>(generos);
     }
 
     public Long getIdMusica() {
