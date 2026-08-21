@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.time.ZoneOffset;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -296,7 +297,7 @@ public class GlobalExceptionHandler {
             Map<String, String> fieldErrors
     ) {
         ErrorResponseDTO resposta = new ErrorResponseDTO(
-                OffsetDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.UTC),
                 status.value(),
                 status.getReasonPhrase(),
                 message,

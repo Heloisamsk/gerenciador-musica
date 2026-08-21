@@ -13,6 +13,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -33,7 +34,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
 
         ErrorResponseDTO erro = new ErrorResponseDTO(
-                OffsetDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.UTC),
                 status.value(),
                 status.getReasonPhrase(),
                 "Autenticação necessária. Envie um token válido.",
