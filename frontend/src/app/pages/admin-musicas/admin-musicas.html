@@ -1,20 +1,26 @@
 <section class="musicas-page">
   <div class="musicas-card">
     <header class="musicas-header">
-      <div class="musicas-title-wrapper" style="display: flex; align-items: center; gap: 1.5rem;">
+      <div
+        class="musicas-title-wrapper"
+        style="display: flex; align-items: center; gap: 1.5rem;"
+      >
         <img
           src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg"
           alt="Logo do Spotify"
           style="width: 45px; height: auto;"
         />
+
         <div class="musicas-title">
           <p class="section-label">Painel administrativo</p>
           <h1>Catálogo de Músicas</h1>
+
           <p>
             Veja as músicas cadastradas no sistema.
           </p>
         </div>
       </div>
+
       <button
         class="atualizar-button"
         type="button"
@@ -37,13 +43,12 @@
     </div>
 
     @if (carregando()) {
-    <div
+    <output
       class="status-message loading-message"
-      role="status"
       aria-live="polite"
     >
       <p>Carregando músicas...</p>
-    </div>
+    </output>
     }
 
     @else if (mensagemErro()) {
@@ -66,16 +71,16 @@
     }
 
     @else if (musicas().length === 0) {
-    <div
+    <output
       class="status-message empty-message"
-      role="status"
+      aria-live="polite"
     >
       <h2>Nenhuma música encontrada</h2>
 
       <p>
         Ainda não existem músicas cadastradas no sistema.
       </p>
-    </div>
+    </output>
     }
 
     @else {
