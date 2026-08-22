@@ -3,10 +3,13 @@ package gerenciador_musica_backend.service;
 import gerenciador_musica_backend.dto.ArtistaRequestDTO;
 import gerenciador_musica_backend.dto.ArtistaResponseDTO;
 import gerenciador_musica_backend.exception.ArtistaDuplicadoException;
+import gerenciador_musica_backend.exception.ArtistaEmUsoException;
 import gerenciador_musica_backend.exception.ArtistaNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosArtistaInvalidosException;
 import gerenciador_musica_backend.model.Artista;
+import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
+import gerenciador_musica_backend.repository.MusicaRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +20,17 @@ import java.util.List;
 public class ArtistaService {
 
     private final ArtistaRepository artistaRepository;
+    private final AlbumRepository albumRepository;
+    private final MusicaRepository musicaRepository;
 
-    public ArtistaService(ArtistaRepository artistaRepository) {
+    public ArtistaService(
+            ArtistaRepository artistaRepository,
+            AlbumRepository albumRepository,
+            MusicaRepository musicaRepository
+    ) {
         this.artistaRepository = artistaRepository;
+        this.albumRepository = albumRepository;
+        this.musicaRepository = musicaRepository;
     }
 
     @Transactional
@@ -138,6 +149,44 @@ public class ArtistaService {
     @Transactional(readOnly = true)
     public Artista buscarEntidadePorId(Long idArtista) {
         return obterEntidadePorId(idArtista);
+    }
+
+    @Transactional
+    public void excluirArtista(Long idArtista) {
+        Artista artista = obterEntidadePorId(idArtista);
+
+        verificarDependencias(idArtista);
+
+        /*
+         * A FK perfil.id_artista_destaque usa ON DELETE SET NULL.
+         * Assim, o perfil é preservado e apenas o destaque é removido.
+         */
+        artistaRepository.delete(artista);
+    }
+
+    private void verificarDependencias(Long idArtista) {
+        if (albumRepository.existsByArtista_IdArtista(idArtista)) {
+            throw new ArtistaEmUsoException(
+                    "Não é possível excluir o artista porque "
+                            + "ele possui álbuns associados."
+            );
+        }
+
+        if (musicaRepository
+                .existsByArtistaPrincipal_IdArtista(idArtista)) {
+            throw new ArtistaEmUsoException(
+                    "Não é possível excluir o artista porque ele é "
+                            + "o artista principal de uma ou mais músicas."
+            );
+        }
+
+        if (musicaRepository
+                .existsByArtistasParticipantes_IdArtista(idArtista)) {
+            throw new ArtistaEmUsoException(
+                    "Não é possível excluir o artista porque ele "
+                            + "participa de uma ou mais músicas."
+            );
+        }
     }
 
     private Artista obterEntidadePorId(Long idArtista) {

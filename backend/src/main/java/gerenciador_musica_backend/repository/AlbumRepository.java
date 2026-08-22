@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface AlbumRepository extends JpaRepository<Album, Long> {
 
+    boolean existsByArtista_IdArtista(Long idArtista);
+
     List<Album> findByArtistaIdArtistaOrderByTituloAscAnoLancamentoAsc(
             Long idArtista
     );
@@ -17,4 +19,3 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
             Short anoLancamento
     );
 }
-
