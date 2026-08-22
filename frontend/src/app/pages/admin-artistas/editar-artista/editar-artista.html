@@ -1,7 +1,8 @@
-<main aria-labelledby="titulo-edicao-artista">
-  <h1 id="titulo-edicao-artista">Editar artista</h1>
-
-  <p>
-    Os dados do artista serão disponibilizados nesta página para edição.
-  </p>
-</main>
+<app-formulario-artista
+  modo="edicao"
+  [dadosIniciais]="dadosIniciais()"
+  [carregando]="carregando()"
+  [mensagemSucesso]="mensagemSucesso()"
+  [mensagemErro]="mensagemErro()"
+  (enviar)="salvar.emit($event)"
+/>

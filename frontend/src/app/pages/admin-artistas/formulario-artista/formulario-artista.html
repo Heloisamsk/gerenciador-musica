@@ -1,0 +1,211 @@
+<div class="formulario-container">
+  <div class="formulario-card">
+    <h2 class="formulario-title">
+      {{ titulo() }}
+    </h2>
+
+    <output
+      class="alerta alerta-sucesso"
+      aria-live="polite"
+      *ngIf="mensagemSucesso()"
+    >
+      {{ mensagemSucesso() }}
+    </output>
+
+    <div
+      class="alerta alerta-erro"
+      role="alert"
+      *ngIf="mensagemErro()"
+    >
+      {{ mensagemErro() }}
+    </div>
+
+    <output
+      class="sr-only"
+      aria-live="polite"
+      *ngIf="carregando()"
+    >
+      {{ textoCarregamento() }}
+    </output>
+
+    <form
+      class="formulario-form"
+      [formGroup]="formulario"
+      (ngSubmit)="submeter()"
+      novalidate
+    >
+      <div class="form-group">
+        <label for="nome">
+          Nome artístico *
+        </label>
+
+        <input
+          id="nome"
+          type="text"
+          class="form-input"
+          formControlName="nome"
+          maxlength="255"
+          placeholder="Ex.: Queen"
+          [class.input-invalido]="
+            formulario.controls.nome.invalid &&
+            formulario.controls.nome.touched
+          "
+        >
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.nome.touched &&
+            (
+              formulario.controls.nome.hasError('required') ||
+              formulario.controls.nome.hasError('apenasEspacos')
+            )
+          "
+        >
+          O nome artístico é obrigatório.
+        </small>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.nome.touched &&
+            formulario.controls.nome.hasError('maxlength')
+          "
+        >
+          O nome artístico deve possuir no máximo 255 caracteres.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="nomeCompleto">
+          Nome completo *
+        </label>
+
+        <input
+          id="nomeCompleto"
+          type="text"
+          class="form-input"
+          formControlName="nomeCompleto"
+          maxlength="255"
+          placeholder="Ex.: Queen"
+          [class.input-invalido]="
+            formulario.controls.nomeCompleto.invalid &&
+            formulario.controls.nomeCompleto.touched
+          "
+        >
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.nomeCompleto.touched &&
+            (
+              formulario.controls.nomeCompleto.hasError('required') ||
+              formulario.controls.nomeCompleto.hasError('apenasEspacos')
+            )
+          "
+        >
+          O nome completo é obrigatório.
+        </small>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.nomeCompleto.touched &&
+            formulario.controls.nomeCompleto.hasError('maxlength')
+          "
+        >
+          O nome completo deve possuir no máximo 255 caracteres.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="descricao">
+          Descrição ou biografia *
+        </label>
+
+        <textarea
+          id="descricao"
+          class="form-input form-textarea"
+          formControlName="descricao"
+          maxlength="500"
+          placeholder="Escreva uma breve descrição do artista"
+          [class.input-invalido]="
+            formulario.controls.descricao.invalid &&
+            formulario.controls.descricao.touched
+          "
+        ></textarea>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.descricao.touched &&
+            (
+              formulario.controls.descricao.hasError('required') ||
+              formulario.controls.descricao.hasError('apenasEspacos')
+            )
+          "
+        >
+          A descrição do artista é obrigatória.
+        </small>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.descricao.touched &&
+            formulario.controls.descricao.hasError('maxlength')
+          "
+        >
+          A descrição deve possuir no máximo 500 caracteres.
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="fotoPerfilUrl">
+          URL da foto
+        </label>
+
+        <input
+          id="fotoPerfilUrl"
+          type="url"
+          class="form-input"
+          formControlName="fotoPerfilUrl"
+          maxlength="2048"
+          placeholder="https://exemplo.com/artista.jpg"
+          [class.input-invalido]="
+            formulario.controls.fotoPerfilUrl.invalid &&
+            formulario.controls.fotoPerfilUrl.touched
+          "
+        >
+
+        <small class="campo-opcional">
+          Campo opcional.
+        </small>
+
+        <small
+          class="error-message"
+          *ngIf="
+            formulario.controls.fotoPerfilUrl.touched &&
+            formulario.controls.fotoPerfilUrl.hasError('maxlength')
+          "
+        >
+          A URL deve possuir no máximo 2048 caracteres.
+        </small>
+      </div>
+
+      <button
+        type="submit"
+        class="formulario-btn"
+        [disabled]="formulario.invalid || carregando()"
+        [attr.aria-busy]="carregando()"
+      >
+        <span *ngIf="!carregando()">
+          {{ textoBotao() }}
+        </span>
+
+        <span *ngIf="carregando()">
+          {{ textoCarregamento() }}
+        </span>
+      </button>
+    </form>
+  </div>
+</div>
