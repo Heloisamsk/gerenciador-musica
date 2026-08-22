@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
   OnInit,
+  computed,
   inject,
   signal
 } from '@angular/core';
@@ -10,6 +11,10 @@ import { finalize } from 'rxjs';
 
 import { ArtistaResponse } from '../../models/ArtistaResponse';
 import { AdminArtistaService } from '../../services/admin-artista';
+
+interface ErroApi {
+  message?: string;
+}
 
 @Component({
   selector: 'app-admin-artistas',
@@ -25,8 +30,13 @@ export class AdminArtistas implements OnInit {
   readonly imagemAlternativa = '/avatar-artista.png';
   readonly artistas = signal<ArtistaResponse[]>([]);
   readonly carregando = signal(false);
+  readonly excluindoId = signal<number | null>(null);
   readonly mensagemErro = signal('');
+  readonly mensagemErroExclusao = signal('');
   readonly mensagemSucesso = signal('');
+  readonly operacaoEmAndamento = computed(
+    () => this.carregando() || this.excluindoId() !== null
+  );
 
   ngOnInit(): void {
     this.recuperarMensagemDaEdicao();
@@ -49,6 +59,53 @@ export class AdminArtistas implements OnInit {
         error: (erro: HttpErrorResponse) => {
           this.artistas.set([]);
           this.mensagemErro.set(this.mensagemParaErro(erro));
+        }
+      });
+  }
+
+  editarArtista(idArtista: number): void {
+    if (this.operacaoEmAndamento()) {
+      return;
+    }
+
+    void this.router.navigate([
+      '/admin/banco/artistas',
+      idArtista,
+      'editar'
+    ]);
+  }
+
+  excluirArtista(artista: ArtistaResponse): void {
+    if (this.operacaoEmAndamento()) {
+      return;
+    }
+
+    const confirmou = window.confirm(
+      `Tem certeza que deseja excluir o artista "${artista.nome}"?`
+    );
+
+    if (!confirmou) {
+      return;
+    }
+
+    this.excluindoId.set(artista.idArtista);
+    this.mensagemSucesso.set('');
+    this.mensagemErroExclusao.set('');
+
+    this.artistaService
+      .excluir(artista.idArtista)
+      .pipe(finalize(() => this.excluindoId.set(null)))
+      .subscribe({
+        complete: () => {
+          this.mensagemSucesso.set(
+            `Artista ${artista.nome} excluído com sucesso!`
+          );
+          this.carregarArtistas();
+        },
+        error: (erro: HttpErrorResponse) => {
+          this.mensagemErroExclusao.set(
+            this.mensagemParaErroDeExclusao(erro)
+          );
         }
       });
   }
@@ -85,5 +142,34 @@ export class AdminArtistas implements OnInit {
       default:
         return 'Não foi possível carregar os artistas.';
     }
+  }
+
+  private mensagemParaErroDeExclusao(
+    erro: HttpErrorResponse
+  ): string {
+    switch (erro.status) {
+      case 0:
+        return 'Não foi possível conectar ao servidor.';
+      case 401:
+        return 'Sua sessão expirou. Faça login novamente.';
+      case 403:
+        return 'Você não possui permissão para excluir artistas.';
+      case 404:
+        return 'O artista não foi encontrado. Atualize a listagem.';
+      case 409:
+        return this.mensagemDeConflito(erro);
+      case 500:
+        return 'Ocorreu um erro no servidor ao excluir o artista.';
+      default:
+        return 'Não foi possível excluir o artista.';
+    }
+  }
+
+  private mensagemDeConflito(erro: HttpErrorResponse): string {
+    const mensagemApi = (erro.error as ErroApi | null)?.message;
+
+    return mensagemApi?.trim() ||
+      'Não é possível excluir o artista porque ele possui ' +
+      'músicas ou álbuns associados.';
   }
 }
