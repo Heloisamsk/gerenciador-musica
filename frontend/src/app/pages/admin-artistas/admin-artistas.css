@@ -1,0 +1,254 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #ffffff;
+  background-color: #0f0f0f;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:host * {
+  box-sizing: border-box;
+}
+
+.artistas-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: radial-gradient(circle at top, #1d3325, #0f0f0f 32rem);
+}
+
+.artistas-container {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+}
+
+.voltar-link {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: #b3b3b3;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.voltar-link:hover,
+.voltar-link:focus-visible {
+  color: #1ed760;
+}
+
+.artistas-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 1.75rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid #343434;
+}
+
+.section-label {
+  margin: 0 0 0.5rem;
+  color: #1ed760;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+}
+
+.artistas-header h1 {
+  margin: 0;
+  font-size: clamp(2.25rem, 6vw, 4rem);
+}
+
+.artistas-header p:last-child {
+  margin: 0.75rem 0 0;
+  color: #b3b3b3;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.primary-link,
+.primary-button,
+.secondary-button,
+.edit-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary-link,
+.primary-button {
+  color: #121212;
+  background-color: #1ed760;
+  border: 1px solid #1ed760;
+}
+
+.secondary-button,
+.edit-link {
+  color: #ffffff;
+  background-color: transparent;
+  border: 1px solid #727272;
+}
+
+.secondary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary-link:focus-visible,
+.primary-button:focus-visible,
+.secondary-button:focus-visible,
+.edit-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.feedback {
+  display: block;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 0.75rem;
+}
+
+.success-feedback {
+  color: #8ff0b1;
+  background-color: #193021;
+  border: 1px solid #1db954;
+}
+
+.state-card {
+  display: flex;
+  min-height: 15rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  color: #b3b3b3;
+  text-align: center;
+  background-color: #181818;
+  border: 1px solid #343434;
+  border-radius: 1rem;
+}
+
+.state-card h2,
+.state-card p {
+  margin: 0;
+}
+
+.error-card {
+  color: #ff8f8f;
+  border-color: #7a3535;
+}
+
+.total-artistas {
+  margin: 0 0 1rem;
+  color: #b3b3b3;
+}
+
+.total-artistas strong {
+  color: #ffffff;
+}
+
+.artistas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.artista-card {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr) auto;
+  gap: 1.25rem;
+  height: 100%;
+  padding: 1.25rem;
+  background-color: #181818;
+  border: 1px solid #343434;
+  border-radius: 1rem;
+}
+
+.artista-foto {
+  width: 7rem;
+  height: 7rem;
+  object-fit: cover;
+  background-color: #282828;
+  border-radius: 50%;
+}
+
+.artista-info {
+  min-width: 0;
+}
+
+.artista-info h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.nome-completo {
+  margin: 0.35rem 0 0;
+  color: #b3b3b3;
+  overflow-wrap: anywhere;
+}
+
+.descricao {
+  margin: 0.8rem 0 0;
+  color: #d1d1d1;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.edit-link {
+  align-self: start;
+  min-height: 2.5rem;
+  padding: 0.55rem 1rem;
+}
+
+@media (max-width: 900px) {
+  .artistas-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .artistas-page {
+    padding: 1.25rem;
+  }
+
+  .artistas-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .header-actions,
+  .primary-link,
+  .secondary-button {
+    width: 100%;
+  }
+
+  .artista-card {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .artista-foto {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+
+  .edit-link {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
