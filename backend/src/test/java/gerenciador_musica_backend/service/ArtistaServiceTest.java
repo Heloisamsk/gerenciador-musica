@@ -208,6 +208,32 @@ class ArtistaServiceTest {
     }
 
     @Test
+    void deveBuscarArtistaPorIdEConverterParaResponse() {
+        Artista artistaExistente = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                "https://exemplo.com/queen.jpg"
+        );
+        artistaExistente.setIdArtista(1L);
+
+        when(artistaRepository.findById(1L))
+                .thenReturn(Optional.of(artistaExistente));
+
+        ArtistaResponseDTO response = artistaService.buscarPorId(1L);
+
+        assertThat(response.idArtista()).isEqualTo(1L);
+        assertThat(response.nome()).isEqualTo("Queen");
+        assertThat(response.nomeCompleto()).isEqualTo("Queen");
+        assertThat(response.descricao())
+                .isEqualTo("Banda britânica de rock.");
+        assertThat(response.fotoPerfilUrl())
+                .isEqualTo("https://exemplo.com/queen.jpg");
+
+        verify(artistaRepository).findById(1L);
+    }
+
+    @Test
     void deveLancarExcecaoQuandoArtistaNaoForEncontrado() {
         when(artistaRepository.findById(99L))
                 .thenReturn(Optional.empty());
@@ -221,7 +247,26 @@ class ArtistaServiceTest {
     @Test
     void deveLancarExcecaoQuandoIdForNull() {
         assertThatThrownBy(() -> artistaService.buscarEntidadePorId(null))
-                .isInstanceOf(DadosArtistaInvalidosException.class);
+                .isInstanceOf(DadosArtistaInvalidosException.class)
+                .hasMessage("O ID do artista deve ser positivo.");
+
+        verify(artistaRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoIdForZero() {
+        assertThatThrownBy(() -> artistaService.buscarPorId(0L))
+                .isInstanceOf(DadosArtistaInvalidosException.class)
+                .hasMessage("O ID do artista deve ser positivo.");
+
+        verify(artistaRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoIdForNegativo() {
+        assertThatThrownBy(() -> artistaService.buscarPorId(-1L))
+                .isInstanceOf(DadosArtistaInvalidosException.class)
+                .hasMessage("O ID do artista deve ser positivo.");
 
         verify(artistaRepository, never()).findById(any());
     }
