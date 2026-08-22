@@ -19,11 +19,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,6 +43,15 @@ class AdminArtistaControllerTest {
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    private static final String REQUEST_CADASTRO = """
+            {
+                "nome": "Queen",
+                "nomeCompleto": "Queen",
+                "descricao": "Banda britânica de rock.",
+                "fotoPerfilUrl": "https://exemplo.com/queen.jpg"
+            }
+            """;
+
     private static final String REQUEST_ATUALIZACAO = """
             {
                 "nome": "Queen + Adam Lambert",
@@ -48,6 +60,72 @@ class AdminArtistaControllerTest {
                 "fotoPerfilUrl": "https://exemplo.com/queen-atualizado.jpg"
             }
             """;
+
+    @Test
+    void deveCadastrarArtistaComStatus201() throws Exception {
+        when(artistaService.cadastrarArtista(
+                any(ArtistaRequestDTO.class)
+        )).thenReturn(new ArtistaResponseDTO(
+                1L,
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                "https://exemplo.com/queen.jpg"
+        ));
+
+        mockMvc.perform(post("/api/admin/artistas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(REQUEST_CADASTRO))
+                .andExpect(status().isCreated())
+                .andExpect(header().string(
+                        "Location",
+                        "http://localhost/api/artistas/1"
+                ))
+                .andExpect(jsonPath("$.idArtista").value(1))
+                .andExpect(jsonPath("$.nome").value("Queen"))
+                .andExpect(jsonPath("$.nomeCompleto").value("Queen"))
+                .andExpect(jsonPath("$.descricao")
+                        .value("Banda britânica de rock."))
+                .andExpect(jsonPath("$.fotoPerfilUrl")
+                        .value("https://exemplo.com/queen.jpg"));
+
+        verify(artistaService).cadastrarArtista(
+                any(ArtistaRequestDTO.class)
+        );
+    }
+
+    @Test
+    void deveRetornar400QuandoCadastroForInvalido() throws Exception {
+        mockMvc.perform(post("/api/admin/artistas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nome": " ",
+                                    "nomeCompleto": "Queen",
+                                    "descricao": "Descrição válida."
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors.nome").exists());
+
+        verify(artistaService, never()).cadastrarArtista(any());
+    }
+
+    @Test
+    void deveRetornar409AoCadastrarNomeDuplicado() throws Exception {
+        when(artistaService.cadastrarArtista(
+                any(ArtistaRequestDTO.class)
+        )).thenThrow(new ArtistaDuplicadoException(
+                "Esse artista já foi cadastrado: Queen"
+        ));
+
+        mockMvc.perform(post("/api/admin/artistas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(REQUEST_CADASTRO))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message")
+                        .value("Esse artista já foi cadastrado: Queen"));
+    }
 
     @Test
     void deveAtualizarArtistaComStatus200() throws Exception {

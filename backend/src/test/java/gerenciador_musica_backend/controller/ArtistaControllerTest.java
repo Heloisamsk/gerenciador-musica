@@ -12,6 +12,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,6 +41,24 @@ class ArtistaControllerTest {
                 "Banda britânica de rock.",
                 "https://exemplo.com/queen.jpg"
         );
+    }
+
+    @Test
+    void deveListarArtistas() throws Exception {
+        when(artistaService.listarArtistas())
+                .thenReturn(List.of(montarResposta()));
+
+        mockMvc.perform(get("/api/artistas"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].idArtista").value(1))
+                .andExpect(jsonPath("$[0].nome").value("Queen"))
+                .andExpect(jsonPath("$[0].nomeCompleto").value("Queen"))
+                .andExpect(jsonPath("$[0].descricao")
+                        .value("Banda britânica de rock."))
+                .andExpect(jsonPath("$[0].fotoPerfilUrl")
+                        .value("https://exemplo.com/queen.jpg"));
+
+        verify(artistaService).listarArtistas();
     }
 
     @Test

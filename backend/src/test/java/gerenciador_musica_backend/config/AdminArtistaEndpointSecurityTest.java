@@ -22,6 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -56,6 +57,55 @@ class AdminArtistaEndpointSecurityTest {
                 "fotoPerfilUrl": null
             }
             """;
+
+    @Test
+    void deveRetornar401AoCadastrarSemAutenticacao() throws Exception {
+        mockMvc.perform(post("/api/admin/artistas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(REQUEST_ATUALIZACAO))
+                .andExpect(status().isUnauthorized());
+
+        verify(artistaService, never()).cadastrarArtista(
+                any(ArtistaRequestDTO.class)
+        );
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void deveRetornar403AoCadastrarComoUsuarioComum()
+            throws Exception {
+        mockMvc.perform(post("/api/admin/artistas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(REQUEST_ATUALIZACAO))
+                .andExpect(status().isForbidden());
+
+        verify(artistaService, never()).cadastrarArtista(
+                any(ArtistaRequestDTO.class)
+        );
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void devePermitirCadastroParaAdministrador() throws Exception {
+        when(artistaService.cadastrarArtista(
+                any(ArtistaRequestDTO.class)
+        )).thenReturn(new ArtistaResponseDTO(
+                1L,
+                "Queen Atualizado",
+                "Queen",
+                "Descrição atualizada.",
+                null
+        ));
+
+        mockMvc.perform(post("/api/admin/artistas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(REQUEST_ATUALIZACAO))
+                .andExpect(status().isCreated());
+
+        verify(artistaService).cadastrarArtista(
+                any(ArtistaRequestDTO.class)
+        );
+    }
 
     @Test
     void deveRetornar401AoAtualizarSemAutenticacao() throws Exception {
