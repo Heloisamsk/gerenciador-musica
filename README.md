@@ -587,6 +587,7 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 | Método | Endpoint | Acesso | Descrição |
 |:------:|----------|--------|-----------|
 | `GET` | `/api/artistas` | `USER` ou `ADMIN` | Listar os artistas disponíveis no catálogo |
+| `GET` | `/api/artistas/{id}` | `USER` ou `ADMIN` | Consultar os dados completos de um artista pelo ID |
 | `GET` | `/api/albuns` | `USER` ou `ADMIN` | Listar álbuns; aceita o filtro `?artistaId={id}` |
 | `GET` | `/api/albuns/{id}` | `USER` ou `ADMIN` | Consultar um álbum por ID |
 | `GET` | `/api/musicas` | `USER` ou `ADMIN` | Listar as músicas disponíveis no catálogo |
@@ -595,10 +596,12 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 
 | Método | Endpoint | Acesso | Descrição |
 |:------:|----------|--------|-----------|
-| `GET` | `/api/admin/artistas` | `ADMIN` | Listar artistas para operações administrativas |
 | `POST` | `/api/admin/artistas` | `ADMIN` | Cadastrar um novo artista |
+| `PUT` | `/api/admin/artistas/{id}` | `ADMIN` | Atualizar os dados de um artista sem alterar seu ID ou suas associações |
+| `DELETE` | `/api/admin/artistas/{id}` | `ADMIN` | Excluir um artista que não possua álbuns ou músicas associados |
 | `POST` | `/api/admin/albuns` | `ADMIN` | Cadastrar um álbum vinculado a um artista |
 | `POST` | `/api/admin/musicas` | `ADMIN` | Cadastrar uma nova música |
 | `GET` | `/api/admin/banco/usuarios` | `ADMIN` | Listar os usuários cadastrados no banco de dados |
 
 > Os endpoints iniciados por `/api/admin` são protegidos e podem ser acessados somente por usuários com a role `ADMIN`. Usuários autenticados com a role `USER` recebem a resposta `403 Forbidden` ao tentar acessar essas rotas.
+
