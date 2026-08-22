@@ -23,4 +23,13 @@ public class ArtistaController {
                 artistaService.listarArtistas()
         );
     }
+
+    @GetMapping("/{idArtista}")
+    public ResponseEntity<ArtistaResponseDTO> buscarPorId(
+            @PathVariable("idArtista") Long idArtista
+    ) {
+        return ResponseEntity.ok(
+                artistaService.buscarPorId(idArtista)
+        );
+    }
 }
