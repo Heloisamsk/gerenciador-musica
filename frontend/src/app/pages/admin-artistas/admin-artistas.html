@@ -29,7 +29,7 @@
         <button
           class="secondary-button"
           type="button"
-          [disabled]="carregando()"
+          [disabled]="operacaoEmAndamento()"
           (click)="carregarArtistas()"
         >
           Atualizar lista
@@ -44,6 +44,15 @@
       >
         {{ mensagemSucesso() }}
       </output>
+    }
+
+    @if (mensagemErroExclusao()) {
+      <div
+        class="feedback error-feedback"
+        role="alert"
+      >
+        {{ mensagemErroExclusao() }}
+      </div>
     }
 
     @if (carregando()) {
@@ -112,17 +121,34 @@
                   </p>
                 </div>
 
-                <a
-                  class="edit-link"
-                  [routerLink]="[
-                    '/admin/banco/artistas',
-                    artista.idArtista,
-                    'editar'
-                  ]"
-                  [attr.aria-label]="'Editar ' + artista.nome"
-                >
-                  Editar
-                </a>
+                <div class="card-actions">
+                  <button
+                    class="secondary-button card-button"
+                    type="button"
+                    [disabled]="operacaoEmAndamento()"
+                    [attr.aria-label]="'Editar ' + artista.nome"
+                    (click)="editarArtista(artista.idArtista)"
+                  >
+                    Editar
+                  </button>
+
+                  <button
+                    class="secondary-button card-button delete-button"
+                    type="button"
+                    [disabled]="operacaoEmAndamento()"
+                    [attr.aria-busy]="
+                      excluindoId() === artista.idArtista
+                    "
+                    [attr.aria-label]="'Excluir ' + artista.nome"
+                    (click)="excluirArtista(artista)"
+                  >
+                    @if (excluindoId() === artista.idArtista) {
+                      Excluindo...
+                    } @else {
+                      Excluir
+                    }
+                  </button>
+                </div>
               </article>
             </li>
           }

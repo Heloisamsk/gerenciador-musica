@@ -72,7 +72,7 @@
 .primary-link,
 .primary-button,
 .secondary-button,
-.edit-link {
+.card-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -92,13 +92,14 @@
 }
 
 .secondary-button,
-.edit-link {
+.card-button {
   color: #ffffff;
   background-color: transparent;
   border: 1px solid #727272;
 }
 
-.secondary-button:disabled {
+.secondary-button:disabled,
+.card-button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
@@ -106,7 +107,7 @@
 .primary-link:focus-visible,
 .primary-button:focus-visible,
 .secondary-button:focus-visible,
-.edit-link:focus-visible {
+.card-button:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 3px;
 }
@@ -122,6 +123,12 @@
   color: #8ff0b1;
   background-color: #193021;
   border: 1px solid #1db954;
+}
+
+.error-feedback {
+  color: #ff8f8f;
+  background-color: #3b2424;
+  border: 1px solid #7a3535;
 }
 
 .state-card {
@@ -209,10 +216,20 @@
   overflow-wrap: anywhere;
 }
 
-.edit-link {
-  align-self: start;
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-button {
   min-height: 2.5rem;
   padding: 0.55rem 1rem;
+}
+
+.delete-button {
+  color: #ff8f8f;
+  border-color: #7a3535;
 }
 
 @media (max-width: 900px) {
@@ -247,8 +264,12 @@
     height: 4.5rem;
   }
 
-  .edit-link {
+  .card-actions {
     grid-column: 1 / -1;
+    flex-direction: row;
+  }
+
+  .card-button {
     width: 100%;
   }
 }
