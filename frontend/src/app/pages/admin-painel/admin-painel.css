@@ -13,13 +13,7 @@
 .painel-page {
   min-height: 100vh;
   padding: 40px;
-  background:
-    radial-gradient(
-      circle at 50% 0,
-      #223429 0,
-      transparent 34rem
-    ),
-    #0f0f0f;
+  background-color: #0f0f0f;
 }
 
 .painel-container {
