@@ -76,14 +76,35 @@ export const routes: Routes = [
   }
   },
   {
+    path: 'admin/banco/artistas',
+    loadComponent: () =>
+      import('./pages/admin-artistas/admin-artistas')
+        .then(modulo => modulo.AdminArtistas),
+    canActivate: [authGuard],
+    data: {
+      expectedRole: 'ADMIN'
+    }
+  },
+  {
     path: 'admin/banco/artistas/novo',
-   loadComponent: () =>
-     import(
+    loadComponent: () =>
+      import(
         './pages/admin-artistas/cadastro-artista/cadastro-artista'
       ).then(modulo => modulo.CadastroArtista),
     canActivate: [authGuard],
-   data: {
-     expectedRole: 'ADMIN'
+    data: {
+      expectedRole: 'ADMIN'
+    }
+  },
+  {
+    path: 'admin/banco/artistas/:id/editar',
+    loadComponent: () =>
+      import(
+        './pages/admin-artistas/editar-artista/editar-artista'
+      ).then(modulo => modulo.EditarArtista),
+    canActivate: [authGuard],
+    data: {
+      expectedRole: 'ADMIN'
     }
   },
   {

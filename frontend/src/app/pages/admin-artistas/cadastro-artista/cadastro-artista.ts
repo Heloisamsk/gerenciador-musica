@@ -1,113 +1,39 @@
-import { CommonModule } from '@angular/common';
-import {
-  AbstractControl,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  ValidatorFn,
-  Validators
-} from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  viewChild
+} from '@angular/core';
 import { finalize } from 'rxjs';
 
 import { ArtistaRequest } from '../../../models/ArtistaRequest';
 import { AdminArtistaService } from '../../../services/admin-artista';
-
+import { FormularioArtista } from '../formulario-artista/formulario-artista';
 
 interface ErroApi {
   message?: string;
   fieldErrors?: Record<string, string>;
 }
 
-const naoPermitirApenasEspacos: ValidatorFn = (
-  control: AbstractControl
-): ValidationErrors | null => {
-  const valor = control.value;
-
-  if (typeof valor !== 'string' || valor.length === 0) {
-    return null;
-  }
-
-  return valor.trim().length === 0
-    ? { apenasEspacos: true }
-    : null;
-};
-
 @Component({
   selector: 'app-cadastro-artista',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule
-  ],
-  templateUrl: './cadastro-artista.html',
-  styleUrls: ['./cadastro-artista.css']
+  imports: [FormularioArtista],
+  templateUrl: './cadastro-artista.html'
 })
 export class CadastroArtista {
 
-  private readonly formBuilder = inject(FormBuilder);
   private readonly artistaService = inject(AdminArtistaService);
+  private readonly formularioArtista = viewChild(FormularioArtista);
 
   readonly carregando = signal(false);
   readonly mensagemSucesso = signal('');
   readonly mensagemErro = signal('');
 
-  readonly formulario = this.formBuilder.nonNullable.group({
-    nome: [
-      '',
-      [
-        Validators.required,
-        naoPermitirApenasEspacos,
-        Validators.maxLength(255)
-      ]
-    ],
-
-    nomeCompleto: [
-      '',
-      [
-        Validators.required,
-        naoPermitirApenasEspacos,
-        Validators.maxLength(255)
-      ]
-    ],
-
-    descricao: [
-      '',
-      [
-        Validators.required,
-        naoPermitirApenasEspacos,
-        Validators.maxLength(500)
-      ]
-    ],
-
-    fotoPerfilUrl: [
-      '',
-      [
-        Validators.maxLength(2048)
-      ]
-    ]
-  });
-
-  salvar(): void {
-    if (this.formulario.invalid) {
-      this.formulario.markAllAsTouched();
-      return;
-    }
-
+  salvar(request: ArtistaRequest): void {
     this.carregando.set(true);
     this.mensagemSucesso.set('');
     this.mensagemErro.set('');
-
-    const valores = this.formulario.getRawValue();
-
-    const request: ArtistaRequest = {
-      nome: valores.nome.trim(),
-      nomeCompleto: valores.nomeCompleto.trim(),
-      descricao: valores.descricao.trim(),
-      fotoPerfilUrl:
-        valores.fotoPerfilUrl.trim() || null
-    };
 
     this.artistaService
       .cadastrar(request)
@@ -120,7 +46,7 @@ export class CadastroArtista {
             `Artista ${response.nome} cadastrado com sucesso!`
           );
 
-          this.formulario.reset();
+          this.formularioArtista()?.resetar();
         },
 
         error: (erro: HttpErrorResponse) => {

@@ -1,7 +1,8 @@
 <app-formulario-artista
-  modo="cadastro"
+  modo="edicao"
+  [dadosIniciais]="dadosIniciais()"
   [carregando]="carregando()"
   [mensagemSucesso]="mensagemSucesso()"
   [mensagemErro]="mensagemErro()"
-  (enviar)="salvar($event)"
+  (enviar)="salvar.emit($event)"
 />
