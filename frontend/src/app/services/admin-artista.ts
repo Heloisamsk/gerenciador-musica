@@ -11,11 +11,11 @@ import { environment } from '../../environments/environment';
 })
 export class AdminArtistaService {
 
-  private readonly cadastroApiUrl =
-    `${environment.apiUrl}/api/admin/artistas`;
-
-  private readonly listagemApiUrl =
+  private readonly apiPublicaUrl =
     `${environment.apiUrl}/api/artistas`;
+
+  private readonly apiAdminUrl =
+    `${environment.apiUrl}/api/admin/artistas`;
 
   constructor(
     private readonly http: HttpClient
@@ -25,14 +25,38 @@ export class AdminArtistaService {
     artista: ArtistaRequest
   ): Observable<ArtistaResponse> {
     return this.http.post<ArtistaResponse>(
-      this.cadastroApiUrl,
+      this.apiAdminUrl,
       artista
     );
   }
 
   listarArtistas(): Observable<ArtistaResponse[]> {
     return this.http.get<ArtistaResponse[]>(
-      this.listagemApiUrl
+      this.apiPublicaUrl
+    );
+  }
+
+  buscarPorId(
+    id: number
+  ): Observable<ArtistaResponse> {
+    return this.http.get<ArtistaResponse>(
+      `${this.apiPublicaUrl}/${id}`
+    );
+  }
+
+  atualizar(
+    id: number,
+    artista: ArtistaRequest
+  ): Observable<ArtistaResponse> {
+    return this.http.put<ArtistaResponse>(
+      `${this.apiAdminUrl}/${id}`,
+      artista
+    );
+  }
+
+  excluir(id: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiAdminUrl}/${id}`
     );
   }
 }

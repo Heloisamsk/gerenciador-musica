@@ -17,10 +17,10 @@ describe('AdminArtistaService', () => {
   let service: AdminArtistaService;
   let httpTesting: HttpTestingController;
 
-  const cadastroApiUrl =
+  const apiAdminUrl =
     'http://localhost:8080/api/admin/artistas';
 
-  const listagemApiUrl =
+  const apiPublicaUrl =
     'http://localhost:8080/api/artistas';
 
   const artistaRequest: ArtistaRequest = {
@@ -66,7 +66,7 @@ describe('AdminArtistaService', () => {
         expect(response).toEqual(artistaResponse);
       });
 
-    const request = httpTesting.expectOne(cadastroApiUrl);
+    const request = httpTesting.expectOne(apiAdminUrl);
 
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual(artistaRequest);
@@ -79,11 +79,60 @@ describe('AdminArtistaService', () => {
       expect(response).toEqual([artistaResponse]);
     });
 
-    const request = httpTesting.expectOne(listagemApiUrl);
+    const request = httpTesting.expectOne(apiPublicaUrl);
 
     expect(request.request.method).toBe('GET');
 
     request.flush([artistaResponse]);
+  });
+
+  it('deve buscar um artista por ID no endpoint público', () => {
+    service.buscarPorId(52).subscribe(response => {
+      expect(response).toEqual(artistaResponse);
+    });
+
+    const request = httpTesting.expectOne(
+      `${apiPublicaUrl}/52`
+    );
+
+    expect(request.request.method).toBe('GET');
+
+    request.flush(artistaResponse);
+  });
+
+  it('deve atualizar um artista por PUT no endpoint administrativo', () => {
+    service.atualizar(52, artistaRequest).subscribe(response => {
+      expect(response).toEqual(artistaResponse);
+    });
+
+    const request = httpTesting.expectOne(
+      `${apiAdminUrl}/52`
+    );
+
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual(artistaRequest);
+
+    request.flush(artistaResponse);
+  });
+
+  it('deve excluir um artista por DELETE no endpoint administrativo', () => {
+    let requisicaoConcluida = false;
+
+    service.excluir(52).subscribe({
+      complete: () => {
+        requisicaoConcluida = true;
+      }
+    });
+
+    const request = httpTesting.expectOne(
+      `${apiAdminUrl}/52`
+    );
+
+    expect(request.request.method).toBe('DELETE');
+
+    request.flush(null);
+
+    expect(requisicaoConcluida).toBe(true);
   });
 
   for (const status of [400, 401, 403, 409]) {
@@ -96,7 +145,7 @@ describe('AdminArtistaService', () => {
         }
       });
 
-      const request = httpTesting.expectOne(cadastroApiUrl);
+      const request = httpTesting.expectOne(apiAdminUrl);
 
       request.flush(
         {

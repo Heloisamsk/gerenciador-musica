@@ -1,0 +1,21 @@
+import { authGuard } from './guards/auth-guard';
+import { routes } from './app.routes';
+
+describe('rotas administrativas de artistas', () => {
+  const caminhos = [
+    'admin/banco/artistas',
+    'admin/banco/artistas/novo',
+    'admin/banco/artistas/:id/editar'
+  ];
+
+  for (const caminho of caminhos) {
+    it(`deve proteger a rota ${caminho} para ADMIN`, () => {
+      const rota = routes.find(item => item.path === caminho);
+
+      expect(rota).toBeDefined();
+      expect(rota?.loadComponent).toBeDefined();
+      expect(rota?.canActivate).toContain(authGuard);
+      expect(rota?.data?.['expectedRole']).toBe('ADMIN');
+    });
+  }
+});
