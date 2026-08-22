@@ -410,6 +410,155 @@ class ArtistaServiceTest {
                 .existsByArtistasParticipantes_IdArtista(any());
     }
 
+    @Test
+    void deveAtualizarArtistaExistenteSemCriarNovaEntidade() {
+        Artista artista = montarArtistaExistente();
+        ArtistaRequestDTO request = new ArtistaRequestDTO(
+                "  Queen + Adam Lambert  ",
+                "  Queen e Adam Lambert  ",
+                "  Projeto musical em atividade.  ",
+                "   "
+        );
+
+        when(artistaRepository.findById(1L))
+                .thenReturn(Optional.of(artista));
+        when(artistaRepository
+                .existsByNomeIgnoreCaseAndIdArtistaNot(
+                        "Queen + Adam Lambert",
+                        1L
+                ))
+                .thenReturn(false);
+
+        ArtistaResponseDTO response = artistaService.atualizarArtista(
+                1L,
+                request
+        );
+
+        assertThat(response.idArtista()).isEqualTo(1L);
+        assertThat(response.nome()).isEqualTo("Queen + Adam Lambert");
+        assertThat(response.nomeCompleto())
+                .isEqualTo("Queen e Adam Lambert");
+        assertThat(response.descricao())
+                .isEqualTo("Projeto musical em atividade.");
+        assertThat(response.fotoPerfilUrl()).isNull();
+        assertThat(artista.getIdArtista()).isEqualTo(1L);
+        assertThat(artista.getNome()).isEqualTo(response.nome());
+        assertThat(artista.getNomeCompleto())
+                .isEqualTo(response.nomeCompleto());
+        assertThat(artista.getDescricao())
+                .isEqualTo(response.descricao());
+        assertThat(artista.getFotoPerfilUrl()).isNull();
+
+        verify(artistaRepository).findById(1L);
+        verify(artistaRepository)
+                .existsByNomeIgnoreCaseAndIdArtistaNot(
+                        "Queen + Adam Lambert",
+                        1L
+                );
+        verify(artistaRepository, never()).save(any(Artista.class));
+    }
+
+    @Test
+    void devePermitirManterOMesmoNome() {
+        Artista artista = montarArtistaExistente();
+        ArtistaRequestDTO request = montarRequestValida();
+
+        when(artistaRepository.findById(1L))
+                .thenReturn(Optional.of(artista));
+        when(artistaRepository
+                .existsByNomeIgnoreCaseAndIdArtistaNot("Queen", 1L))
+                .thenReturn(false);
+
+        ArtistaResponseDTO response = artistaService.atualizarArtista(
+                1L,
+                request
+        );
+
+        assertThat(response.nome()).isEqualTo("Queen");
+        verify(artistaRepository)
+                .existsByNomeIgnoreCaseAndIdArtistaNot("Queen", 1L);
+    }
+
+    @Test
+    void naoDeveAtualizarComNomeDeOutroArtista() {
+        Artista artista = montarArtistaExistente();
+        ArtistaRequestDTO request = new ArtistaRequestDTO(
+                "The Beatles",
+                "The Beatles",
+                "Banda britânica de rock.",
+                null
+        );
+
+        when(artistaRepository.findById(1L))
+                .thenReturn(Optional.of(artista));
+        when(artistaRepository
+                .existsByNomeIgnoreCaseAndIdArtistaNot(
+                        "The Beatles",
+                        1L
+                ))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> artistaService.atualizarArtista(
+                1L,
+                request
+        ))
+                .isInstanceOf(ArtistaDuplicadoException.class)
+                .hasMessage(
+                        "Esse artista já foi cadastrado: The Beatles"
+                );
+
+        assertThat(artista.getNome()).isEqualTo("Queen");
+        assertThat(artista.getNomeCompleto()).isEqualTo("Queen");
+        assertThat(artista.getDescricao())
+                .isEqualTo("Banda britânica de rock.");
+        verify(artistaRepository, never()).save(any(Artista.class));
+    }
+
+    @Test
+    void naoDeveAtualizarArtistaInexistente() {
+        ArtistaRequestDTO request = montarRequestValida();
+
+        when(artistaRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> artistaService.atualizarArtista(
+                99L,
+                request
+        ))
+                .isInstanceOf(ArtistaNaoEncontradoException.class)
+                .hasMessage("Artista não encontrado com o ID: 99");
+
+        verify(artistaRepository, never())
+                .existsByNomeIgnoreCaseAndIdArtistaNot(any(), any());
+        verify(artistaRepository, never()).save(any(Artista.class));
+    }
+
+    @Test
+    void naoDeveAtualizarComRequestNulo() {
+        assertThatThrownBy(() -> artistaService.atualizarArtista(
+                1L,
+                null
+        ))
+                .isInstanceOf(DadosArtistaInvalidosException.class)
+                .hasMessage("Os dados do artista são obrigatórios");
+
+        verify(artistaRepository, never()).findById(any());
+    }
+
+    @Test
+    void naoDeveAtualizarQuandoIdForInvalido() {
+        assertThatThrownBy(() -> artistaService.atualizarArtista(
+                0L,
+                montarRequestValida()
+        ))
+                .isInstanceOf(DadosArtistaInvalidosException.class)
+                .hasMessage("O ID do artista deve ser positivo.");
+
+        verify(artistaRepository, never()).findById(any());
+        verify(artistaRepository, never())
+                .existsByNomeIgnoreCaseAndIdArtistaNot(any(), any());
+    }
+
     private Artista montarArtistaExistente() {
         Artista artista = new Artista(
                 "Queen",
