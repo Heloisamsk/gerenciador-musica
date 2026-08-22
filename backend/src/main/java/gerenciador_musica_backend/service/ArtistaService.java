@@ -68,14 +68,15 @@ public class ArtistaService {
         return artistaRepository
                 .findAll(Sort.by(Sort.Direction.ASC, "nome"))
                 .stream()
-                .map(artista -> new ArtistaResponseDTO(
-                        artista.getIdArtista(),
-                        artista.getNome(),
-                        artista.getNomeCompleto(),
-                        artista.getDescricao(),
-                        artista.getFotoPerfilUrl()
-                ))
+                .map(this::converterParaResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ArtistaResponseDTO buscarPorId(Long idArtista) {
+        Artista artista = obterEntidadePorId(idArtista);
+
+        return converterParaResponse(artista);
     }
 
     private String normalizarCampoObrigatorio(String valor, String nomeDoCampo){
@@ -136,13 +137,18 @@ public class ArtistaService {
 
     @Transactional(readOnly = true)
     public Artista buscarEntidadePorId(Long idArtista) {
-        if (idArtista == null || idArtista == 0) {
+        return obterEntidadePorId(idArtista);
+    }
+
+    private Artista obterEntidadePorId(Long idArtista) {
+        if (idArtista == null || idArtista <= 0) {
             throw new DadosArtistaInvalidosException(
-                    "O ID precisa ser válido."
+                    "O ID do artista deve ser positivo."
             );
         }
 
-        return artistaRepository.findById(idArtista)
+        return artistaRepository
+                .findById(idArtista)
                 .orElseThrow(
                         () -> new ArtistaNaoEncontradoException(idArtista)
                 );
