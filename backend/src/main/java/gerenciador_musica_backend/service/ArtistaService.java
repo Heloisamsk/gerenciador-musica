@@ -35,11 +35,7 @@ public class ArtistaService {
 
     @Transactional
     public ArtistaResponseDTO cadastrarArtista(ArtistaRequestDTO request){
-        if (request == null) {
-            throw new DadosArtistaInvalidosException(
-                    "Os dados do artista são obrigatórios"
-            );
-        }
+        validarRequest(request);
 
 
         String nomeNormalizado = normalizarCampoObrigatorio(
@@ -72,6 +68,41 @@ public class ArtistaService {
 
 
         return converterParaResponse(artistaSalvo);
+    }
+
+    @Transactional
+    public ArtistaResponseDTO atualizarArtista(
+            Long idArtista,
+            ArtistaRequestDTO request
+    ) {
+        validarRequest(request);
+
+        Artista artista = obterEntidadePorId(idArtista);
+
+        String nomeNormalizado = normalizarCampoObrigatorio(
+                request.nome(),
+                "Nome Artístico"
+        );
+        String nomeCompletoNormalizado = normalizarCampoObrigatorio(
+                request.nomeCompleto(),
+                "Nome Completo"
+        );
+        String descricaoNormalizada = normalizarCampoObrigatorio(
+                request.descricao(),
+                "Descrição do Artista"
+        );
+        String fotoPerfilUrlNormalizada = normalizarFotoPerfilUrl(
+                request.fotoPerfilUrl()
+        );
+
+        verificarDuplicidade(nomeNormalizado, idArtista);
+
+        artista.setNome(nomeNormalizado);
+        artista.setNomeCompleto(nomeCompletoNormalizado);
+        artista.setDescricao(descricaoNormalizada);
+        artista.setFotoPerfilUrl(fotoPerfilUrlNormalizada);
+
+        return converterParaResponse(artista);
     }
 
     @Transactional(readOnly = true)
@@ -129,9 +160,37 @@ public class ArtistaService {
                 nome
         );
 
+        validarDuplicidade(artistaJaExiste, nome);
+    }
+
+    private void verificarDuplicidade(
+            String nome,
+            Long idArtista
+    ) {
+        boolean artistaJaExiste = artistaRepository
+                .existsByNomeIgnoreCaseAndIdArtistaNot(
+                        nome,
+                        idArtista
+                );
+
+        validarDuplicidade(artistaJaExiste, nome);
+    }
+
+    private void validarDuplicidade(
+            boolean artistaJaExiste,
+            String nome
+    ) {
         if (artistaJaExiste) {
             throw new ArtistaDuplicadoException(
                     "Esse artista já foi cadastrado: " + nome
+            );
+        }
+    }
+
+    private void validarRequest(ArtistaRequestDTO request) {
+        if (request == null) {
+            throw new DadosArtistaInvalidosException(
+                    "Os dados do artista são obrigatórios"
             );
         }
     }

@@ -37,6 +37,16 @@ public class AdminArtistaController {
                 .body(response);
     }
 
+    @PutMapping("/{idArtista}")
+    public ResponseEntity<ArtistaResponseDTO> atualizar(
+            @PathVariable("idArtista") Long idArtista,
+            @Valid @RequestBody ArtistaRequestDTO request
+    ) {
+        return ResponseEntity.ok(
+                artistaService.atualizarArtista(idArtista, request)
+        );
+    }
+
     @DeleteMapping("/{idArtista}")
     public ResponseEntity<Void> excluir(
             @PathVariable("idArtista") Long idArtista
