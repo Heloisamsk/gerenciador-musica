@@ -273,6 +273,22 @@ public class GlobalExceptionHandler {
     }
 
     /*
+     * 409 - Artista possui álbuns ou músicas associados.
+     */
+    @ExceptionHandler(ArtistaEmUsoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarArtistaEmUso(
+            ArtistaEmUsoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
+    /*
      * 400 - Dados da artista inválidos segundo
      * as regras de negócio do ArtistaService.
      */

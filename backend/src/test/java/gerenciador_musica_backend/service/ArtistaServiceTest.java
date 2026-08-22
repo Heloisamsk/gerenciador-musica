@@ -3,10 +3,13 @@ package gerenciador_musica_backend.service;
 import gerenciador_musica_backend.dto.ArtistaRequestDTO;
 import gerenciador_musica_backend.dto.ArtistaResponseDTO;
 import gerenciador_musica_backend.exception.ArtistaDuplicadoException;
+import gerenciador_musica_backend.exception.ArtistaEmUsoException;
 import gerenciador_musica_backend.exception.ArtistaNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosArtistaInvalidosException;
 import gerenciador_musica_backend.model.Artista;
+import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
+import gerenciador_musica_backend.repository.MusicaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +34,12 @@ class ArtistaServiceTest {
 
     @Mock
     private ArtistaRepository artistaRepository;
+
+    @Mock
+    private AlbumRepository albumRepository;
+
+    @Mock
+    private MusicaRepository musicaRepository;
 
     @InjectMocks
     private ArtistaService artistaService;
@@ -269,5 +278,147 @@ class ArtistaServiceTest {
                 .hasMessage("O ID do artista deve ser positivo.");
 
         verify(artistaRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveExcluirArtistaSemDependencias() {
+        Artista artista = montarArtistaExistente();
+
+        when(artistaRepository.findById(1L))
+                .thenReturn(Optional.of(artista));
+        when(albumRepository.existsByArtista_IdArtista(1L))
+                .thenReturn(false);
+        when(musicaRepository
+                .existsByArtistaPrincipal_IdArtista(1L))
+                .thenReturn(false);
+        when(musicaRepository
+                .existsByArtistasParticipantes_IdArtista(1L))
+                .thenReturn(false);
+
+        artistaService.excluirArtista(1L);
+
+        verify(albumRepository).existsByArtista_IdArtista(1L);
+        verify(musicaRepository)
+                .existsByArtistaPrincipal_IdArtista(1L);
+        verify(musicaRepository)
+                .existsByArtistasParticipantes_IdArtista(1L);
+        verify(artistaRepository).delete(artista);
+    }
+
+    @Test
+    void naoDeveExcluirArtistaComAlbum() {
+        Artista artista = montarArtistaExistente();
+
+        when(artistaRepository.findById(1L))
+                .thenReturn(Optional.of(artista));
+        when(albumRepository.existsByArtista_IdArtista(1L))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> artistaService.excluirArtista(1L))
+                .isInstanceOf(ArtistaEmUsoException.class)
+                .hasMessage(
+                        "Não é possível excluir o artista porque "
+                                + "ele possui álbuns associados."
+                );
+
+        verify(artistaRepository, never()).delete(any(Artista.class));
+        verify(musicaRepository, never())
+                .existsByArtistaPrincipal_IdArtista(any());
+        verify(musicaRepository, never())
+                .existsByArtistasParticipantes_IdArtista(any());
+    }
+
+    @Test
+    void naoDeveExcluirArtistaPrincipalDeMusica() {
+        Artista artista = montarArtistaExistente();
+
+        when(artistaRepository.findById(1L))
+                .thenReturn(Optional.of(artista));
+        when(albumRepository.existsByArtista_IdArtista(1L))
+                .thenReturn(false);
+        when(musicaRepository
+                .existsByArtistaPrincipal_IdArtista(1L))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> artistaService.excluirArtista(1L))
+                .isInstanceOf(ArtistaEmUsoException.class)
+                .hasMessage(
+                        "Não é possível excluir o artista porque ele é "
+                                + "o artista principal de uma ou mais músicas."
+                );
+
+        verify(artistaRepository, never()).delete(any(Artista.class));
+        verify(musicaRepository, never())
+                .existsByArtistasParticipantes_IdArtista(any());
+    }
+
+    @Test
+    void naoDeveExcluirArtistaParticipanteDeMusica() {
+        Artista artista = montarArtistaExistente();
+
+        when(artistaRepository.findById(1L))
+                .thenReturn(Optional.of(artista));
+        when(albumRepository.existsByArtista_IdArtista(1L))
+                .thenReturn(false);
+        when(musicaRepository
+                .existsByArtistaPrincipal_IdArtista(1L))
+                .thenReturn(false);
+        when(musicaRepository
+                .existsByArtistasParticipantes_IdArtista(1L))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> artistaService.excluirArtista(1L))
+                .isInstanceOf(ArtistaEmUsoException.class)
+                .hasMessage(
+                        "Não é possível excluir o artista porque ele "
+                                + "participa de uma ou mais músicas."
+                );
+
+        verify(artistaRepository, never()).delete(any(Artista.class));
+    }
+
+    @Test
+    void naoDeveExcluirArtistaInexistente() {
+        when(artistaRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> artistaService.excluirArtista(99L))
+                .isInstanceOf(ArtistaNaoEncontradoException.class)
+                .hasMessage("Artista não encontrado com o ID: 99");
+
+        verify(albumRepository, never())
+                .existsByArtista_IdArtista(any());
+        verify(musicaRepository, never())
+                .existsByArtistaPrincipal_IdArtista(any());
+        verify(musicaRepository, never())
+                .existsByArtistasParticipantes_IdArtista(any());
+        verify(artistaRepository, never()).delete(any(Artista.class));
+    }
+
+    @Test
+    void naoDeveConsultarRepositoriosQuandoIdDaExclusaoForInvalido() {
+        assertThatThrownBy(() -> artistaService.excluirArtista(0L))
+                .isInstanceOf(DadosArtistaInvalidosException.class)
+                .hasMessage("O ID do artista deve ser positivo.");
+
+        verify(artistaRepository, never()).findById(any());
+        verify(albumRepository, never())
+                .existsByArtista_IdArtista(any());
+        verify(musicaRepository, never())
+                .existsByArtistaPrincipal_IdArtista(any());
+        verify(musicaRepository, never())
+                .existsByArtistasParticipantes_IdArtista(any());
+    }
+
+    private Artista montarArtistaExistente() {
+        Artista artista = new Artista(
+                "Queen",
+                "Queen",
+                "Banda britânica de rock.",
+                null
+        );
+        artista.setIdArtista(1L);
+
+        return artista;
     }
 }

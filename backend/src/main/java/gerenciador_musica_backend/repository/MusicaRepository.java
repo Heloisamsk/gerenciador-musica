@@ -6,7 +6,13 @@ import gerenciador_musica_backend.model.Musica;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface MusicaRepository extends JpaRepository<Musica, Long>, JpaSpecificationExecutor<Musica> {
+public interface MusicaRepository
+        extends JpaRepository<Musica, Long>,
+        JpaSpecificationExecutor<Musica> {
+
+    boolean existsByArtistaPrincipal_IdArtista(Long idArtista);
+
+    boolean existsByArtistasParticipantes_IdArtista(Long idArtista);
 
     boolean existsByAlbumAndTituloIgnoreCase(
             Album album,

@@ -36,4 +36,13 @@ public class AdminArtistaController {
                 .created(location)
                 .body(response);
     }
+
+    @DeleteMapping("/{idArtista}")
+    public ResponseEntity<Void> excluir(
+            @PathVariable("idArtista") Long idArtista
+    ) {
+        artistaService.excluirArtista(idArtista);
+
+        return ResponseEntity.noContent().build();
+    }
 }
