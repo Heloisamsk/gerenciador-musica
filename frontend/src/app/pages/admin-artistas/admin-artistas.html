@@ -1,9 +1,133 @@
-<main aria-labelledby="titulo-administracao-artistas">
-  <h1 id="titulo-administracao-artistas">
-    Administração de artistas
-  </h1>
+<main class="artistas-page">
+  <section
+    class="artistas-container"
+    aria-labelledby="titulo-administracao-artistas"
+  >
+    <a class="voltar-link" routerLink="/admin/painel">
+      ← Voltar para o painel
+    </a>
 
-  <p>
-    A listagem de artistas será disponibilizada nesta página.
-  </p>
+    <header class="artistas-header">
+      <div>
+        <p class="section-label">Painel administrativo</p>
+
+        <h1 id="titulo-administracao-artistas">
+          Artistas
+        </h1>
+
+        <p>Consulte e gerencie os artistas do catálogo.</p>
+      </div>
+
+      <div class="header-actions">
+        <a
+          class="primary-link"
+          routerLink="/admin/banco/artistas/novo"
+        >
+          Cadastrar artista
+        </a>
+
+        <button
+          class="secondary-button"
+          type="button"
+          [disabled]="carregando()"
+          (click)="carregarArtistas()"
+        >
+          Atualizar lista
+        </button>
+      </div>
+    </header>
+
+    @if (mensagemSucesso()) {
+      <output
+        class="feedback success-feedback"
+        aria-live="polite"
+      >
+        {{ mensagemSucesso() }}
+      </output>
+    }
+
+    @if (carregando()) {
+      <output
+        class="state-card"
+        aria-live="polite"
+      >
+        Carregando artistas...
+      </output>
+    } @else if (mensagemErro()) {
+      <div class="state-card error-card" role="alert">
+        <h2>Não foi possível carregar a listagem</h2>
+        <p>{{ mensagemErro() }}</p>
+
+        <button
+          class="primary-button"
+          type="button"
+          (click)="carregarArtistas()"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    } @else {
+      <p class="total-artistas" aria-live="polite">
+        Total de artistas:
+        <strong>{{ artistas().length }}</strong>
+      </p>
+
+      @if (artistas().length === 0) {
+        <output
+          class="state-card"
+          aria-live="polite"
+        >
+          <strong>Nenhum artista encontrado</strong>
+          <span>Ainda não existem artistas cadastrados.</span>
+        </output>
+      } @else {
+        <ul class="artistas-grid" aria-label="Artistas cadastrados">
+          @for (artista of artistas(); track artista.idArtista) {
+            <li>
+              <article
+                class="artista-card"
+                [attr.aria-labelledby]="'artista-' + artista.idArtista"
+              >
+                <img
+                  class="artista-foto"
+                  [src]="artista.fotoPerfilUrl || imagemAlternativa"
+                  [alt]="'Foto de ' + artista.nome"
+                  width="112"
+                  height="112"
+                  loading="lazy"
+                  (error)="usarImagemAlternativa($event)"
+                >
+
+                <div class="artista-info">
+                  <h2 [id]="'artista-' + artista.idArtista">
+                    {{ artista.nome }}
+                  </h2>
+
+                  <p class="nome-completo">
+                    {{ artista.nomeCompleto }}
+                  </p>
+
+                  <p class="descricao">
+                    {{ artista.descricao }}
+                  </p>
+                </div>
+
+                <a
+                  class="edit-link"
+                  [routerLink]="[
+                    '/admin/banco/artistas',
+                    artista.idArtista,
+                    'editar'
+                  ]"
+                  [attr.aria-label]="'Editar ' + artista.nome"
+                >
+                  Editar
+                </a>
+              </article>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
 </main>

@@ -137,6 +137,21 @@ describe('FormularioArtista', () => {
       .toContain('Salvar alterações');
   });
 
+  it('deve emitir o cancelamento quando a ação estiver disponível', () => {
+    const cancelar = vi.fn();
+    component.cancelar.subscribe(cancelar);
+    fixture.componentRef.setInput('exibirCancelar', true);
+    fixture.detectChanges();
+
+    const botaoCancelar = (
+      fixture.nativeElement as HTMLElement
+    ).querySelector<HTMLButtonElement>('.cancelar-btn');
+    botaoCancelar?.click();
+
+    expect(botaoCancelar?.textContent).toContain('Cancelar');
+    expect(cancelar).toHaveBeenCalledOnce();
+  });
+
   it('deve exibir mensagens acessíveis de sucesso, erro e carregamento', () => {
     fixture.componentRef.setInput(
       'mensagemSucesso',

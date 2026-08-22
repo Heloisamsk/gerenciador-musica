@@ -52,8 +52,10 @@ export class FormularioArtista {
   readonly carregando = input(false);
   readonly mensagemSucesso = input('');
   readonly mensagemErro = input('');
+  readonly exibirCancelar = input(false);
 
   readonly enviar = output<ArtistaRequest>();
+  readonly cancelar = output<void>();
 
   readonly titulo = computed(() =>
     this.modo() === 'edicao'

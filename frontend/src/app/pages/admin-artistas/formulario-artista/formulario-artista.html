@@ -192,20 +192,32 @@
         </small>
       </div>
 
-      <button
-        type="submit"
-        class="formulario-btn"
-        [disabled]="formulario.invalid || carregando()"
-        [attr.aria-busy]="carregando()"
-      >
-        <span *ngIf="!carregando()">
-          {{ textoBotao() }}
-        </span>
+      <div class="formulario-acoes">
+        <button
+          *ngIf="exibirCancelar()"
+          type="button"
+          class="cancelar-btn"
+          [disabled]="carregando()"
+          (click)="cancelar.emit()"
+        >
+          Cancelar
+        </button>
 
-        <span *ngIf="carregando()">
-          {{ textoCarregamento() }}
-        </span>
-      </button>
+        <button
+          type="submit"
+          class="formulario-btn"
+          [disabled]="formulario.invalid || carregando()"
+          [attr.aria-busy]="carregando()"
+        >
+          <span *ngIf="!carregando()">
+            {{ textoBotao() }}
+          </span>
+
+          <span *ngIf="carregando()">
+            {{ textoCarregamento() }}
+          </span>
+        </button>
+      </div>
     </form>
   </div>
 </div>

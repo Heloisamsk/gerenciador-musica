@@ -1,0 +1,67 @@
+:host {
+  display: block;
+}
+
+.edicao-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 2rem;
+  color: #ffffff;
+  background-color: #121212;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.edicao-state {
+  display: flex;
+  width: min(100%, 560px);
+  min-height: 15rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  color: #b3b3b3;
+  text-align: center;
+  background-color: #181818;
+  border: 1px solid #343434;
+  border-radius: 0.75rem;
+}
+
+.edicao-state h1,
+.edicao-state p {
+  margin: 0;
+}
+
+.error-state {
+  color: #ff8f8f;
+  border-color: #7a3535;
+}
+
+.error-state a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  padding: 0.7rem 1.2rem;
+  color: #121212;
+  background-color: #1ed760;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.error-state a:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .edicao-page {
+    align-items: start;
+    padding: 1rem;
+  }
+
+  .edicao-state {
+    padding: 1.5rem;
+  }
+}

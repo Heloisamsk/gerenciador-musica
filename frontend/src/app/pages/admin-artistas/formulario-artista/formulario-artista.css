@@ -100,22 +100,37 @@
   font-size: 0.8rem;
 }
 
-.formulario-btn {
-  width: 100%;
+.formulario-acoes {
+  display: flex;
+  gap: 0.75rem;
   margin-top: 0.9rem;
+}
+
+.formulario-btn,
+.cancelar-btn {
+  flex: 1;
   padding: 0.875rem;
-  color: #000000;
-  background-color: #1db954;
-  border: none;
   border-radius: 500px;
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
+}
+
+.formulario-btn {
+  color: #000000;
+  background-color: #1db954;
+  border: 1px solid #1db954;
   transition:
     background-color 0.2s,
     transform 0.2s;
+}
+
+.cancelar-btn {
+  color: #ffffff;
+  background-color: transparent;
+  border: 1px solid #727272;
 }
 
 .formulario-btn:hover:not(:disabled) {
@@ -123,12 +138,14 @@
   transform: scale(1.01);
 }
 
-.formulario-btn:focus-visible {
+.formulario-btn:focus-visible,
+.cancelar-btn:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 3px;
 }
 
-.formulario-btn:disabled {
+.formulario-btn:disabled,
+.cancelar-btn:disabled {
   color: #c7c7c7;
   background-color: #535353;
   cursor: not-allowed;
@@ -182,5 +199,9 @@
 
   .formulario-title {
     font-size: 1.5rem;
+  }
+
+  .formulario-acoes {
+    flex-direction: column-reverse;
   }
 }

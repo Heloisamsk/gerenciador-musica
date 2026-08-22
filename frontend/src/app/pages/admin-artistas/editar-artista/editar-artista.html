@@ -1,8 +1,32 @@
-<app-formulario-artista
-  modo="edicao"
-  [dadosIniciais]="dadosIniciais()"
-  [carregando]="carregando()"
-  [mensagemSucesso]="mensagemSucesso()"
-  [mensagemErro]="mensagemErro()"
-  (enviar)="salvar.emit($event)"
-/>
+@if (carregandoDados()) {
+  <main class="edicao-page">
+    <output
+      class="edicao-state"
+      aria-live="polite"
+    >
+      Carregando dados do artista...
+    </output>
+  </main>
+} @else if (!dadosIniciais()) {
+  <main class="edicao-page">
+    <section class="edicao-state error-state" role="alert">
+      <h1>Não foi possível editar o artista</h1>
+      <p>{{ mensagemErro() }}</p>
+
+      <a routerLink="/admin/banco/artistas">
+        Voltar para a listagem
+      </a>
+    </section>
+  </main>
+} @else {
+  <app-formulario-artista
+    modo="edicao"
+    [dadosIniciais]="dadosIniciais()"
+    [carregando]="salvando()"
+    [mensagemSucesso]="mensagemSucesso()"
+    [mensagemErro]="mensagemErro()"
+    [exibirCancelar]="true"
+    (enviar)="salvar($event)"
+    (cancelar)="cancelar()"
+  />
+}
