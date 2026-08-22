@@ -13,7 +13,7 @@
 .artistas-page {
   min-height: 100vh;
   padding: 2rem;
-  background: radial-gradient(circle at top, #1d3325, #0f0f0f 32rem);
+  background-color: #0f0f0f;
 }
 
 .artistas-container {
