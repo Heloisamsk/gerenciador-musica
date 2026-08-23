@@ -20,20 +20,21 @@ describe('AdminPainel', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('deve exibir as seis opções administrativas', () => {
+  it('deve exibir as sete opções administrativas', () => {
     const elemento = fixture.nativeElement as HTMLElement;
     const opcoes = Array.from(
       elemento.querySelectorAll<HTMLAnchorElement>('.acao-card')
     );
 
-    expect(opcoes).toHaveLength(6);
+    expect(opcoes).toHaveLength(7);
     expect(opcoes.map(opcao => opcao.textContent?.trim())).toEqual([
       expect.stringContaining('Cadastrar música'),
       expect.stringContaining('Cadastrar artista'),
       expect.stringContaining('Cadastrar álbum'),
       expect.stringContaining('Listar músicas'),
       expect.stringContaining('Listar usuários'),
-      expect.stringContaining('Listar artistas')
+      expect.stringContaining('Listar artistas'),
+      expect.stringContaining('Listar álbuns')
     ]);
   });
 
@@ -49,7 +50,8 @@ describe('AdminPainel', () => {
       '/admin/banco/albuns/novo',
       '/admin/banco/musicas',
       '/admin/banco/usuarios',
-      '/admin/banco/artistas'
+      '/admin/banco/artistas',
+      '/admin/banco/albuns'
     ]);
   });
 });

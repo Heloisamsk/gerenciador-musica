@@ -1,9 +1,116 @@
-<main aria-labelledby="titulo-administracao-albuns">
-  <h1 id="titulo-administracao-albuns">
-    Administração de álbuns
-  </h1>
+<main class="albuns-page">
+  <section
+    class="albuns-container"
+    aria-labelledby="titulo-administracao-albuns"
+  >
+    <a class="voltar-link" routerLink="/admin/painel">
+      ← Voltar para o painel
+    </a>
 
-  <p>
-    A listagem de álbuns será disponibilizada nesta página.
-  </p>
+    <header class="albuns-header">
+      <div>
+        <p class="section-label">Painel administrativo</p>
+
+        <h1 id="titulo-administracao-albuns">
+          Álbuns
+        </h1>
+
+        <p>Consulte os álbuns cadastrados no catálogo.</p>
+      </div>
+
+      <div class="header-actions">
+        <a
+          class="primary-link"
+          routerLink="/admin/banco/albuns/novo"
+        >
+          Cadastrar álbum
+        </a>
+
+        <button
+          class="secondary-button"
+          type="button"
+          [disabled]="carregando()"
+          (click)="carregarAlbuns()"
+        >
+          Atualizar lista
+        </button>
+      </div>
+    </header>
+
+    @if (mensagemSucesso()) {
+      <output
+        class="feedback success-feedback"
+        aria-live="polite"
+      >
+        {{ mensagemSucesso() }}
+      </output>
+    }
+
+    @if (carregando()) {
+      <output class="state-card" aria-live="polite">
+        Carregando álbuns...
+      </output>
+    } @else if (mensagemErro()) {
+      <div class="state-card error-card" role="alert">
+        <h2>Não foi possível carregar a listagem</h2>
+        <p>{{ mensagemErro() }}</p>
+
+        <button
+          class="primary-button"
+          type="button"
+          (click)="carregarAlbuns()"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    } @else {
+      <p class="total-albuns" aria-live="polite">
+        Total de álbuns:
+        <strong>{{ albuns().length }}</strong>
+      </p>
+
+      @if (albuns().length === 0) {
+        <output class="state-card" aria-live="polite">
+          <strong>Nenhum álbum encontrado</strong>
+          <span>Ainda não existem álbuns cadastrados.</span>
+        </output>
+      } @else {
+        <ul class="albuns-grid" aria-label="Álbuns cadastrados">
+          @for (album of albuns(); track album.idAlbum) {
+            <li>
+              <article
+                class="album-card"
+                [attr.aria-labelledby]="'album-' + album.idAlbum"
+              >
+                <img
+                  class="album-capa"
+                  [src]="album.capaUrl || capaAlternativa"
+                  [alt]="'Capa do álbum ' + album.titulo"
+                  width="144"
+                  height="144"
+                  loading="lazy"
+                  (error)="usarCapaAlternativa($event)"
+                >
+
+                <div class="album-info">
+                  <h2 [id]="'album-' + album.idAlbum">
+                    {{ album.titulo }}
+                  </h2>
+
+                  <p class="album-artista">
+                    <span>Artista</span>
+                    <strong>{{ album.artista.nome }}</strong>
+                  </p>
+
+                  <p class="album-ano">
+                    Lançamento: {{ album.anoLancamento }}
+                  </p>
+                </div>
+              </article>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
 </main>
