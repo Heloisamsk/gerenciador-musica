@@ -1,0 +1,251 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #ffffff;
+  background-color: #0f0f0f;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:host * {
+  box-sizing: border-box;
+}
+
+.albuns-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #0f0f0f;
+}
+
+.albuns-container {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+}
+
+.voltar-link {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: #b3b3b3;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.voltar-link:hover,
+.voltar-link:focus-visible {
+  color: #1ed760;
+}
+
+.albuns-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 1.75rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid #343434;
+}
+
+.section-label {
+  margin: 0 0 0.5rem;
+  color: #1ed760;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+}
+
+.albuns-header h1 {
+  margin: 0;
+  font-size: clamp(2.25rem, 6vw, 4rem);
+}
+
+.albuns-header p:last-child {
+  margin: 0.75rem 0 0;
+  color: #b3b3b3;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.primary-link,
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary-link,
+.primary-button {
+  color: #121212;
+  background-color: #1ed760;
+  border: 1px solid #1ed760;
+}
+
+.secondary-button {
+  color: #ffffff;
+  background-color: transparent;
+  border: 1px solid #727272;
+}
+
+.secondary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary-link:focus-visible,
+.primary-button:focus-visible,
+.secondary-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.feedback {
+  display: block;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 0.75rem;
+}
+
+.success-feedback {
+  color: #8ff0b1;
+  background-color: #193021;
+  border: 1px solid #1db954;
+}
+
+.state-card {
+  display: flex;
+  min-height: 15rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  color: #b3b3b3;
+  text-align: center;
+  background-color: #181818;
+  border: 1px solid #343434;
+  border-radius: 1rem;
+}
+
+.state-card h2,
+.state-card p {
+  margin: 0;
+}
+
+.error-card {
+  color: #ff8f8f;
+  border-color: #7a3535;
+}
+
+.total-albuns {
+  margin: 0 0 1rem;
+  color: #b3b3b3;
+}
+
+.total-albuns strong {
+  color: #ffffff;
+}
+
+.albuns-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.album-card {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: 1.25rem;
+  height: 100%;
+  padding: 1.25rem;
+  background-color: #181818;
+  border: 1px solid #343434;
+  border-radius: 1rem;
+}
+
+.album-capa {
+  width: 9rem;
+  height: 9rem;
+  object-fit: cover;
+  background-color: #282828;
+  border-radius: 0.75rem;
+}
+
+.album-info {
+  min-width: 0;
+}
+
+.album-info h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  overflow-wrap: anywhere;
+}
+
+.album-artista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 1rem 0 0;
+}
+
+.album-artista span,
+.album-ano {
+  color: #b3b3b3;
+}
+
+.album-artista strong {
+  color: #ffffff;
+  overflow-wrap: anywhere;
+}
+
+.album-ano {
+  margin: 0.75rem 0 0;
+}
+
+@media (max-width: 860px) {
+  .albuns-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .albuns-page {
+    padding: 1.25rem;
+  }
+
+  .albuns-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .header-actions,
+  .primary-link,
+  .secondary-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .album-card {
+    grid-template-columns: 5rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .album-capa {
+    width: 5rem;
+    height: 5rem;
+  }
+}
