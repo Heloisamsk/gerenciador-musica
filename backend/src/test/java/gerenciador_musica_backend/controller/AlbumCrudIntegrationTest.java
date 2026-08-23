@@ -92,6 +92,7 @@ class AlbumCrudIntegrationTest {
         assertThat(cadastrado.idAlbum()).isNotNull();
         assertThat(buscarAlbum(cadastrado.idAlbum()))
                 .isEqualTo(cadastrado);
+        assertThat(listarAlbuns()).contains(cadastrado);
 
         AlbumResponseDTO atualizado = atualizarAlbum(
                 cadastrado.idAlbum(),
@@ -111,9 +112,11 @@ class AlbumCrudIntegrationTest {
         ));
         assertThat(buscarAlbum(cadastrado.idAlbum()))
                 .isEqualTo(atualizado);
+        assertThat(listarAlbuns()).contains(atualizado);
 
         excluirAlbum(cadastrado.idAlbum());
         verificarAlbumInexistente(cadastrado.idAlbum());
+        assertThat(listarAlbuns()).doesNotContain(atualizado);
         assertThat(artistaRepository.existsById(
                 artista.getIdArtista()
         )).isTrue();
@@ -220,6 +223,20 @@ class AlbumCrudIntegrationTest {
         return objectMapper.readValue(
                 responseJson,
                 AlbumResponseDTO.class
+        );
+    }
+
+    private AlbumResponseDTO[] listarAlbuns() throws Exception {
+        String responseJson = mockMvc.perform(get("/api/albuns")
+                        .header("Authorization", tokenAutorizacao()))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        return objectMapper.readValue(
+                responseJson,
+                AlbumResponseDTO[].class
         );
     }
 

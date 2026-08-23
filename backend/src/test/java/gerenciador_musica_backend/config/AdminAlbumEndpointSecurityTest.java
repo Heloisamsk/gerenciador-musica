@@ -2,6 +2,7 @@ package gerenciador_musica_backend.config;
 
 import gerenciador_musica_backend.controller.AdminAlbumController;
 import gerenciador_musica_backend.dto.AlbumAtualizacaoRequestDTO;
+import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.dto.ArtistaResumoDTO;
 import gerenciador_musica_backend.repository.UsuarioRepository;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +38,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "app.cors.allowed-origins=http://localhost:4200"
 )
 class AdminAlbumEndpointSecurityTest {
+
+    private static final String REQUEST_CADASTRO = """
+            {
+                "titulo": "A Night at the Opera",
+                "idArtista": 1,
+                "anoLancamento": 1975,
+                "capaUrl": null
+            }
+            """;
 
     private static final String REQUEST_ATUALIZACAO = """
             {
@@ -56,6 +67,49 @@ class AdminAlbumEndpointSecurityTest {
 
     @MockitoBean
     private UsuarioRepository usuarioRepository;
+
+    @Test
+    void deveRetornar401AoCadastrarSemAutenticacao() throws Exception {
+        mockMvc.perform(post("/api/admin/albuns")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(REQUEST_CADASTRO))
+                .andExpect(status().isUnauthorized());
+
+        verify(albumService, never()).cadastrarAlbum(
+                any(AlbumRequestDTO.class)
+        );
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void deveRetornar403AoCadastrarComoUsuarioComum()
+            throws Exception {
+        mockMvc.perform(post("/api/admin/albuns")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(REQUEST_CADASTRO))
+                .andExpect(status().isForbidden());
+
+        verify(albumService, never()).cadastrarAlbum(
+                any(AlbumRequestDTO.class)
+        );
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void devePermitirCadastroParaAdministrador() throws Exception {
+        when(albumService.cadastrarAlbum(
+                any(AlbumRequestDTO.class)
+        )).thenReturn(montarResposta());
+
+        mockMvc.perform(post("/api/admin/albuns")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(REQUEST_CADASTRO))
+                .andExpect(status().isCreated());
+
+        verify(albumService).cadastrarAlbum(
+                any(AlbumRequestDTO.class)
+        );
+    }
 
     @Test
     void deveRetornar401AoAtualizarSemAutenticacao() throws Exception {
