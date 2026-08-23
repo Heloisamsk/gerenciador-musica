@@ -1,14 +1,17 @@
 package gerenciador_musica_backend.service;
 
+import gerenciador_musica_backend.dto.AlbumAtualizacaoRequestDTO;
 import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.dto.ArtistaResumoDTO;
 import gerenciador_musica_backend.exception.AlbumDuplicadoException;
+import gerenciador_musica_backend.exception.AlbumEmUsoException;
 import gerenciador_musica_backend.exception.AlbumNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosAlbumInvalidosException;
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
+import gerenciador_musica_backend.repository.MusicaRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +27,16 @@ public class AlbumService {
 
     private final AlbumRepository albumRepository;
     private final ArtistaService artistaService;
+    private final MusicaRepository musicaRepository;
 
     public AlbumService(
             AlbumRepository albumRepository,
-            ArtistaService artistaService
+            ArtistaService artistaService,
+            MusicaRepository musicaRepository
     ) {
         this.albumRepository = albumRepository;
         this.artistaService = artistaService;
+        this.musicaRepository = musicaRepository;
     }
 
     @Transactional
@@ -68,6 +74,37 @@ public class AlbumService {
         Album albumSalvo = albumRepository.save(album);
 
         return converterParaResponse(albumSalvo);
+    }
+
+    @Transactional
+    public AlbumResponseDTO atualizarAlbum(
+            Long idAlbum,
+            AlbumAtualizacaoRequestDTO request
+    ) {
+        validarRequestAtualizacao(request);
+
+        Album album = obterEntidadePorId(idAlbum);
+
+        String tituloNormalizado = normalizarCampoObrigatorio(
+                request.titulo(),
+                "O título do álbum"
+        );
+        String capaUrlNormalizada = normalizarCampoOpcional(
+                request.capaUrl()
+        );
+
+        verificarDuplicidade(
+                tituloNormalizado,
+                album.getArtista().getIdArtista(),
+                request.anoLancamento(),
+                idAlbum
+        );
+
+        album.setTitulo(tituloNormalizado);
+        album.setAnoLancamento(request.anoLancamento());
+        album.setCapaUrl(capaUrlNormalizada);
+
+        return converterParaResponse(album);
     }
 
     @Transactional(readOnly = true)
@@ -114,6 +151,24 @@ public class AlbumService {
     @Transactional(readOnly = true)
     public Album buscarEntidadePorId(Long idAlbum) {
         return obterEntidadePorId(idAlbum);
+    }
+
+    @Transactional
+    public void excluirAlbum(Long idAlbum) {
+        Album album = obterEntidadePorId(idAlbum);
+
+        if (musicaRepository.existsByAlbum_IdAlbum(idAlbum)) {
+            throw new AlbumEmUsoException(
+                    "Não é possível excluir o álbum porque "
+                            + "ele possui músicas associadas."
+            );
+        }
+
+        /*
+         * A FK perfil.id_album_destaque usa ON DELETE SET NULL.
+         * O artista não recebe cascata e permanece cadastrado.
+         */
+        albumRepository.delete(album);
     }
 
     @Transactional(readOnly = true)
@@ -184,8 +239,22 @@ public class AlbumService {
                 "O ID do artista deve ser válido."
         );
 
-        Short anoLancamento = request.anoLancamento();
+        validarAnoLancamento(request.anoLancamento());
+    }
 
+    private void validarRequestAtualizacao(
+            AlbumAtualizacaoRequestDTO request
+    ) {
+        if (request == null) {
+            throw new DadosAlbumInvalidosException(
+                    "Os dados do álbum são obrigatórios."
+            );
+        }
+
+        validarAnoLancamento(request.anoLancamento());
+    }
+
+    private void validarAnoLancamento(Short anoLancamento) {
         if (anoLancamento == null
                 || anoLancamento < ANO_MINIMO
                 || anoLancamento > ANO_MAXIMO) {
@@ -207,15 +276,42 @@ public class AlbumService {
                         anoLancamento
                 );
 
-        if (albumJaExiste) {
-            throw new AlbumDuplicadoException(
-                    "Já existe um álbum com o título '"
-                            + titulo
-                            + "' para esse artista no ano de "
-                            + anoLancamento
-                            + "."
-            );
+        validarDuplicidade(albumJaExiste, titulo, anoLancamento);
+    }
+
+    private void verificarDuplicidade(
+            String titulo,
+            Long idArtista,
+            Short anoLancamento,
+            Long idAlbum
+    ) {
+        boolean albumJaExiste = albumRepository
+                .existsByTituloIgnoreCaseAndArtistaIdArtistaAndAnoLancamentoAndIdAlbumNot(
+                        titulo,
+                        idArtista,
+                        anoLancamento,
+                        idAlbum
+                );
+
+        validarDuplicidade(albumJaExiste, titulo, anoLancamento);
+    }
+
+    private void validarDuplicidade(
+            boolean albumJaExiste,
+            String titulo,
+            Short anoLancamento
+    ) {
+        if (!albumJaExiste) {
+            return;
         }
+
+        throw new AlbumDuplicadoException(
+                "Já existe um álbum com o título '"
+                        + titulo
+                        + "' para esse artista no ano de "
+                        + anoLancamento
+                        + "."
+        );
     }
 
     private void validarIdPositivo(

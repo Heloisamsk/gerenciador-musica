@@ -350,6 +350,19 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(AlbumEmUsoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarAlbumEmUso(
+            AlbumEmUsoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
     @ExceptionHandler(DadosAlbumInvalidosException.class)
     public ResponseEntity<ErrorResponseDTO> tratarDadosAlbumInvalidos(
             DadosAlbumInvalidosException exception,
