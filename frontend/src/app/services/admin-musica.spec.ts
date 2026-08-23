@@ -8,6 +8,7 @@ import {
 import { AdminMusicaService } from './admin-musica';
 import { MusicaListagem } from '../models/MusicaListagem';
 import { MusicaRequest } from '../models/MusicaRequest';
+import { MusicaResponse } from '../models/MusicaResponse';
 
 describe('AdminMusicaService', () => {
   let service: AdminMusicaService;
@@ -16,6 +17,38 @@ describe('AdminMusicaService', () => {
   const apiUrl = 'http://localhost:8080/api/musicas';
   const apiAdminUrl =
     'http://localhost:8080/api/admin/musicas';
+
+  function musicaDetalhadaDeExemplo(): MusicaResponse {
+    return {
+      id: 7,
+      titulo: 'Música de teste',
+      letra: 'Texto de teste.',
+      duracaoSegundos: 210,
+      anoLancamento: 2026,
+      artistaPrincipal: {
+        id: 2,
+        nome: 'Artista principal'
+      },
+      album: {
+        id: 3,
+        titulo: 'Álbum de teste',
+        anoLancamento: 2026,
+        capaUrl: null
+      },
+      artistasParticipantes: [
+        {
+          id: 4,
+          nome: 'Artista participante'
+        }
+      ],
+      generos: [
+        {
+          id: 5,
+          nome: 'Gênero de teste'
+        }
+      ]
+    };
+  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -101,5 +134,67 @@ describe('AdminMusicaService', () => {
       artistasParticipantes: [],
       generos: [{ id: 1, nome: 'Rock' }]
     });
+  });
+
+  it('deve buscar música por ID no endpoint público', () => {
+    const respostaEsperada = musicaDetalhadaDeExemplo();
+
+    service.buscarMusicaPorId(7).subscribe(resposta => {
+      expect(resposta).toEqual(respostaEsperada);
+    });
+
+    const requisicao = httpMock.expectOne(`${apiUrl}/7`);
+
+    expect(requisicao.request.method).toBe('GET');
+
+    requisicao.flush(respostaEsperada);
+  });
+
+  it('deve atualizar música por PUT no endpoint administrativo', () => {
+    const request: MusicaRequest = {
+      titulo: 'Música atualizada',
+      letra: 'Texto atualizado de teste.',
+      duracaoSegundos: 240,
+      anoLancamento: 2026,
+      artistaPrincipalId: 2,
+      artistasParticipantesIds: [4],
+      albumId: 3,
+      generos: ['Gênero de teste']
+    };
+    const respostaEsperada: MusicaResponse = {
+      ...musicaDetalhadaDeExemplo(),
+      titulo: request.titulo,
+      letra: request.letra ?? null,
+      duracaoSegundos: request.duracaoSegundos
+    };
+
+    service.atualizarMusica(7, request).subscribe(resposta => {
+      expect(resposta).toEqual(respostaEsperada);
+    });
+
+    const requisicao = httpMock.expectOne(`${apiAdminUrl}/7`);
+
+    expect(requisicao.request.method).toBe('PUT');
+    expect(requisicao.request.body).toEqual(request);
+
+    requisicao.flush(respostaEsperada);
+  });
+
+  it('deve excluir música por DELETE no endpoint administrativo', () => {
+    let requisicaoConcluida = false;
+
+    service.excluirMusica(7).subscribe({
+      complete: () => {
+        requisicaoConcluida = true;
+      }
+    });
+
+    const requisicao = httpMock.expectOne(`${apiAdminUrl}/7`);
+
+    expect(requisicao.request.method).toBe('DELETE');
+
+    requisicao.flush(null);
+
+    expect(requisicaoConcluida).toBe(true);
   });
 });

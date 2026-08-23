@@ -14,7 +14,7 @@ import { environment } from '../../environments/environment';
 })
 export class AdminMusicaService {
 
-  private readonly apiUrl =
+  private readonly apiPublicaUrl =
     `${environment.apiUrl}/api/musicas`;
 
   private readonly apiAdminUrl =
@@ -29,7 +29,7 @@ export class AdminMusicaService {
   listarMusicas(): Observable<MusicaListagem[]> {
     return this.http
       .get<PaginaResponse<MusicaListagem>>(
-        this.apiUrl,
+        this.apiPublicaUrl,
         {
           params: {
             size: this.TAMANHO_PAGINA_MAXIMO
@@ -47,6 +47,30 @@ export class AdminMusicaService {
     return this.http.post<MusicaResponse>(
       this.apiAdminUrl,
       request
+    );
+  }
+
+  buscarMusicaPorId(
+    id: number
+  ): Observable<MusicaResponse> {
+    return this.http.get<MusicaResponse>(
+      `${this.apiPublicaUrl}/${id}`
+    );
+  }
+
+  atualizarMusica(
+    id: number,
+    request: MusicaRequest
+  ): Observable<MusicaResponse> {
+    return this.http.put<MusicaResponse>(
+      `${this.apiAdminUrl}/${id}`,
+      request
+    );
+  }
+
+  excluirMusica(id: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiAdminUrl}/${id}`
     );
   }
 }
