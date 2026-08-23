@@ -189,6 +189,9 @@ class MusicaAtualizacaoExclusaoIntegrationTest {
                 perfil.getId()
         );
 
+        entityManager.flush();
+        entityManager.clear();
+
         musicaService.excluirMusica(idMusica);
         musicaRepository.flush();
         entityManager.clear();
