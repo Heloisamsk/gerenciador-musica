@@ -186,7 +186,7 @@ public class GlobalExceptionHandler {
     }
 
     /*
-     * 409 - Tentativa de cadastrar a mesma música novamente.
+     * 409 - Tentativa de cadastrar ou atualizar uma música duplicada.
      */
     @ExceptionHandler(MusicaDuplicadaException.class)
     public ResponseEntity<ErrorResponseDTO> tratarMusicaDuplicada(

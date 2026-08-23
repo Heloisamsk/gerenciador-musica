@@ -85,6 +85,62 @@ public class MusicaService {
         return converterParaResponse(musicaSalva);
     }
 
+    @Transactional
+    public MusicaResponseDTO atualizarMusica(
+            Long idMusica,
+            MusicaRequestDTO request
+    ) {
+        validarRegrasDeNegocio(request);
+
+        Musica musica = obterEntidadePorId(idMusica);
+
+        Artista artistaPrincipal = artistaService.buscarEntidadePorId(
+                request.artistaPrincipalId()
+        );
+
+        Set<Artista> participantes = buscarParticipantes(
+                request.artistasParticipantesIds(),
+                artistaPrincipal
+        );
+
+        Album album = albumService.buscarAlbumDoArtista(
+                request.albumId(),
+                artistaPrincipal
+        );
+
+        verificarDuplicidade(
+                request,
+                artistaPrincipal,
+                album,
+                idMusica
+        );
+
+        Set<Genero> generos = buscarOuCriarGeneros(request.generos());
+
+        aplicarAtualizacao(
+                musica,
+                request,
+                artistaPrincipal,
+                album,
+                participantes,
+                generos
+        );
+
+        return converterParaResponse(musica);
+    }
+
+    @Transactional
+    public void excluirMusica(Long idMusica) {
+        Musica musica = obterEntidadePorId(idMusica);
+
+        /*
+         * As tabelas dependentes usam ON DELETE CASCADE e o destaque
+         * do perfil usa ON DELETE SET NULL. A entidade principal pode,
+         * portanto, ser removida sem exclusões manuais ou órfãos.
+         */
+        musicaRepository.delete(musica);
+    }
+
     private void validarRegrasDeNegocio(MusicaRequestDTO request) {
         if (request == null) {
             throw new DadosMusicaInvalidosException(
@@ -144,22 +200,37 @@ public class MusicaService {
             Artista artistaPrincipal,
             Album album
     ) {
+        verificarDuplicidade(
+                request,
+                artistaPrincipal,
+                album,
+                null
+        );
+    }
+
+    private void verificarDuplicidade(
+            MusicaRequestDTO request,
+            Artista artistaPrincipal,
+            Album album,
+            Long idMusicaIgnorada
+    ) {
         String tituloNormalizado = normalizarTexto(request.titulo());
 
         boolean musicaJaExiste;
 
         if (album != null) {
-            musicaJaExiste = musicaRepository.existsByAlbumAndTituloIgnoreCase(
+            musicaJaExiste = verificarDuplicidadeComAlbum(
                     album,
-                    tituloNormalizado
+                    tituloNormalizado,
+                    idMusicaIgnorada
             );
         } else {
-            musicaJaExiste = musicaRepository
-                    .existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamento(
-                            artistaPrincipal,
-                            tituloNormalizado,
-                            request.anoLancamento()
-                    );
+            musicaJaExiste = verificarDuplicidadeSemAlbum(
+                    artistaPrincipal,
+                    tituloNormalizado,
+                    request.anoLancamento(),
+                    idMusicaIgnorada
+            );
         }
 
         if (musicaJaExiste) {
@@ -167,6 +238,50 @@ public class MusicaService {
                     "A música já está cadastrada."
             );
         }
+    }
+
+    private boolean verificarDuplicidadeComAlbum(
+            Album album,
+            String titulo,
+            Long idMusicaIgnorada
+    ) {
+        if (idMusicaIgnorada == null) {
+            return musicaRepository.existsByAlbumAndTituloIgnoreCase(
+                    album,
+                    titulo
+            );
+        }
+
+        return musicaRepository
+                .existsByAlbumAndTituloIgnoreCaseAndIdMusicaNot(
+                        album,
+                        titulo,
+                        idMusicaIgnorada
+                );
+    }
+
+    private boolean verificarDuplicidadeSemAlbum(
+            Artista artistaPrincipal,
+            String titulo,
+            Short anoLancamento,
+            Long idMusicaIgnorada
+    ) {
+        if (idMusicaIgnorada == null) {
+            return musicaRepository
+                    .existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamento(
+                            artistaPrincipal,
+                            titulo,
+                            anoLancamento
+                    );
+        }
+
+        return musicaRepository
+                .existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamentoAndIdMusicaNot(
+                        artistaPrincipal,
+                        titulo,
+                        anoLancamento,
+                        idMusicaIgnorada
+                );
     }
 
     private Set<Genero> buscarOuCriarGeneros(Set<String> nomesGeneros) {
@@ -221,6 +336,24 @@ public class MusicaService {
         musica.setGeneros(generos);
 
         return musica;
+    }
+
+    private void aplicarAtualizacao(
+            Musica musica,
+            MusicaRequestDTO request,
+            Artista artistaPrincipal,
+            Album album,
+            Set<Artista> artistasParticipantes,
+            Set<Genero> generos
+    ) {
+        musica.setTitulo(normalizarTexto(request.titulo()));
+        musica.setLetra(normalizarLetra(request.letra()));
+        musica.setDuracaoSegundos(request.duracaoSegundos());
+        musica.setAnoLancamento(request.anoLancamento());
+        musica.setArtistaPrincipal(artistaPrincipal);
+        musica.setAlbum(album);
+        musica.setArtistasParticipantes(artistasParticipantes);
+        musica.setGeneros(generos);
     }
 
     private MusicaResponseDTO converterParaResponse(Musica musica) {
@@ -373,13 +506,23 @@ public class MusicaService {
 
     @Transactional(readOnly = true)
     public MusicaResponseDTO buscarPorId(Long id) {
-        Musica musica = musicaRepository
-                .findById(id)
-                .orElseThrow(
-                        () -> new MusicaNaoEncontradaException(id)
-                );
+        Musica musica = obterEntidadePorId(id);
 
         return converterParaResponse(musica);
+    }
+
+    private Musica obterEntidadePorId(Long idMusica) {
+        if (idMusica == null || idMusica <= 0) {
+            throw new DadosMusicaInvalidosException(
+                    "O ID da música deve ser positivo."
+            );
+        }
+
+        return musicaRepository
+                .findById(idMusica)
+                .orElseThrow(
+                        () -> new MusicaNaoEncontradaException(idMusica)
+                );
     }
 
     private static final int TAMANHO_PAGINA_PADRAO = 20;
@@ -527,4 +670,3 @@ public class MusicaService {
         );
     }
 }
-
