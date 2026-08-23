@@ -222,6 +222,28 @@ class MusicaPesquisaIntegrationTest {
     }
 
     @Test
+    void deveRetornarCapaEParticipantesNaListagem() throws Exception {
+        var resultadoComAlbum = pesquisar(params(
+                "titulo",
+                amorEterno.getTitulo()
+        ));
+        var itemComAlbum = resultadoComAlbum.itens().getFirst();
+
+        assertThat(itemComAlbum.album().capaUrl())
+                .isEqualTo(album.getCapaUrl());
+
+        var resultadoComParticipante = pesquisar(params(
+                "titulo",
+                outraCancao.getTitulo()
+        ));
+        var itemComParticipante = resultadoComParticipante.itens().getFirst();
+
+        assertThat(itemComParticipante.artistasParticipantes())
+                .extracting(participante -> participante.nome())
+                .containsExactly(artistaA.getNome());
+    }
+
+    @Test
     void deveFiltrarPorArtistaPrincipal() throws Exception {
         var resultado = pesquisar(params("artistaId", artistaA.getIdArtista().toString()));
 

@@ -13,6 +13,7 @@ import java.util.Set;
  * @param anoLancamento       ano de lançamento da música
  * @param artistaPrincipal    resumo do artista principal
  * @param album               resumo do álbum (nulo quando a música não pertence a um álbum)
+ * @param artistasParticipantes resumos dos artistas participantes
  * @param generos             resumo dos gêneros associados à música
  */
 public record MusicaListagemDTO(
@@ -22,6 +23,7 @@ public record MusicaListagemDTO(
         Short anoLancamento,
         ArtistaResumoDTO artistaPrincipal,
         AlbumResumoDTO album,
+        Set<ArtistaResumoDTO> artistasParticipantes,
         Set<GeneroResumoDTO> generos
 ) {
 }

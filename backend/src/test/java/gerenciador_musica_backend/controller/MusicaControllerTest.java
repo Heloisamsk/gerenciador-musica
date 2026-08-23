@@ -64,7 +64,15 @@ class MusicaControllerTest {
         MusicaListagemDTO item = new MusicaListagemDTO(
                 1L, "Bohemian Rhapsody", 354, (short) 1975,
                 new ArtistaResumoDTO(1L, "Queen", "Queen", null, null),
-                null, Set.of()
+                null,
+                Set.of(new ArtistaResumoDTO(
+                        2L,
+                        "Artista Participante",
+                        "Nome Completo",
+                        null,
+                        null
+                )),
+                Set.of()
         );
 
         when(musicaService.pesquisarMusicas(any(MusicaFiltroDTO.class), isNull(), isNull(), isNull()))
@@ -74,6 +82,8 @@ class MusicaControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.itens[0].titulo").value("Bohemian Rhapsody"))
                 .andExpect(jsonPath("$.itens[0].artistaPrincipal.nome").value("Queen"))
+                .andExpect(jsonPath("$.itens[0].artistasParticipantes[0].nome")
+                        .value("Artista Participante"))
                 .andExpect(jsonPath("$.totalItens").value(1));
     }
 

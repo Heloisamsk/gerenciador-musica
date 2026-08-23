@@ -653,6 +653,12 @@ public class MusicaService {
 
         AlbumResumoDTO album = converterAlbumParaResumo(musica.getAlbum());
 
+        Set<ArtistaResumoDTO> participantes = musica
+                .getArtistasParticipantes()
+                .stream()
+                .map(this::converterArtistaParaResumo)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
         Set<GeneroResumoDTO> generos = musica
                 .getGeneros()
                 .stream()
@@ -666,6 +672,7 @@ public class MusicaService {
                 musica.getAnoLancamento(),
                 artistaPrincipal,
                 album,
+                participantes,
                 generos
         );
     }

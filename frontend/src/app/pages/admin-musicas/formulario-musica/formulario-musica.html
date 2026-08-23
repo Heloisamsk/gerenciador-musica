@@ -220,31 +220,17 @@
             <label for="artistasParticipantesIds">
               Artistas participantes
             </label>
-            <select
-              id="artistasParticipantesIds"
-              class="form-input selecao-multipla"
-              formControlName="artistasParticipantesIds"
-              multiple
-              size="5"
-              aria-describedby="ajuda-participantes"
-              [attr.disabled]="
-                formulario.controls.artistaPrincipalId.value === null
-                  ? true
-                  : null
+            <app-seletor-participantes
+              [artistas]="artistasParticipantesDisponiveis()"
+              [participantesIds]="
+                formulario.controls.artistasParticipantesIds.value
               "
-            >
-              @for (
-                artista of artistasParticipantesDisponiveis();
-                track artista.idArtista
-              ) {
-                <option [ngValue]="artista.idArtista">
-                  {{ artista.nome }}
-                </option>
-              }
-            </select>
-            <small id="ajuda-participantes" class="campo-opcional">
-              Campo opcional. Use Ctrl ou Command para selecionar vários.
-            </small>
+              [desabilitado]="
+                formulario.controls.artistaPrincipalId.value === null
+                || carregando()
+              "
+              (participantesIdsChange)="atualizarParticipantes($event)"
+            />
           </div>
 
           <div class="form-group campo-largo">

@@ -1,5 +1,6 @@
 package gerenciador_musica_backend.service;
 
+import gerenciador_musica_backend.dto.ArtistaResumoDTO;
 import gerenciador_musica_backend.dto.MusicaFiltroDTO;
 import gerenciador_musica_backend.dto.MusicaListagemDTO;
 import gerenciador_musica_backend.dto.MusicaRequestDTO;
@@ -596,6 +597,12 @@ class MusicaServiceTest {
                 artista,
                 album
         );
+        musica.setArtistasParticipantes(Set.of(new Artista(
+                "Artista Participante",
+                "Nome Completo do Participante",
+                "Descrição de teste.",
+                null
+        )));
         musica.setGeneros(Set.of(new Genero("Rock")));
 
         return musica;
@@ -632,6 +639,10 @@ class MusicaServiceTest {
         assertThat(item.titulo()).isEqualTo("Bohemian Rhapsody");
         assertThat(item.artistaPrincipal().nome()).isEqualTo("Queen");
         assertThat(item.album().titulo()).isEqualTo("A Night at the Opera");
+        assertThat(item.album().capaUrl()).isEqualTo("http://capa.png");
+        assertThat(item.artistasParticipantes())
+                .extracting(ArtistaResumoDTO::nome)
+                .containsExactly("Artista Participante");
         assertThat(item.generos()).hasSize(1);
     }
 

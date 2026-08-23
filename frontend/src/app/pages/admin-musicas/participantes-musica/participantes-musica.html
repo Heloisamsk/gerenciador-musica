@@ -1,0 +1,14 @@
+<div
+  role="group"
+  [attr.aria-label]="descricaoAcessivel()"
+>
+  @if (participantes().length > 0) {
+    <div class="participantes-lista">
+      @for (artista of participantes(); track artista.id) {
+        <span class="participante-item">{{ artista.nome }}</span>
+      }
+    </div>
+  } @else {
+    <span aria-hidden="true">-</span>
+  }
+</div>

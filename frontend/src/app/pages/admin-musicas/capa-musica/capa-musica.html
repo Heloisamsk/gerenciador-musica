@@ -1,0 +1,21 @@
+@if (capaDisponivel()) {
+  <img
+    class="capa-album"
+    [src]="musica().album?.capaUrl"
+    [alt]="'Capa do álbum ' + musica().album?.titulo"
+    loading="lazy"
+    (error)="registrarErro()"
+  >
+} @else {
+  <span
+    class="capa-album capa-alternativa"
+    role="img"
+    [attr.aria-label]="
+      musica().album
+        ? 'Capa indisponível para o álbum ' + musica().album?.titulo
+        : 'Música sem álbum'
+    "
+  >
+    <span aria-hidden="true">♪</span>
+  </span>
+}

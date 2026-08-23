@@ -704,6 +704,7 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 | `GET` | `/api/albuns` | `USER` ou `ADMIN` | Listar álbuns; aceita o filtro `?artistaId={id}` |
 | `GET` | `/api/albuns/{id}` | `USER` ou `ADMIN` | Consultar um álbum por ID |
 | `GET` | `/api/musicas` | `USER` ou `ADMIN` | Listar as músicas disponíveis no catálogo |
+| `GET` | `/api/musicas/{id}` | `USER` ou `ADMIN` | Consultar os dados completos de uma música pelo ID |
 
 ### Administração
 
@@ -716,6 +717,8 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 | `PUT` | `/api/admin/albuns/{id}` | `ADMIN` | Atualizar título, ano e capa sem alterar o artista ou as músicas associadas |
 | `DELETE` | `/api/admin/albuns/{id}` | `ADMIN` | Excluir um álbum somente quando ele não possuir músicas associadas |
 | `POST` | `/api/admin/musicas` | `ADMIN` | Cadastrar uma nova música |
+| `PUT` | `/api/admin/musicas/{id}` | `ADMIN` | Atualizar uma música e suas associações sem alterar seu ID |
+| `DELETE` | `/api/admin/musicas/{id}` | `ADMIN` | Excluir uma música e limpar suas associações dependentes |
 | `GET` | `/api/admin/banco/usuarios` | `ADMIN` | Listar os usuários cadastrados no banco de dados |
 
 > Os endpoints iniciados por `/api/admin` são protegidos e podem ser acessados somente por usuários com a role `ADMIN`. Usuários autenticados com a role `USER` recebem a resposta `403 Forbidden` ao tentar acessar essas rotas.

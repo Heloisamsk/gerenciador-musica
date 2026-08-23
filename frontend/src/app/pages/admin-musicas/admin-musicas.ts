@@ -11,6 +11,8 @@ import { finalize } from 'rxjs';
 import { MusicaListagem } from '../../models/MusicaListagem';
 import { AdminMusicaService } from '../../services/admin-musica';
 import { AcoesMusica } from './acoes-musica/acoes-musica';
+import { CapaMusica } from './capa-musica/capa-musica';
+import { ParticipantesMusica } from './participantes-musica/participantes-musica';
 
 interface ErroApi {
   message?: string;
@@ -18,7 +20,11 @@ interface ErroApi {
 
 @Component({
   selector: 'app-admin-musicas',
-  imports: [AcoesMusica],
+  imports: [
+    AcoesMusica,
+    CapaMusica,
+    ParticipantesMusica
+  ],
   templateUrl: './admin-musicas.html',
   styleUrls: ['./admin-musicas.css']
 })
@@ -57,7 +63,9 @@ export class AdminMusicas implements OnInit {
         finalize(() => this.carregando.set(false))
       )
       .subscribe({
-        next: dados => this.musicas.set(dados),
+        next: dados => {
+          this.musicas.set(dados);
+        },
         error: (erro: HttpErrorResponse) => {
           this.musicas.set([]);
           this.mensagemErro.set(this.mensagemParaErroDeListagem(erro));

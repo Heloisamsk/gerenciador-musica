@@ -31,8 +31,12 @@ describe('AdminMusicas', () => {
         id: 11,
         titulo: 'Álbum de Teste',
         anoLancamento: 2024,
-        capaUrl: null
+        capaUrl: 'https://example.com/capa-teste.jpg'
       },
+      artistasParticipantes: [
+        { id: 9, nome: 'Participante Um' },
+        { id: 10, nome: 'Participante Dois' }
+      ],
       generos: [
         { id: 1, nome: 'Gênero Um' },
         { id: 2, nome: 'Gênero Dois' }
@@ -48,6 +52,7 @@ describe('AdminMusicas', () => {
         nome: 'Outro Artista'
       },
       album: null,
+      artistasParticipantes: [],
       generos: []
     }
   ];
@@ -108,13 +113,15 @@ describe('AdminMusicas', () => {
 
     expect(listarMusicas).toHaveBeenCalledOnce();
     expect(linhas).toHaveLength(2);
-    expect(elemento.querySelectorAll('thead th')).toHaveLength(7);
+    expect(elemento.querySelectorAll('thead th')).toHaveLength(9);
     expect(elemento.textContent).toContain('Total de músicas:');
     expect(elemento.querySelector('.table-information strong')?.textContent)
       .toContain('2');
     expect(elemento.textContent).toContain('Música de Teste Um');
     expect(elemento.textContent).toContain('Artista Principal');
     expect(elemento.textContent).toContain('Álbum de Teste');
+    expect(elemento.textContent).toContain('Participante Um');
+    expect(elemento.textContent).toContain('Participante Dois');
     expect(elemento.textContent).toContain('Gênero Um, Gênero Dois');
     expect(elemento.textContent).toContain('Música de Teste Dois');
     expect(botoesEditar).toHaveLength(2);
@@ -123,6 +130,25 @@ describe('AdminMusicas', () => {
       .toBe('Editar música Música de Teste Um');
     expect(botoesExcluir[0].getAttribute('aria-label'))
       .toBe('Excluir música Música de Teste Um');
+    expect(elemento.querySelector<HTMLImageElement>('.capa-album')?.src)
+      .toBe('https://example.com/capa-teste.jpg');
+    expect(elemento.querySelector('.capa-alternativa')?.getAttribute(
+      'aria-label'
+    )).toBe('Música sem álbum');
+  });
+
+  it('deve substituir uma capa inválida pela imagem alternativa', () => {
+    criarComponente();
+    const elemento = fixture.nativeElement as HTMLElement;
+    const imagem = elemento.querySelector<HTMLImageElement>('img.capa-album');
+
+    imagem?.dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+
+    expect(elemento.querySelectorAll('.capa-alternativa')).toHaveLength(2);
+    expect(elemento.querySelector('.capa-alternativa')?.getAttribute(
+      'aria-label'
+    )).toBe('Capa indisponível para o álbum Álbum de Teste');
   });
 
   it('deve exibir carregamento e impedir chamadas duplicadas', () => {

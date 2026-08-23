@@ -204,6 +204,47 @@ describe('FormularioMusica', () => {
     });
   });
 
+  it('deve pesquisar, adicionar e remover um participante com sugestões', () => {
+    criarComponente();
+    component.formulario.controls.artistaPrincipalId
+      .setValue(artistaPrincipal.idArtista);
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const campo = elemento.querySelector<HTMLInputElement>(
+      '#artistasParticipantesIds'
+    );
+
+    if (campo === null) {
+      throw new Error('Campo de busca de participantes não encontrado.');
+    }
+
+    campo.value = 'participante';
+    campo.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const sugestao = elemento.querySelector<HTMLButtonElement>(
+      '.sugestao-participante'
+    );
+    expect(sugestao?.textContent).toContain('Artista Participante');
+
+    sugestao?.click();
+    fixture.detectChanges();
+
+    expect(component.formulario.controls.artistasParticipantesIds.value)
+      .toEqual([artistaParticipante.idArtista]);
+    expect(elemento.querySelector('.participante-chip')?.textContent)
+      .toContain('Artista Participante');
+
+    elemento.querySelector<HTMLButtonElement>(
+      '.remover-participante'
+    )?.click();
+    fixture.detectChanges();
+
+    expect(component.formulario.controls.artistasParticipantesIds.value)
+      .toEqual([]);
+  });
+
   it('deve permitir música sem letra, participantes ou álbum', () => {
     criarComponente();
     const enviar = vi.fn();
@@ -294,6 +335,8 @@ describe('FormularioMusica', () => {
       .toContain('Editar música');
     expect(elemento.querySelector('.formulario-btn')?.textContent)
       .toContain('Salvar alterações');
+    expect(elemento.querySelector('.participante-chip')?.textContent)
+      .toContain(artistaParticipante.nome);
   });
 
   it('deve informar falhas ao carregar artistas e álbuns', () => {

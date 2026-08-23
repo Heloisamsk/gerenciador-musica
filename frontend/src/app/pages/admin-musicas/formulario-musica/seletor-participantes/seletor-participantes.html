@@ -1,0 +1,91 @@
+<div class="seletor-participantes">
+  <div
+    class="participantes-selecionados"
+    role="group"
+    aria-label="Artistas participantes selecionados"
+  >
+    @if (participantesSelecionados().length > 0) {
+      @for (
+        artista of participantesSelecionados();
+        track artista.idArtista
+      ) {
+        <span class="participante-chip">
+          <span>{{ artista.nome }}</span>
+          <button
+            type="button"
+            class="remover-participante"
+            [disabled]="desabilitado()"
+            [attr.aria-label]="'Remover ' + artista.nome + ' dos participantes'"
+            (click)="remover(artista.idArtista)"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </span>
+      }
+    } @else {
+      <span class="participantes-vazio">
+        Nenhum artista participante adicionado.
+      </span>
+    }
+  </div>
+
+  <div class="busca-participante">
+    <input
+      id="artistasParticipantesIds"
+      class="busca-participante-input"
+      type="search"
+      autocomplete="off"
+      maxlength="255"
+      role="combobox"
+      aria-autocomplete="list"
+      aria-controls="sugestoes-participantes"
+      aria-describedby="ajuda-participantes"
+      [attr.aria-expanded]="sugestoes().length > 0"
+      [value]="busca()"
+      [disabled]="desabilitado()"
+      [placeholder]="
+        desabilitado()
+          ? 'Selecione primeiro o artista principal'
+          : 'Digite o nome de um artista'
+      "
+      (input)="atualizarBusca($event)"
+      (keydown)="tratarTecla($event)"
+    >
+
+    @if (busca().trim().length > 0) {
+      @if (sugestoes().length > 0) {
+        <ul
+          id="sugestoes-participantes"
+          class="sugestoes-participantes"
+          role="listbox"
+          aria-label="Sugestões de artistas"
+        >
+          @for (artista of sugestoes(); track artista.idArtista) {
+            <li>
+              <button
+                type="button"
+                role="option"
+                class="sugestao-participante"
+                (click)="adicionar(artista)"
+              >
+                <strong>{{ artista.nome }}</strong>
+                <span>{{ artista.nomeCompleto }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <output
+          class="nenhuma-sugestao"
+          aria-live="polite"
+        >
+          Nenhum artista encontrado.
+        </output>
+      }
+    }
+  </div>
+
+  <small id="ajuda-participantes" class="ajuda-participantes">
+    Campo opcional. Digite um nome e escolha uma sugestão. Use o botão × para remover.
+  </small>
+</div>

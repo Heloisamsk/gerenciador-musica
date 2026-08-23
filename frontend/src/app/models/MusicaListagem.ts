@@ -7,5 +7,6 @@ export interface MusicaListagem {
   anoLancamento: number;
   artistaPrincipal: ArtistaResumo;
   album: AlbumResumo | null;
+  artistasParticipantes: ArtistaResumo[];
   generos: GeneroResumo[];
 }

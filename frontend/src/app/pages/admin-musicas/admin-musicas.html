@@ -117,9 +117,11 @@
 
         <thead>
         <tr>
+          <th scope="col">Capa</th>
           <th scope="col">Título</th>
           <th scope="col">Artista</th>
           <th scope="col">Álbum</th>
+          <th scope="col">Participantes</th>
           <th scope="col">Gênero</th>
           <th scope="col">Ano</th>
           <th scope="col">Duração</th>
@@ -130,6 +132,10 @@
         <tbody>
         @for (musica of musicas(); track musica.id) {
         <tr>
+          <td data-label="Capa">
+            <app-capa-musica [musica]="musica" />
+          </td>
+
           <td data-label="Título">
             <strong>{{ musica.titulo }}</strong>
           </td>
@@ -140,6 +146,12 @@
 
           <td data-label="Álbum">
             {{ musica.album?.titulo || '-' }}
+          </td>
+
+          <td data-label="Participantes">
+            <app-participantes-musica
+              [participantes]="musica.artistasParticipantes"
+            />
           </td>
 
           <td data-label="Gênero">
