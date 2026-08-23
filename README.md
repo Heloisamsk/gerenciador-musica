@@ -710,6 +710,8 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 | `PUT` | `/api/admin/artistas/{id}` | `ADMIN` | Atualizar os dados de um artista sem alterar seu ID ou suas associações |
 | `DELETE` | `/api/admin/artistas/{id}` | `ADMIN` | Excluir um artista que não possua álbuns ou músicas associados |
 | `POST` | `/api/admin/albuns` | `ADMIN` | Cadastrar um álbum vinculado a um artista |
+| `PUT` | `/api/admin/albuns/{id}` | `ADMIN` | Atualizar título, ano e capa sem alterar o artista ou as músicas associadas |
+| `DELETE` | `/api/admin/albuns/{id}` | `ADMIN` | Excluir um álbum somente quando ele não possuir músicas associadas |
 | `POST` | `/api/admin/musicas` | `ADMIN` | Cadastrar uma nova música |
 | `GET` | `/api/admin/banco/usuarios` | `ADMIN` | Listar os usuários cadastrados no banco de dados |
 
