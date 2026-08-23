@@ -417,7 +417,7 @@ class MusicaServiceTest {
                 .isInstanceOf(MusicaNaoEncontradaException.class)
                 .hasMessage("Música não encontrada com o ID: 99");
 
-        verify(musicaRepository, never()).delete(any());
+        verify(musicaRepository, never()).delete(any(Musica.class));
     }
 
     @Test
