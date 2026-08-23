@@ -4,6 +4,8 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
+import { vi } from 'vitest';
 
 import { AdminMusicas } from './admin-musicas';
 import { MusicaListagem } from '../../models/MusicaListagem';
@@ -12,13 +14,24 @@ describe('AdminMusicas', () => {
   let component: AdminMusicas;
   let fixture: ComponentFixture<AdminMusicas>;
   let httpMock: HttpTestingController;
+  const getCurrentNavigation = vi.fn();
 
   const apiUrl = 'http://localhost:8080/api/musicas';
 
   beforeEach(async () => {
+    getCurrentNavigation.mockReset();
+    getCurrentNavigation.mockReturnValue(null);
+
     await TestBed.configureTestingModule({
       imports: [AdminMusicas],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        {
+          provide: Router,
+          useValue: { getCurrentNavigation }
+        }
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminMusicas);
@@ -82,5 +95,31 @@ describe('AdminMusicas', () => {
     const musica = musicaDeExemplo([]);
 
     expect(component.generosTexto(musica)).toBe('-');
+  });
+
+  it('deve exibir a mensagem recebida após cadastrar ou editar', () => {
+    getCurrentNavigation.mockReturnValue({
+      extras: {
+        state: {
+          mensagemSucesso: 'Música atualizada com sucesso!'
+        }
+      }
+    });
+
+    fixture.detectChanges();
+    httpMock.expectOne(`${apiUrl}?size=100`).flush({
+      itens: [],
+      paginaAtual: 0,
+      tamanhoPagina: 100,
+      totalItens: 0,
+      totalPaginas: 0,
+    });
+    fixture.detectChanges();
+
+    expect(component.mensagemSucesso())
+      .toBe('Música atualizada com sucesso!');
+    expect((fixture.nativeElement as HTMLElement)
+      .querySelector('output[aria-live="polite"]')?.textContent)
+      .toContain('Música atualizada com sucesso!');
   });
 });

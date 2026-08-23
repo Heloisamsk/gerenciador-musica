@@ -1,0 +1,321 @@
+<main class="formulario-container">
+  <section class="formulario-card" [attr.aria-busy]="!formularioPronto()">
+    <h1 class="formulario-title">
+      {{ titulo() }}
+    </h1>
+
+    @if (mensagemSucesso()) {
+      <output class="alerta alerta-sucesso" aria-live="polite">
+        {{ mensagemSucesso() }}
+      </output>
+    }
+
+    @if (mensagemErro()) {
+      <div class="alerta alerta-erro" role="alert">
+        {{ mensagemErro() }}
+      </div>
+    }
+
+    @if (erroFormulario()) {
+      <div class="alerta alerta-erro" role="alert">
+        {{ erroFormulario() }}
+      </div>
+    }
+
+    @if (!formularioPronto()) {
+      <output class="estado-carregamento" aria-live="polite">
+        Preparando opções do formulário...
+      </output>
+    } @else {
+      <form
+        class="formulario-form"
+        [formGroup]="formulario"
+        (ngSubmit)="submeter()"
+        novalidate
+      >
+        <div class="formulario-grid">
+          <div class="form-group campo-largo">
+            <label for="titulo">Título *</label>
+            <input
+              id="titulo"
+              class="form-input"
+              type="text"
+              formControlName="titulo"
+              maxlength="255"
+              autocomplete="off"
+              [class.input-invalido]="
+                formulario.controls.titulo.invalid
+                && formulario.controls.titulo.touched
+              "
+            >
+
+            @if (
+              formulario.controls.titulo.touched
+              && (
+                formulario.controls.titulo.hasError('required')
+                || formulario.controls.titulo.hasError('apenasEspacos')
+              )
+            ) {
+              <small class="error-message">
+                O título da música é obrigatório.
+              </small>
+            }
+
+            @if (
+              formulario.controls.titulo.touched
+              && formulario.controls.titulo.hasError('maxlength')
+            ) {
+              <small class="error-message">
+                O título deve possuir no máximo 255 caracteres.
+              </small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="duracaoSegundos">Duração em segundos *</label>
+            <input
+              id="duracaoSegundos"
+              class="form-input"
+              type="number"
+              min="1"
+              step="1"
+              inputmode="numeric"
+              formControlName="duracaoSegundos"
+              [class.input-invalido]="
+                formulario.controls.duracaoSegundos.invalid
+                && formulario.controls.duracaoSegundos.touched
+              "
+            >
+
+            @if (
+              formulario.controls.duracaoSegundos.touched
+              && formulario.controls.duracaoSegundos.invalid
+            ) {
+              <small class="error-message">
+                Informe uma duração maior que zero.
+              </small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="anoLancamento">Ano de lançamento *</label>
+            <input
+              id="anoLancamento"
+              class="form-input"
+              type="number"
+              min="1800"
+              max="2100"
+              step="1"
+              inputmode="numeric"
+              formControlName="anoLancamento"
+              [class.input-invalido]="
+                formulario.controls.anoLancamento.invalid
+                && formulario.controls.anoLancamento.touched
+              "
+            >
+
+            @if (
+              formulario.controls.anoLancamento.touched
+              && formulario.controls.anoLancamento.invalid
+            ) {
+              <small class="error-message">
+                O ano deve estar entre 1800 e 2100.
+              </small>
+            }
+          </div>
+
+          <div class="form-group campo-largo">
+            <label for="letra">Letra</label>
+            <textarea
+              id="letra"
+              class="form-input form-textarea"
+              formControlName="letra"
+              rows="7"
+            ></textarea>
+            <small class="campo-opcional">Campo opcional.</small>
+          </div>
+
+          <div class="form-group campo-largo">
+            <label for="generosTexto">Gêneros *</label>
+            <input
+              id="generosTexto"
+              class="form-input"
+              type="text"
+              formControlName="generosTexto"
+              aria-describedby="ajuda-generos"
+              [class.input-invalido]="
+                formulario.controls.generosTexto.invalid
+                && formulario.controls.generosTexto.touched
+              "
+            >
+            <small id="ajuda-generos" class="campo-opcional">
+              Separe vários gêneros utilizando vírgulas.
+            </small>
+
+            @if (
+              formulario.controls.generosTexto.touched
+              && formulario.controls.generosTexto.hasError('generosObrigatorios')
+            ) {
+              <small class="error-message">
+                Informe pelo menos um gênero.
+              </small>
+            }
+
+            @if (
+              formulario.controls.generosTexto.touched
+              && formulario.controls.generosTexto.hasError('generoMuitoLongo')
+            ) {
+              <small class="error-message">
+                Cada gênero deve possuir no máximo 100 caracteres.
+              </small>
+            }
+
+            @if (
+              formulario.controls.generosTexto.touched
+              && formulario.controls.generosTexto.hasError('generoDuplicado')
+            ) {
+              <small class="error-message">
+                Não informe o mesmo gênero mais de uma vez.
+              </small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="artistaPrincipalId">Artista principal *</label>
+            <select
+              id="artistaPrincipalId"
+              class="form-input"
+              formControlName="artistaPrincipalId"
+              [class.input-invalido]="
+                formulario.controls.artistaPrincipalId.invalid
+                && formulario.controls.artistaPrincipalId.touched
+              "
+            >
+              <option [ngValue]="null" disabled>
+                Selecione o artista principal
+              </option>
+
+              @for (artista of artistas(); track artista.idArtista) {
+                <option [ngValue]="artista.idArtista">
+                  {{ artista.nome }}
+                </option>
+              }
+            </select>
+
+            @if (
+              formulario.controls.artistaPrincipalId.touched
+              && formulario.controls.artistaPrincipalId.invalid
+            ) {
+              <small class="error-message">
+                Selecione o artista principal.
+              </small>
+            }
+
+            @if (erroArtistas()) {
+              <small class="error-message">{{ erroArtistas() }}</small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="artistasParticipantesIds">
+              Artistas participantes
+            </label>
+            <select
+              id="artistasParticipantesIds"
+              class="form-input selecao-multipla"
+              formControlName="artistasParticipantesIds"
+              multiple
+              size="5"
+              aria-describedby="ajuda-participantes"
+              [attr.disabled]="
+                formulario.controls.artistaPrincipalId.value === null
+                  ? true
+                  : null
+              "
+            >
+              @for (
+                artista of artistasParticipantesDisponiveis();
+                track artista.idArtista
+              ) {
+                <option [ngValue]="artista.idArtista">
+                  {{ artista.nome }}
+                </option>
+              }
+            </select>
+            <small id="ajuda-participantes" class="campo-opcional">
+              Campo opcional. Use Ctrl ou Command para selecionar vários.
+            </small>
+          </div>
+
+          <div class="form-group campo-largo">
+            <label for="albumId">Álbum</label>
+            <select
+              id="albumId"
+              class="form-input"
+              formControlName="albumId"
+              [attr.disabled]="
+                formulario.controls.artistaPrincipalId.value === null
+                || carregandoAlbuns()
+                  ? true
+                  : null
+              "
+            >
+              <option [ngValue]="null">
+                @if (carregandoAlbuns()) {
+                  Carregando álbuns...
+                } @else {
+                  Sem álbum (single)
+                }
+              </option>
+
+              @for (album of albuns(); track album.idAlbum) {
+                <option [ngValue]="album.idAlbum">
+                  {{ album.titulo }} ({{ album.anoLancamento }})
+                </option>
+              }
+            </select>
+
+            @if (erroAlbuns()) {
+              <small class="error-message">{{ erroAlbuns() }}</small>
+            } @else {
+              <small class="campo-opcional">
+                A lista contém somente álbuns do artista principal.
+              </small>
+            }
+          </div>
+        </div>
+
+        <div class="formulario-acoes">
+          @if (exibirCancelar()) {
+            <button
+              type="button"
+              class="cancelar-btn"
+              [disabled]="carregando()"
+              (click)="cancelar.emit()"
+            >
+              Cancelar
+            </button>
+          }
+
+          <button
+            type="submit"
+            class="formulario-btn"
+            [disabled]="
+              formulario.invalid
+              || carregando()
+              || carregandoAlbuns()
+              || artistas().length === 0
+            "
+            [attr.aria-busy]="carregando()"
+          >
+            @if (carregando()) {
+              {{ textoCarregamento() }}
+            } @else {
+              {{ textoBotao() }}
+            }
+          </button>
+        </div>
+      </form>
+    }
+  </section>
+</main>

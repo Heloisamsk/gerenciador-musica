@@ -1,7 +1,29 @@
-<main aria-labelledby="titulo-edicao-musica">
-  <h1 id="titulo-edicao-musica">Editar música</h1>
+@if (carregandoDados()) {
+  <main class="edicao-page">
+    <output class="edicao-state" aria-live="polite">
+      Carregando dados da música...
+    </output>
+  </main>
+} @else if (!musica()) {
+  <main class="edicao-page">
+    <section class="edicao-state error-state" role="alert">
+      <h1>Não foi possível editar a música</h1>
+      <p>{{ mensagemErro() }}</p>
 
-  <p>
-    Os dados da música serão disponibilizados nesta página para edição.
-  </p>
-</main>
+      <a routerLink="/admin/banco/musicas">
+        Voltar para a listagem
+      </a>
+    </section>
+  </main>
+} @else {
+  <app-formulario-musica
+    modo="edicao"
+    [dadosIniciais]="musica()"
+    [carregando]="salvando()"
+    [mensagemSucesso]="mensagemSucesso()"
+    [mensagemErro]="mensagemErro()"
+    [exibirCancelar]="true"
+    (enviar)="salvar($event)"
+    (cancelar)="cancelar()"
+  />
+}
