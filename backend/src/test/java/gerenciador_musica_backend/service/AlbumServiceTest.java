@@ -1,13 +1,16 @@
 package gerenciador_musica_backend.service;
 
+import gerenciador_musica_backend.dto.AlbumAtualizacaoRequestDTO;
 import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.exception.AlbumDuplicadoException;
+import gerenciador_musica_backend.exception.AlbumEmUsoException;
 import gerenciador_musica_backend.exception.AlbumNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosAlbumInvalidosException;
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
+import gerenciador_musica_backend.repository.MusicaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +36,9 @@ class AlbumServiceTest {
 
     @Mock
     private ArtistaService artistaService;
+
+    @Mock
+    private MusicaRepository musicaRepository;
 
     @InjectMocks
     private AlbumService albumService;
@@ -429,5 +435,236 @@ class AlbumServiceTest {
 
         assertThat(resultado.capaUrl())
                 .isEqualTo("https://example.com/capa.jpg");
+    }
+
+    @Test
+    void deveAtualizarAlbumSemAlterarIdOuArtista() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "Título original",
+                (short) 1974,
+                "https://example.com/capa-original.jpg"
+        );
+        album.setIdAlbum(10L);
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        "  A Night   at the Opera  ",
+                        (short) 1975,
+                        "   "
+                );
+
+        when(albumRepository.findById(10L))
+                .thenReturn(Optional.of(album));
+        when(albumRepository
+                .existsByTituloIgnoreCaseAndArtistaIdArtistaAndAnoLancamentoAndIdAlbumNot(
+                        "A Night at the Opera",
+                        1L,
+                        (short) 1975,
+                        10L
+                ))
+                .thenReturn(false);
+
+        AlbumResponseDTO resultado = albumService.atualizarAlbum(
+                10L,
+                request
+        );
+
+        assertThat(resultado.idAlbum()).isEqualTo(10L);
+        assertThat(resultado.titulo())
+                .isEqualTo("A Night at the Opera");
+        assertThat(resultado.anoLancamento()).isEqualTo((short) 1975);
+        assertThat(resultado.capaUrl()).isNull();
+        assertThat(resultado.artista().id()).isEqualTo(1L);
+        assertThat(album.getArtista()).isSameAs(artista);
+        verify(albumRepository, never()).save(any());
+        verify(artistaService, never()).buscarEntidadePorId(any());
+    }
+
+    @Test
+    void devePermitirManterOsDadosAtuaisDoAlbum() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "A Night at the Opera",
+                (short) 1975,
+                null
+        );
+        album.setIdAlbum(10L);
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        "A Night at the Opera",
+                        (short) 1975,
+                        null
+                );
+
+        when(albumRepository.findById(10L))
+                .thenReturn(Optional.of(album));
+        when(albumRepository
+                .existsByTituloIgnoreCaseAndArtistaIdArtistaAndAnoLancamentoAndIdAlbumNot(
+                        "A Night at the Opera",
+                        1L,
+                        (short) 1975,
+                        10L
+                ))
+                .thenReturn(false);
+
+        AlbumResponseDTO resultado = albumService.atualizarAlbum(
+                10L,
+                request
+        );
+
+        assertThat(resultado.idAlbum()).isEqualTo(10L);
+        assertThat(resultado.titulo())
+                .isEqualTo("A Night at the Opera");
+    }
+
+    @Test
+    void deveRejeitarAtualizacaoDuplicadaComOutroAlbum() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "Sheer Heart Attack",
+                (short) 1974,
+                null
+        );
+        album.setIdAlbum(20L);
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        "A Night at the Opera",
+                        (short) 1975,
+                        null
+                );
+
+        when(albumRepository.findById(20L))
+                .thenReturn(Optional.of(album));
+        when(albumRepository
+                .existsByTituloIgnoreCaseAndArtistaIdArtistaAndAnoLancamentoAndIdAlbumNot(
+                        "A Night at the Opera",
+                        1L,
+                        (short) 1975,
+                        20L
+                ))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> albumService.atualizarAlbum(
+                20L,
+                request
+        ))
+                .isInstanceOf(AlbumDuplicadoException.class)
+                .hasMessageContaining("A Night at the Opera");
+
+        assertThat(album.getTitulo()).isEqualTo("Sheer Heart Attack");
+        assertThat(album.getAnoLancamento()).isEqualTo((short) 1974);
+        verify(albumRepository, never()).save(any());
+    }
+
+    @Test
+    void deveRejeitarAtualizacaoQuandoAlbumNaoExistir() {
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        "A Night at the Opera",
+                        (short) 1975,
+                        null
+                );
+
+        when(albumRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> albumService.atualizarAlbum(
+                99L,
+                request
+        )).isInstanceOf(AlbumNaoEncontradoException.class);
+
+        verify(albumRepository, never()).save(any());
+    }
+
+    @Test
+    void deveRejeitarAtualizacaoQuandoIdNaoForPositivo() {
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        "A Night at the Opera",
+                        (short) 1975,
+                        null
+                );
+
+        assertThatThrownBy(() -> albumService.atualizarAlbum(
+                0L,
+                request
+        ))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage("O ID do álbum deve ser válido.");
+
+        verify(albumRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveExcluirAlbumSemMusicasAssociadas() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "A Night at the Opera",
+                (short) 1975,
+                null
+        );
+        album.setIdAlbum(10L);
+
+        when(albumRepository.findById(10L))
+                .thenReturn(Optional.of(album));
+        when(musicaRepository.existsByAlbum_IdAlbum(10L))
+                .thenReturn(false);
+
+        albumService.excluirAlbum(10L);
+
+        verify(albumRepository).delete(album);
+        assertThat(album.getArtista()).isSameAs(artista);
+    }
+
+    @Test
+    void deveBloquearExclusaoQuandoAlbumPossuirMusicas() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "A Night at the Opera",
+                (short) 1975,
+                null
+        );
+        album.setIdAlbum(10L);
+
+        when(albumRepository.findById(10L))
+                .thenReturn(Optional.of(album));
+        when(musicaRepository.existsByAlbum_IdAlbum(10L))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> albumService.excluirAlbum(10L))
+                .isInstanceOf(AlbumEmUsoException.class)
+                .hasMessage(
+                        "Não é possível excluir o álbum porque "
+                                + "ele possui músicas associadas."
+                );
+
+        verify(albumRepository, never()).delete(any());
+    }
+
+    @Test
+    void deveRejeitarExclusaoQuandoAlbumNaoExistir() {
+        when(albumRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> albumService.excluirAlbum(99L))
+                .isInstanceOf(AlbumNaoEncontradoException.class);
+
+        verify(musicaRepository, never()).existsByAlbum_IdAlbum(any());
+        verify(albumRepository, never()).delete(any());
+    }
+
+    @Test
+    void deveRejeitarExclusaoQuandoIdNaoForPositivo() {
+        assertThatThrownBy(() -> albumService.excluirAlbum(-1L))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage("O ID do álbum deve ser válido.");
+
+        verify(albumRepository, never()).findById(any());
+        verify(musicaRepository, never()).existsByAlbum_IdAlbum(any());
     }
 }
