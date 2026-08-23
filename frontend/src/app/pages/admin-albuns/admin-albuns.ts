@@ -121,7 +121,7 @@ export class AdminAlbuns implements OnInit {
 
   private recuperarMensagemDaEdicao(): void {
     const mensagem = this.router
-      .getCurrentNavigation()
+      .currentNavigation()
       ?.extras
       .state?.['mensagemSucesso'];
 

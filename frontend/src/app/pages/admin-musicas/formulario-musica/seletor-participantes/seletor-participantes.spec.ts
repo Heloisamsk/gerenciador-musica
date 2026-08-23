@@ -61,20 +61,48 @@ describe('SeletorParticipantes', () => {
       .toContain('Adéla Jergová');
   });
 
+  it('deve associar o campo ao rótulo e às sugestões nativas', () => {
+    const elemento = fixture.nativeElement as HTMLElement;
+    const rotulo = elemento.querySelector<HTMLLabelElement>(
+      'label[for="artistasParticipantesIds"]'
+    );
+    const campo = elemento.querySelector<HTMLInputElement>(
+      '#artistasParticipantesIds'
+    );
+
+    expect(rotulo?.textContent).toContain('Artistas participantes');
+    expect(campo?.getAttribute('list')).toBe('sugestoes-participantes');
+    expect(elemento.querySelector('datalist#sugestoes-participantes'))
+      .not.toBeNull();
+  });
+
   it('deve sugerir também pelo nome completo', () => {
     pesquisar('completo dois');
 
     expect(component.sugestoes()).toEqual([artistas[1]]);
   });
 
-  it('deve adicionar a sugestão e limpar a busca', () => {
+  it('deve adicionar a sugestão nativa e limpar a busca', () => {
     const alterar = vi.fn();
     component.participantesIdsChange.subscribe(alterar);
-    pesquisar('artista dois');
+    pesquisar('artista');
 
-    (fixture.nativeElement as HTMLElement)
-      .querySelector<HTMLButtonElement>('.sugestao-participante')
-      ?.click();
+    const elemento = fixture.nativeElement as HTMLElement;
+    const opcao = elemento.querySelector<HTMLOptionElement>(
+      'datalist option[value="Artista Dois"]'
+    );
+    const campo = elemento.querySelector<HTMLInputElement>(
+      '#artistasParticipantesIds'
+    );
+
+    expect(opcao?.textContent).toContain('Nome Completo Dois');
+    if (campo === null) {
+      throw new Error('Campo de busca de participantes não encontrado.');
+    }
+
+    campo.value = 'Artista Dois';
+    campo.dispatchEvent(new Event('input'));
+    campo.dispatchEvent(new Event('change'));
 
     expect(alterar).toHaveBeenCalledWith([2]);
     expect(component.busca()).toBe('');

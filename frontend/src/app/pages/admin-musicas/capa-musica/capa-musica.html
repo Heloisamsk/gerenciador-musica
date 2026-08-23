@@ -7,15 +7,14 @@
     (error)="registrarErro()"
   >
 } @else {
-  <span
-    class="capa-album capa-alternativa"
-    role="img"
-    [attr.aria-label]="
-      musica().album
-        ? 'Capa indisponível para o álbum ' + musica().album?.titulo
-        : 'Música sem álbum'
-    "
-  >
+  <span class="capa-album capa-alternativa">
     <span aria-hidden="true">♪</span>
+    <span class="texto-acessivel">
+      @if (musica().album) {
+        Capa indisponível para o álbum {{ musica().album?.titulo }}
+      } @else {
+        Música sem álbum
+      }
+    </span>
   </span>
 }

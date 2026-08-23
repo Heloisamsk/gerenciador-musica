@@ -1,15 +1,21 @@
 <div class="seletor-participantes">
-  <div
-    class="participantes-selecionados"
-    role="group"
-    aria-label="Artistas participantes selecionados"
+  <label
+    class="rotulo-participantes"
+    for="artistasParticipantesIds"
   >
-    @if (participantesSelecionados().length > 0) {
+    Artistas participantes
+  </label>
+
+  @if (participantesSelecionados().length > 0) {
+    <ul
+      class="participantes-selecionados"
+      aria-label="Artistas participantes selecionados"
+    >
       @for (
         artista of participantesSelecionados();
         track artista.idArtista
       ) {
-        <span class="participante-chip">
+        <li class="participante-chip">
           <span>{{ artista.nome }}</span>
           <button
             type="button"
@@ -20,14 +26,14 @@
           >
             <span aria-hidden="true">×</span>
           </button>
-        </span>
+        </li>
       }
-    } @else {
-      <span class="participantes-vazio">
-        Nenhum artista participante adicionado.
-      </span>
-    }
-  </div>
+    </ul>
+  } @else {
+    <p class="participantes-selecionados participantes-vazio">
+      Nenhum artista participante adicionado.
+    </p>
+  }
 
   <div class="busca-participante">
     <input
@@ -36,11 +42,8 @@
       type="search"
       autocomplete="off"
       maxlength="255"
-      role="combobox"
-      aria-autocomplete="list"
-      aria-controls="sugestoes-participantes"
+      list="sugestoes-participantes"
       aria-describedby="ajuda-participantes"
-      [attr.aria-expanded]="sugestoes().length > 0"
       [value]="busca()"
       [disabled]="desabilitado()"
       [placeholder]="
@@ -49,39 +52,28 @@
           : 'Digite o nome de um artista'
       "
       (input)="atualizarBusca($event)"
+      (change)="selecionarSugestao($event)"
       (keydown)="tratarTecla($event)"
     >
 
-    @if (busca().trim().length > 0) {
-      @if (sugestoes().length > 0) {
-        <ul
-          id="sugestoes-participantes"
-          class="sugestoes-participantes"
-          role="listbox"
-          aria-label="Sugestões de artistas"
-        >
-          @for (artista of sugestoes(); track artista.idArtista) {
-            <li>
-              <button
-                type="button"
-                role="option"
-                class="sugestao-participante"
-                (click)="adicionar(artista)"
-              >
-                <strong>{{ artista.nome }}</strong>
-                <span>{{ artista.nomeCompleto }}</span>
-              </button>
-            </li>
-          }
-        </ul>
-      } @else {
-        <output
-          class="nenhuma-sugestao"
-          aria-live="polite"
-        >
-          Nenhum artista encontrado.
-        </output>
+    <datalist id="sugestoes-participantes">
+      @for (artista of sugestoes(); track artista.idArtista) {
+        <option [value]="artista.nome">
+          {{ artista.nomeCompleto }}
+        </option>
       }
+    </datalist>
+
+    @if (
+      busca().trim().length > 0
+      && sugestoes().length === 0
+    ) {
+      <output
+        class="nenhuma-sugestao"
+        aria-live="polite"
+      >
+        Nenhum artista encontrado.
+      </output>
     }
   </div>
 

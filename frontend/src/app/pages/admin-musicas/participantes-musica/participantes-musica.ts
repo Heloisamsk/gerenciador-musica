@@ -1,6 +1,5 @@
 import {
   Component,
-  computed,
   input
 } from '@angular/core';
 
@@ -14,13 +13,4 @@ import type { ArtistaResumo } from '../../../models/MusicaResponse';
 export class ParticipantesMusica {
 
   readonly participantes = input<readonly ArtistaResumo[]>([]);
-  readonly descricaoAcessivel = computed(() => {
-    if (this.participantes().length === 0) {
-      return 'Nenhum artista participante';
-    }
-
-    return this.participantes()
-      .map(artista => artista.nome)
-      .join(', ');
-  });
 }

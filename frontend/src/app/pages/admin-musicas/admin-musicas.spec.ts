@@ -15,7 +15,7 @@ describe('AdminMusicas', () => {
   const listarMusicas = vi.fn();
   const excluirMusica = vi.fn();
   const navigate = vi.fn();
-  const getCurrentNavigation = vi.fn();
+  const currentNavigation = vi.fn();
 
   const musicas: MusicaListagem[] = [
     {
@@ -61,12 +61,12 @@ describe('AdminMusicas', () => {
     listarMusicas.mockReset();
     excluirMusica.mockReset();
     navigate.mockReset();
-    getCurrentNavigation.mockReset();
+    currentNavigation.mockReset();
 
     listarMusicas.mockReturnValue(of(musicas));
     excluirMusica.mockReturnValue(of(undefined));
     navigate.mockResolvedValue(true);
-    getCurrentNavigation.mockReturnValue(null);
+    currentNavigation.mockReturnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [AdminMusicas],
@@ -82,7 +82,7 @@ describe('AdminMusicas', () => {
           provide: Router,
           useValue: {
             navigate,
-            getCurrentNavigation
+            currentNavigation
           }
         }
       ]
@@ -132,9 +132,8 @@ describe('AdminMusicas', () => {
       .toBe('Excluir música Música de Teste Um');
     expect(elemento.querySelector<HTMLImageElement>('.capa-album')?.src)
       .toBe('https://example.com/capa-teste.jpg');
-    expect(elemento.querySelector('.capa-alternativa')?.getAttribute(
-      'aria-label'
-    )).toBe('Música sem álbum');
+    expect(elemento.querySelector('.capa-alternativa .texto-acessivel')
+      ?.textContent).toContain('Música sem álbum');
   });
 
   it('deve substituir uma capa inválida pela imagem alternativa', () => {
@@ -146,9 +145,10 @@ describe('AdminMusicas', () => {
     fixture.detectChanges();
 
     expect(elemento.querySelectorAll('.capa-alternativa')).toHaveLength(2);
-    expect(elemento.querySelector('.capa-alternativa')?.getAttribute(
-      'aria-label'
-    )).toBe('Capa indisponível para o álbum Álbum de Teste');
+    expect(elemento.querySelector('.capa-alternativa .texto-acessivel')
+      ?.textContent).toContain(
+        'Capa indisponível para o álbum Álbum de Teste'
+      );
   });
 
   it('deve exibir carregamento e impedir chamadas duplicadas', () => {
@@ -221,7 +221,7 @@ describe('AdminMusicas', () => {
   });
 
   it('deve recuperar a mensagem de sucesso da navegação', () => {
-    getCurrentNavigation.mockReturnValue({
+    currentNavigation.mockReturnValue({
       extras: {
         state: {
           mensagemSucesso: 'Música atualizada com sucesso!'
