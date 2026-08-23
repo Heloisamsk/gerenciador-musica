@@ -24,71 +24,181 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 
 ### Frontend
 
+<p>
+  <img src="https://skillicons.dev/icons?i=angular,ts,html,css,reactivex,nodejs,express,npm&theme=dark" alt="Angular, TypeScript, HTML5, CSS3, RxJS, Node.js, Express e npm" />
+</p>
+
 #### [Angular](https://angular.dev/)
 
-- Desenvolvimento da interface web em componentes.
-- Formulários reativos, rotas protegidas e integração com a API REST.
+- Desenvolvimento da interface web baseada em componentes.
+- Utilização de formulários reativos, injeção de dependências, rotas protegidas e integração com a API REST.
+- Organização da aplicação utilizando componentes standalone e Angular Router.
 
 #### [TypeScript](https://www.typescriptlang.org/)
 
-- Linguagem utilizada no desenvolvimento do frontend.
-- Tipagem de serviços, modelos, formulários e respostas da API.
+- Linguagem principal do frontend.
+- Tipagem de componentes, serviços, formulários, modelos e respostas da API.
+
+#### [HTML5](https://developer.mozilla.org/docs/Web/HTML) e [CSS3](https://developer.mozilla.org/docs/Web/CSS)
+
+- Estruturação semântica e acessível das páginas.
+- Desenvolvimento de layouts responsivos para diferentes tamanhos de tela.
+- Estilização dos componentes e estados visuais da aplicação.
 
 #### [RxJS](https://rxjs.dev/)
 
-- Tratamento de requisições HTTP e operações assíncronas.
-- Controle dos estados de carregamento, sucesso e erro.
+- Gerenciamento das operações assíncronas e requisições HTTP.
+- Tratamento dos estados de carregamento, sucesso e erro.
+- Controle do fluxo de dados por meio de Observables.
+
+#### [Node.js](https://nodejs.org/) e [Express](https://expressjs.com/)
+
+- Ambiente de execução e suporte à infraestrutura do frontend Angular.
+- Configuração do servidor utilizado pelo projeto Angular com suporte ao pacote de SSR.
+
+#### [npm](https://www.npmjs.com/)
+
+- Gerenciamento das dependências, scripts de desenvolvimento, testes e build do frontend.
+
+---
 
 ### Backend
 
-#### [Java](https://www.java.com/)
+<p>
+  <img src="https://skillicons.dev/icons?i=java,spring,hibernate,maven&theme=dark" alt="Java, Spring Boot, Hibernate e Maven" />
+</p>
+
+#### [Java 21](https://www.java.com/)
 
 - Linguagem utilizada no desenvolvimento do backend.
+- Implementação das regras de negócio, serviços, validações e modelos da aplicação.
 
 #### [Spring Boot](https://spring.io/projects/spring-boot)
 
-- Desenvolvimento da API REST e organização das regras de negócio.
+- Desenvolvimento e configuração da API REST.
+- Organização da aplicação em controllers, services, repositories, DTOs e configurações.
+- Gerenciamento de dependências e inicialização dos componentes do backend.
+
+#### [Spring MVC](https://docs.spring.io/spring-framework/reference/web/webmvc.html)
+
+- Implementação dos endpoints HTTP da API.
+- Recebimento, validação e retorno dos dados em formato JSON.
+- Padronização dos códigos de resposta e tratamento global de exceções.
 
 #### [Spring Security](https://spring.io/projects/spring-security)
 
-- Autenticação e autorização de usuários.
-- Proteção de endpoints de acordo com as roles `USER` e `ADMIN`.
+- Autenticação e autorização dos usuários.
+- Proteção dos endpoints de acordo com as roles `USER` e `ADMIN`.
+- Configuração da aplicação como uma API stateless.
 
-#### [JWT](https://jwt.io/)
+#### [JSON Web Token](https://jwt.io/)
 
-- Geração e validação dos tokens utilizados na autenticação.
+- Geração e validação dos tokens de autenticação.
+- Identificação do usuário autenticado em cada requisição protegida.
+- Implementação realizada com a biblioteca JJWT.
 
 #### [Spring Data JPA](https://spring.io/projects/spring-data-jpa) e [Hibernate](https://hibernate.org/orm/)
 
 - Persistência das entidades e comunicação com o banco de dados.
-- Mapeamento dos relacionamentos entre usuários, artistas, músicas, álbuns, gêneros e playlists.
+- Criação de consultas com repositories, métodos derivados e specifications.
+- Mapeamento dos relacionamentos entre usuários, artistas, músicas, álbuns, gêneros, perfis e playlists.
 
 #### [Jakarta Bean Validation](https://beanvalidation.org/)
 
-- Validação dos dados recebidos nos DTOs da API.
+- Validação automática dos dados recebidos nos DTOs.
+- Verificação de campos obrigatórios, tamanhos máximos, valores positivos e formatos permitidos.
 
-### Banco de dados e infraestrutura
+#### [Flyway](https://documentation.red-gate.com/flyway)
+
+- Versionamento e execução automática das migrations do banco de dados.
+- Criação, evolução e povoamento inicial da estrutura do PostgreSQL.
+
+#### [Spring Boot Actuator](https://docs.spring.io/spring-boot/reference/actuator/)
+
+- Disponibilização do endpoint de monitoramento da saúde do backend.
+- Verificação do estado da aplicação durante a execução e o deploy.
+
+#### [Apache Maven](https://maven.apache.org/)
+
+- Gerenciamento das dependências e plugins do backend.
+- Execução dos testes, geração de cobertura e criação do arquivo executável da aplicação.
+
+---
+
+### Banco de dados, infraestrutura e deploy
+
+<p>
+  <img src="https://skillicons.dev/icons?i=postgres,docker,nginx&theme=dark" alt="PostgreSQL, Docker e Nginx" />
+</p>
 
 #### [PostgreSQL](https://www.postgresql.org/)
 
 - Banco de dados relacional utilizado para persistência das informações.
+- Armazenamento dos dados do catálogo musical, usuários, perfis, playlists e demais relacionamentos.
 
 #### [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/)
 
 - Containerização do frontend Angular, backend Spring Boot e banco de dados PostgreSQL.
-- Construção das imagens e execução dos serviços em containers isolados.
-- Orquestração da comunicação e inicialização dos containers da aplicação.
+- Construção das imagens e execução dos serviços em ambientes isolados.
+- Orquestração da comunicação, dependências e inicialização dos containers.
+- Utilização de health checks e volume persistente para o banco de dados.
 
-### Testes e ferramentas
+#### [Nginx](https://nginx.org/)
+
+- Servidor utilizado para disponibilizar os arquivos de produção do frontend.
+- Execução do Angular em uma imagem Docker leve e sem privilégios administrativos.
+
+#### [Render](https://render.com/)
+
+- Hospedagem do frontend e do backend em ambiente de produção.
+- Configuração das URLs públicas e das variáveis de ambiente da aplicação.
+
+---
+
+### Testes, qualidade e automação
+
+<p>
+  <img src="https://skillicons.dev/icons?i=git,github,githubactions,vitest&theme=dark" alt="Git, GitHub, GitHub Actions e Vitest" />
+</p>
 
 #### [JUnit 5](https://junit.org/junit5/), [Mockito](https://site.mockito.org/) e MockMvc
 
-- Testes unitários e de integração do backend.
+- Desenvolvimento dos testes unitários, de integração e de segurança do backend.
+- Simulação das dependências da aplicação com mocks.
+- Validação dos endpoints, códigos HTTP, permissões e respostas JSON.
 
 #### [Vitest](https://vitest.dev/) e Angular TestBed
 
-- Testes dos componentes, serviços e requisições HTTP do frontend.
+- Desenvolvimento dos testes de componentes, serviços, formulários, guards e requisições HTTP do frontend.
+- Validação dos estados de carregamento, sucesso, erro e navegação.
+- Geração de relatórios de cobertura do frontend.
 
+#### [JaCoCo](https://www.jacoco.org/jacoco/)
+
+- Medição da cobertura dos testes automatizados do backend.
+- Geração de relatórios em HTML e XML durante o processo de verificação do Maven.
+
+#### [SonarCloud](https://sonarcloud.io/)
+
+- Análise estática e acompanhamento da qualidade do código.
+- Verificação de bugs, vulnerabilidades, duplicações, cobertura e code smells.
+- Validação automática do Quality Gate nos pull requests.
+
+#### [GitHub Actions](https://github.com/features/actions)
+
+- Automação dos pipelines de integração contínua do frontend e do backend.
+- Execução automática dos testes, builds, cobertura e análise do SonarCloud.
+- Utilização de PostgreSQL como serviço durante os testes de integração.
+
+#### [Git](https://git-scm.com/) e [GitHub](https://github.com/)
+
+- Controle de versão e colaboração no desenvolvimento do projeto.
+- Organização das alterações em branches, commits, pull requests e revisões de código.
+
+#### [Prettier](https://prettier.io/)
+
+- Padronização da formatação dos arquivos do frontend.
+- Manutenção de um estilo consistente no código TypeScript, HTML e CSS.
 
 ## 🎶 » Status do Projeto
 
