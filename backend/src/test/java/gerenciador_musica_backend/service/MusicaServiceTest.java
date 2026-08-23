@@ -200,6 +200,227 @@ class MusicaServiceTest {
     }
 
     @Test
+    void deveAtualizarTodosOsDadosEAssociacoesNaMesmaEntidade() {
+        Artista artistaAnterior = montarArtista(1L, "Artista anterior");
+        Artista artistaNovo = montarArtista(2L, "Artista novo");
+        Artista participante = montarArtista(3L, "Participante");
+        Album albumAnterior = montarAlbum(
+                1L,
+                artistaAnterior,
+                "Álbum anterior"
+        );
+        Album albumNovo = montarAlbum(2L, artistaNovo, "Álbum novo");
+        Genero generoNovo = new Genero("Pop");
+        generoNovo.setIdGenero(2L);
+        Musica musica = new Musica(
+                "Título anterior",
+                null,
+                180,
+                (short) 2020,
+                artistaAnterior,
+                albumAnterior
+        );
+        musica.setIdMusica(10L);
+        musica.setGeneros(Set.of(new Genero("Rock")));
+
+        MusicaRequestDTO request = new MusicaRequestDTO(
+                "  Música   atualizada  ",
+                "  Texto de teste  ",
+                240,
+                (short) 2024,
+                2L,
+                Set.of(3L),
+                2L,
+                Set.of("  Pop  ")
+        );
+
+        when(musicaRepository.findById(10L))
+                .thenReturn(Optional.of(musica));
+        when(artistaService.buscarEntidadePorId(2L))
+                .thenReturn(artistaNovo);
+        when(artistaService.buscarEntidadePorId(3L))
+                .thenReturn(participante);
+        when(albumService.buscarAlbumDoArtista(2L, artistaNovo))
+                .thenReturn(albumNovo);
+        when(musicaRepository
+                .existsByAlbumAndTituloIgnoreCaseAndIdMusicaNot(
+                        albumNovo,
+                        "Música atualizada",
+                        10L
+                )).thenReturn(false);
+        when(generoRepository.findByNomeIgnoreCase("Pop"))
+                .thenReturn(Optional.of(generoNovo));
+
+        MusicaResponseDTO response = musicaService.atualizarMusica(
+                10L,
+                request
+        );
+
+        assertThat(response.id()).isEqualTo(10L);
+        assertThat(response.titulo()).isEqualTo("Música atualizada");
+        assertThat(response.letra()).isEqualTo("Texto de teste");
+        assertThat(response.duracaoSegundos()).isEqualTo(240);
+        assertThat(response.anoLancamento()).isEqualTo((short) 2024);
+        assertThat(response.artistaPrincipal().id()).isEqualTo(2L);
+        assertThat(response.album().id()).isEqualTo(2L);
+        assertThat(response.artistasParticipantes())
+                .extracting(artista -> artista.id())
+                .containsExactly(3L);
+        assertThat(response.generos())
+                .extracting(genero -> genero.nome())
+                .containsExactly("Pop");
+        assertThat(musica.getIdMusica()).isEqualTo(10L);
+        assertThat(musica.getArtistaPrincipal()).isSameAs(artistaNovo);
+        assertThat(musica.getAlbum()).isSameAs(albumNovo);
+
+        verify(musicaRepository, never()).save(any());
+    }
+
+    @Test
+    void deveManterTituloAtualERemoverAlbumSemFalsoConflito() {
+        Artista artista = montarArtista(1L, "Artista");
+        Album album = montarAlbum(1L, artista, "Álbum");
+        Genero genero = new Genero("Rock");
+        Musica musica = new Musica(
+                "Mesmo título",
+                null,
+                200,
+                (short) 2022,
+                artista,
+                album
+        );
+        musica.setIdMusica(10L);
+        musica.setGeneros(Set.of(genero));
+        MusicaRequestDTO request = new MusicaRequestDTO(
+                "Mesmo título",
+                null,
+                200,
+                (short) 2022,
+                1L,
+                Set.of(),
+                null,
+                Set.of("Rock")
+        );
+
+        when(musicaRepository.findById(10L))
+                .thenReturn(Optional.of(musica));
+        when(artistaService.buscarEntidadePorId(1L))
+                .thenReturn(artista);
+        when(albumService.buscarAlbumDoArtista(null, artista))
+                .thenReturn(null);
+        when(musicaRepository
+                .existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamentoAndIdMusicaNot(
+                        artista,
+                        "Mesmo título",
+                        (short) 2022,
+                        10L
+                )).thenReturn(false);
+        when(generoRepository.findByNomeIgnoreCase("Rock"))
+                .thenReturn(Optional.of(genero));
+
+        MusicaResponseDTO response = musicaService.atualizarMusica(
+                10L,
+                request
+        );
+
+        assertThat(response.id()).isEqualTo(10L);
+        assertThat(response.titulo()).isEqualTo("Mesmo título");
+        assertThat(response.album()).isNull();
+        assertThat(musica.getAlbum()).isNull();
+    }
+
+    @Test
+    void deveBloquearDuplicidadePertencenteAOutraMusica() {
+        Artista artista = montarArtista(1L, "Artista");
+        Album album = montarAlbum(1L, artista, "Álbum");
+        Musica musica = new Musica(
+                "Título anterior",
+                null,
+                180,
+                (short) 2020,
+                artista,
+                album
+        );
+        musica.setIdMusica(10L);
+        MusicaRequestDTO request = montarRequestValida();
+
+        when(musicaRepository.findById(10L))
+                .thenReturn(Optional.of(musica));
+        when(artistaService.buscarEntidadePorId(1L))
+                .thenReturn(artista);
+        when(albumService.buscarAlbumDoArtista(1L, artista))
+                .thenReturn(album);
+        when(musicaRepository
+                .existsByAlbumAndTituloIgnoreCaseAndIdMusicaNot(
+                        album,
+                        "Bohemian Rhapsody",
+                        10L
+                )).thenReturn(true);
+
+        assertThatThrownBy(() -> musicaService.atualizarMusica(
+                10L,
+                request
+        ))
+                .isInstanceOf(MusicaDuplicadaException.class)
+                .hasMessage("A música já está cadastrada.");
+
+        assertThat(musica.getTitulo()).isEqualTo("Título anterior");
+        verify(generoRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarExcecaoAoAtualizarMusicaInexistente() {
+        when(musicaRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> musicaService.atualizarMusica(
+                99L,
+                montarRequestValida()
+        ))
+                .isInstanceOf(MusicaNaoEncontradaException.class)
+                .hasMessage("Música não encontrada com o ID: 99");
+
+        verify(artistaService, never()).buscarEntidadePorId(any());
+    }
+
+    @Test
+    void deveExcluirMusicaExistente() {
+        Artista artista = montarArtista(1L, "Artista");
+        Musica musica = new Musica(
+                "Música",
+                null,
+                180,
+                (short) 2020,
+                artista,
+                null
+        );
+        musica.setIdMusica(10L);
+
+        when(musicaRepository.findById(10L))
+                .thenReturn(Optional.of(musica));
+
+        musicaService.excluirMusica(10L);
+
+        verify(musicaRepository).delete(musica);
+    }
+
+    @Test
+    void deveRejeitarIdInvalidoOuMusicaInexistenteNaExclusao() {
+        assertThatThrownBy(() -> musicaService.excluirMusica(0L))
+                .isInstanceOf(DadosMusicaInvalidosException.class)
+                .hasMessage("O ID da música deve ser positivo.");
+
+        when(musicaRepository.findById(99L))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> musicaService.excluirMusica(99L))
+                .isInstanceOf(MusicaNaoEncontradaException.class)
+                .hasMessage("Música não encontrada com o ID: 99");
+
+        verify(musicaRepository, never()).delete(any());
+    }
+
+    @Test
     void deveBuscarMusicaPorId() {
         Artista artista = new Artista(
                 "Queen",
@@ -231,6 +452,34 @@ class MusicaServiceTest {
 
         assertThatThrownBy(() -> musicaService.buscarPorId(99L))
                 .isInstanceOf(MusicaNaoEncontradaException.class);
+    }
+
+    private Artista montarArtista(Long id, String nome) {
+        Artista artista = new Artista(
+                nome,
+                nome + " completo",
+                "Descrição de teste.",
+                null
+        );
+        artista.setIdArtista(id);
+
+        return artista;
+    }
+
+    private Album montarAlbum(
+            Long id,
+            Artista artista,
+            String titulo
+    ) {
+        Album album = new Album(
+                artista,
+                titulo,
+                (short) 2024,
+                null
+        );
+        album.setIdAlbum(id);
+
+        return album;
     }
 
     private Musica montarMusicaCompleta() {
