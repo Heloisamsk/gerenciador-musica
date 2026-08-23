@@ -1,27 +1,24 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting
-} from '@angular/common/http/testing';
+import { By } from '@angular/platform-browser';
+import { Subject, of, throwError } from 'rxjs';
+import { vi } from 'vitest';
 
-import { CadastroAlbum } from './cadastro-album';
 import { AlbumResponse } from '../../../models/AlbumResponse';
 import { ArtistaResponse } from '../../../models/ArtistaResponse';
-import { ArtistaResumo } from '../../../models/ArtistaResumoModel';
+import { AdminAlbumService } from '../../../services/admin-album.service';
+import { AdminArtistaService } from '../../../services/admin-artista';
+import { FormularioAlbum } from '../formulario-album/formulario-album';
+import { CadastroAlbum } from './cadastro-album';
 
 describe('CadastroAlbum', () => {
   let component: CadastroAlbum;
   let fixture: ComponentFixture<CadastroAlbum>;
-  let httpMock: HttpTestingController;
 
-  const apiArtistasUrl =
-    'http://localhost:8080/api/artistas';
+  const listarArtistas = vi.fn();
+  const cadastrarAlbum = vi.fn();
 
-  const apiAlbunsUrl =
-    'http://localhost:8080/api/admin/albuns';
-
-  const artistaMock: ArtistaResponse = {
+  const artista: ArtistaResponse = {
     idArtista: 1,
     nome: 'Queen',
     nomeCompleto: 'Queen',
@@ -29,180 +26,119 @@ describe('CadastroAlbum', () => {
     fotoPerfilUrl: null
   };
 
-  const artistaResumoMock: ArtistaResumo = {
-    id: 1,
-    nome: 'Queen',
-    nomeCompleto: 'Queen',
-    descricao: 'Banda britânica de rock.',
-    fotoPerfilUrl: null
-  };
-
-  const albumMock: AlbumResponse = {
-    idAlbum: 1,
+  const album: AlbumResponse = {
+    idAlbum: 10,
     titulo: 'A Night at the Opera',
     anoLancamento: 1975,
-    capaUrl: 'https://example.com/capa.jpg',
-    artista: artistaResumoMock
+    capaUrl: null,
+    artista: {
+      id: artista.idArtista,
+      nome: artista.nome,
+      nomeCompleto: artista.nomeCompleto,
+      descricao: artista.descricao,
+      fotoPerfilUrl: artista.fotoPerfilUrl
+    }
   };
 
   beforeEach(async () => {
+    listarArtistas.mockReset();
+    cadastrarAlbum.mockReset();
+    listarArtistas.mockReturnValue(of([artista]));
+    cadastrarAlbum.mockReturnValue(of(album));
+
     await TestBed.configureTestingModule({
       imports: [CadastroAlbum],
       providers: [
-        provideHttpClient(),
-        provideHttpClientTesting()
+        {
+          provide: AdminAlbumService,
+          useValue: { cadastrarAlbum }
+        },
+        {
+          provide: AdminArtistaService,
+          useValue: { listarArtistas }
+        }
       ]
     }).compileComponents();
+  });
 
+  function criarComponente(): void {
     fixture = TestBed.createComponent(CadastroAlbum);
     component = fixture.componentInstance;
-    httpMock = TestBed.inject(HttpTestingController);
-  });
-
-  afterEach(() => {
-    httpMock.verify();
-  });
-
-  function carregarArtistas(
-    artistas: ArtistaResponse[] = [artistaMock]
-  ): void {
     fixture.detectChanges();
-
-    const requisicao = httpMock.expectOne(apiArtistasUrl);
-
-    expect(requisicao.request.method).toBe('GET');
-
-    requisicao.flush(artistas);
   }
 
-  function preencherFormularioValido(): void {
-    component.formulario.setValue({
-      titulo: ' A Night at the Opera ',
-      idArtista: artistaMock.idArtista,
+  function obterFormulario(): FormularioAlbum {
+    return fixture.debugElement.query(
+      By.directive(FormularioAlbum)
+    ).componentInstance as FormularioAlbum;
+  }
+
+  function preencherFormularioValido(
+    formulario: FormularioAlbum
+  ): void {
+    formulario.formulario.setValue({
+      titulo: '  A Night   at the Opera  ',
+      idArtista: artista.idArtista,
       anoLancamento: 1975,
-      capaUrl: ' https://example.com/capa.jpg '
+      capaUrl: '   '
     });
   }
 
-  it('should create', () => {
+  it('deve criar a tela usando o formulário reutilizável', () => {
+    criarComponente();
+
+    const formulario = obterFormulario();
+
     expect(component).toBeTruthy();
-  });
-
-  it('deve carregar os artistas ao inicializar', () => {
-    fixture.detectChanges();
-
-    expect(component.carregandoArtistas()).toBe(true);
-
-    const requisicao = httpMock.expectOne(apiArtistasUrl);
-
-    expect(requisicao.request.method).toBe('GET');
-
-    requisicao.flush([artistaMock]);
-
-    expect(component.artistas).toEqual([artistaMock]);
-    expect(component.carregandoArtistas()).toBe(false);
+    expect(formulario.modo()).toBe('cadastro');
+    expect(formulario.artistas()).toEqual([artista]);
+    expect(listarArtistas).toHaveBeenCalledOnce();
   });
 
   it('deve informar quando não houver artistas cadastrados', () => {
-    carregarArtistas([]);
+    listarArtistas.mockReturnValue(of([]));
+
+    criarComponente();
 
     expect(component.artistas).toEqual([]);
     expect(component.erroArtistas()).toBe(
       'Nenhum artista cadastrado. Cadastre um artista primeiro.'
     );
-    expect(component.carregandoArtistas()).toBe(false);
+    expect(obterFormulario().cadastroIndisponivel()).toBe(true);
   });
 
-  it('deve liberar o carregamento quando a busca de artistas falhar', () => {
-    fixture.detectChanges();
+  it('deve tratar falha ao carregar os artistas', () => {
+    listarArtistas.mockReturnValue(throwError(() =>
+      new HttpErrorResponse({ status: 500 })
+    ));
 
-    httpMock
-      .expectOne(apiArtistasUrl)
-      .flush(
-        {},
-        {
-          status: 500,
-          statusText: 'Internal Server Error'
-        }
-      );
+    criarComponente();
 
     expect(component.artistas).toEqual([]);
+    expect(component.erroArtistas()).toBe(
+      'Não foi possível carregar a lista de artistas.'
+    );
     expect(component.carregandoArtistas()).toBe(false);
   });
 
-  it('não deve cadastrar quando o formulário for inválido', () => {
-    carregarArtistas();
+  it('deve cadastrar o request emitido e limpar o formulário', () => {
+    criarComponente();
+    const formulario = obterFormulario();
+    preencherFormularioValido(formulario);
 
-    component.salvar();
+    formulario.submeter();
 
-    httpMock.expectNone(apiAlbunsUrl);
-
-    expect(component.formulario.controls.titulo.touched)
-      .toBe(true);
-
-    expect(component.formulario.controls.idArtista.touched)
-      .toBe(true);
-
-    expect(component.formulario.controls.anoLancamento.touched)
-      .toBe(true);
-  });
-
-  it('deve rejeitar título apenas com espaços e URL inválida', () => {
-    component.formulario.controls.titulo.setValue('   ');
-
-    component.formulario.controls.capaUrl.setValue(
-      'url-invalida'
-    );
-
-    expect(
-      component.formulario.controls.titulo
-        .hasError('apenasEspacos')
-    ).toBe(true);
-
-    expect(
-      component.formulario.controls.capaUrl
-        .hasError('urlInvalida')
-    ).toBe(true);
-
-    component.formulario.controls.capaUrl.setValue(
-      'https://example.com/capa.jpg'
-    );
-
-    expect(
-      component.formulario.controls.capaUrl
-        .hasError('urlInvalida')
-    ).toBe(false);
-  });
-
-  it('deve cadastrar o álbum e limpar o formulário', () => {
-    carregarArtistas();
-    preencherFormularioValido();
-
-    component.salvar();
-
-    expect(component.carregando()).toBe(true);
-
-    const requisicao = httpMock.expectOne(apiAlbunsUrl);
-
-    expect(requisicao.request.method).toBe('POST');
-
-    expect(requisicao.request.body).toEqual({
+    expect(cadastrarAlbum).toHaveBeenCalledWith({
       titulo: 'A Night at the Opera',
       idArtista: 1,
       anoLancamento: 1975,
-      capaUrl: 'https://example.com/capa.jpg'
+      capaUrl: null
     });
-
-    requisicao.flush(albumMock);
-
     expect(component.mensagemSucesso()).toBe(
       'Álbum A Night at the Opera cadastrado com sucesso!'
     );
-
-    expect(component.mensagemErro()).toBe('');
     expect(component.carregando()).toBe(false);
-
-    expect(component.formulario.getRawValue()).toEqual({
+    expect(formulario.formulario.getRawValue()).toEqual({
       titulo: '',
       idArtista: null,
       anoLancamento: null,
@@ -210,99 +146,51 @@ describe('CadastroAlbum', () => {
     });
   });
 
-  it('não deve enviar outro cadastro enquanto houver requisição em andamento', () => {
-    carregarArtistas();
-    preencherFormularioValido();
+  it('deve bloquear cadastros duplicados durante a requisição', () => {
+    const resposta = new Subject<AlbumResponse>();
+    cadastrarAlbum.mockReturnValue(resposta.asObservable());
+    criarComponente();
+    const formulario = obterFormulario();
+    preencherFormularioValido(formulario);
 
-    component.salvar();
+    formulario.submeter();
+    formulario.submeter();
 
-    const requisicao = httpMock.expectOne(apiAlbunsUrl);
+    expect(cadastrarAlbum).toHaveBeenCalledOnce();
+    expect(component.carregando()).toBe(true);
 
-    component.salvar();
-
-    httpMock.expectNone(apiAlbunsUrl);
-
-    requisicao.flush(albumMock);
+    resposta.next(album);
+    resposta.complete();
 
     expect(component.carregando()).toBe(false);
   });
 
-  const cenariosDeErro = [
-    {
-      status: 400,
-      statusText: 'Bad Request',
-      corpo: {
-        message: 'Título inválido.'
-      },
-      mensagemEsperada: 'Título inválido.'
-    },
-    {
-      status: 400,
-      statusText: 'Bad Request',
-      corpo: {},
-      mensagemEsperada:
-        'Existem dados inválidos no formulário.'
-    },
-    {
-      status: 401,
-      statusText: 'Unauthorized',
-      corpo: {},
-      mensagemEsperada:
-        'Sua sessão não é válida. Faça login novamente.'
-    },
-    {
-      status: 403,
-      statusText: 'Forbidden',
-      corpo: {},
-      mensagemEsperada:
-        'Você não possui permissão para cadastrar álbuns.'
-    },
-    {
-      status: 404,
-      statusText: 'Not Found',
-      corpo: {},
-      mensagemEsperada:
-        'O artista selecionado não foi encontrado.'
-    },
-    {
-      status: 409,
-      statusText: 'Conflict',
-      corpo: {},
-      mensagemEsperada:
-        'Esse álbum já está cadastrado.'
-    },
-    {
-      status: 500,
-      statusText: 'Internal Server Error',
-      corpo: {},
-      mensagemEsperada:
-        'Ocorreu um erro ao cadastrar o álbum.'
-    }
-  ];
+  it.each([
+    [0, {}, 'Não foi possível conectar ao servidor.'],
+    [400, {}, 'Existem dados inválidos no formulário.'],
+    [400, { message: 'Título inválido.' }, 'Título inválido.'],
+    [401, {}, 'Sua sessão não é válida. Faça login novamente.'],
+    [403, {}, 'Você não possui permissão para cadastrar álbuns.'],
+    [404, {}, 'O artista selecionado não foi encontrado.'],
+    [409, {}, 'Esse álbum já está cadastrado.'],
+    [500, {}, 'Ocorreu um erro ao cadastrar o álbum.']
+  ])(
+    'deve tratar o erro HTTP %i no cadastro',
+    (status, error, mensagem) => {
+      cadastrarAlbum.mockReturnValue(throwError(() =>
+        new HttpErrorResponse({ status, error })
+      ));
+      criarComponente();
+      const formulario = obterFormulario();
+      preencherFormularioValido(formulario);
 
-  for (const cenario of cenariosDeErro) {
-    it(`deve tratar resposta de erro ${cenario.status}`, () => {
-      carregarArtistas();
-      preencherFormularioValido();
+      formulario.submeter();
 
-      component.salvar();
-
-      httpMock
-        .expectOne(apiAlbunsUrl)
-        .flush(
-          cenario.corpo,
-          {
-            status: cenario.status,
-            statusText: cenario.statusText
-          }
-        );
-
-      expect(component.mensagemErro()).toBe(
-        cenario.mensagemEsperada
-      );
-
+      expect(component.mensagemErro()).toBe(mensagem);
       expect(component.mensagemSucesso()).toBe('');
       expect(component.carregando()).toBe(false);
-    });
-  }
+      expect(formulario.formulario.controls.titulo.value)
+        .toContain('A Night');
+    }
+  );
 });

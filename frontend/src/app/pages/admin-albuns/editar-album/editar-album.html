@@ -1,7 +1,29 @@
-<main aria-labelledby="titulo-edicao-album">
-  <h1 id="titulo-edicao-album">Editar álbum</h1>
+@if (carregandoDados()) {
+  <main class="edicao-page">
+    <output class="edicao-state" aria-live="polite">
+      Carregando dados do álbum...
+    </output>
+  </main>
+} @else if (!album()) {
+  <main class="edicao-page">
+    <section class="edicao-state error-state" role="alert">
+      <h1>Não foi possível editar o álbum</h1>
+      <p>{{ mensagemErro() }}</p>
 
-  <p>
-    Os dados do álbum serão disponibilizados nesta página para edição.
-  </p>
-</main>
+      <a routerLink="/admin/banco/albuns">
+        Voltar para a listagem
+      </a>
+    </section>
+  </main>
+} @else {
+  <app-formulario-album
+    modo="edicao"
+    [dadosIniciais]="album()"
+    [carregando]="salvando()"
+    [mensagemSucesso]="mensagemSucesso()"
+    [mensagemErro]="mensagemErro()"
+    [exibirCancelar]="true"
+    (enviarEdicao)="salvar($event)"
+    (cancelar)="cancelar()"
+  />
+}
