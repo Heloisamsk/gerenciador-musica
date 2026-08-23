@@ -5,6 +5,7 @@ import gerenciador_musica_backend.dto.MusicaListagemDTO;
 import gerenciador_musica_backend.dto.MusicaRequestDTO;
 import gerenciador_musica_backend.dto.MusicaResponseDTO;
 import gerenciador_musica_backend.dto.PaginaResponseDTO;
+import gerenciador_musica_backend.exception.DadosAlbumInvalidosException;
 import gerenciador_musica_backend.exception.DadosMusicaInvalidosException;
 import gerenciador_musica_backend.exception.MusicaDuplicadaException;
 import gerenciador_musica_backend.exception.MusicaNaoEncontradaException;
@@ -204,6 +205,10 @@ class MusicaServiceTest {
         Artista artistaAnterior = montarArtista(1L, "Artista anterior");
         Artista artistaNovo = montarArtista(2L, "Artista novo");
         Artista participante = montarArtista(3L, "Participante");
+        Artista participanteAnterior = montarArtista(
+                4L,
+                "Participante anterior"
+        );
         Album albumAnterior = montarAlbum(
                 1L,
                 artistaAnterior,
@@ -221,6 +226,7 @@ class MusicaServiceTest {
                 albumAnterior
         );
         musica.setIdMusica(10L);
+        musica.setArtistasParticipantes(Set.of(participanteAnterior));
         musica.setGeneros(Set.of(new Genero("Rock")));
 
         MusicaRequestDTO request = new MusicaRequestDTO(
@@ -272,6 +278,9 @@ class MusicaServiceTest {
         assertThat(musica.getIdMusica()).isEqualTo(10L);
         assertThat(musica.getArtistaPrincipal()).isSameAs(artistaNovo);
         assertThat(musica.getAlbum()).isSameAs(albumNovo);
+        assertThat(musica.getArtistasParticipantes())
+                .containsExactly(participante)
+                .doesNotContain(participanteAnterior);
 
         verify(musicaRepository, never()).save(any());
     }
@@ -381,6 +390,89 @@ class MusicaServiceTest {
                 .hasMessage("Música não encontrada com o ID: 99");
 
         verify(artistaService, never()).buscarEntidadePorId(any());
+    }
+
+    @Test
+    void deveRejeitarAtualizacaoQuandoAlbumNaoPertenceAoArtista() {
+        Artista artistaAnterior = montarArtista(1L, "Artista anterior");
+        Artista artistaNovo = montarArtista(2L, "Artista novo");
+        Album albumAnterior = montarAlbum(
+                1L,
+                artistaAnterior,
+                "Álbum anterior"
+        );
+        Musica musica = new Musica(
+                "Título anterior",
+                null,
+                180,
+                (short) 2020,
+                artistaAnterior,
+                albumAnterior
+        );
+        musica.setIdMusica(10L);
+
+        MusicaRequestDTO request = new MusicaRequestDTO(
+                "Título atualizado",
+                null,
+                200,
+                (short) 2024,
+                2L,
+                Set.of(),
+                99L,
+                Set.of("Rock")
+        );
+
+        when(musicaRepository.findById(10L))
+                .thenReturn(Optional.of(musica));
+        when(artistaService.buscarEntidadePorId(2L))
+                .thenReturn(artistaNovo);
+        when(albumService.buscarAlbumDoArtista(99L, artistaNovo))
+                .thenThrow(new DadosAlbumInvalidosException(
+                        "O álbum selecionado não pertence ao "
+                                + "artista principal da música."
+                ));
+
+        assertThatThrownBy(() -> musicaService.atualizarMusica(
+                10L,
+                request
+        ))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage(
+                        "O álbum selecionado não pertence ao "
+                                + "artista principal da música."
+                );
+
+        assertThat(musica.getTitulo()).isEqualTo("Título anterior");
+        assertThat(musica.getArtistaPrincipal())
+                .isSameAs(artistaAnterior);
+        assertThat(musica.getAlbum()).isSameAs(albumAnterior);
+        verify(generoRepository, never()).findByNomeIgnoreCase(any());
+    }
+
+    @Test
+    void deveRejeitarParticipanteIgualAoPrincipalNaAtualizacao() {
+        MusicaRequestDTO request = new MusicaRequestDTO(
+                "Título atualizado",
+                null,
+                200,
+                (short) 2024,
+                1L,
+                Set.of(1L),
+                null,
+                Set.of("Rock")
+        );
+
+        assertThatThrownBy(() -> musicaService.atualizarMusica(
+                10L,
+                request
+        ))
+                .isInstanceOf(DadosMusicaInvalidosException.class)
+                .hasMessage(
+                        "O artista principal não pode aparecer "
+                                + "como participante."
+                );
+
+        verify(musicaRepository, never()).findById(any(Long.class));
     }
 
     @Test
