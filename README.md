@@ -18,6 +18,9 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 - **Frontend:** [gerenciador-musica.onrender.com](https://gerenciador-musica.onrender.com)
 - **Backend:** [gerenciador-musica-1.onrender.com](https://gerenciador-musica-1.onrender.com)
 
+→ Acesso ADMIN: 
+*Email*: eloa93@example.net | *Senha*: Senha@123
+
 
 
 ## 🤖 » Tecnologias
