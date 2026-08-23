@@ -21,9 +21,22 @@ public interface MusicaRepository
             String titulo
     );
 
+    boolean existsByAlbumAndTituloIgnoreCaseAndIdMusicaNot(
+            Album album,
+            String titulo,
+            Long idMusica
+    );
+
     boolean existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamento(
             Artista artistaPrincipal,
             String titulo,
             Short anoLancamento
+    );
+
+    boolean existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamentoAndIdMusicaNot(
+            Artista artistaPrincipal,
+            String titulo,
+            Short anoLancamento,
+            Long idMusica
     );
 }

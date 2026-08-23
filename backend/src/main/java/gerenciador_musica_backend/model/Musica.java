@@ -124,10 +124,12 @@ public class Musica {
     public void setArtistasParticipantes(
             Set<Artista> artistasParticipantes
     ) {
-        this.artistasParticipantes =
-                artistasParticipantes == null
-                        ? new LinkedHashSet<>()
-                        : new LinkedHashSet<>(artistasParticipantes);
+        Set<Artista> novosParticipantes = artistasParticipantes == null
+                ? Set.of()
+                : new LinkedHashSet<>(artistasParticipantes);
+
+        this.artistasParticipantes.clear();
+        this.artistasParticipantes.addAll(novosParticipantes);
     }
 
     public Set<Genero> getGeneros() {
@@ -135,10 +137,12 @@ public class Musica {
     }
 
     public void setGeneros(Set<Genero> generos) {
-        this.generos =
-                generos == null
-                        ? new LinkedHashSet<>()
-                        : new LinkedHashSet<>(generos);
+        Set<Genero> novosGeneros = generos == null
+                ? Set.of()
+                : new LinkedHashSet<>(generos);
+
+        this.generos.clear();
+        this.generos.addAll(novosGeneros);
     }
 
     public String getTitulo() {

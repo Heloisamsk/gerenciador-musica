@@ -37,4 +37,24 @@ public class AdminMusicaController {
                 .created(location)
                 .body(response);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MusicaResponseDTO> atualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody MusicaRequestDTO request
+    ) {
+        MusicaResponseDTO response = musicaService.atualizarMusica(
+                id,
+                request
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        musicaService.excluirMusica(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
