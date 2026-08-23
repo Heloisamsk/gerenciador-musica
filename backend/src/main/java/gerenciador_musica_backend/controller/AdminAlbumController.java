@@ -1,5 +1,6 @@
 package gerenciador_musica_backend.controller;
 
+import gerenciador_musica_backend.dto.AlbumAtualizacaoRequestDTO;
 import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.service.AlbumService;
@@ -36,5 +37,24 @@ public class AdminAlbumController {
         return ResponseEntity
                 .created(location)
                 .body(response);
+    }
+
+    @PutMapping("/{idAlbum}")
+    public ResponseEntity<AlbumResponseDTO> atualizar(
+            @PathVariable("idAlbum") Long idAlbum,
+            @Valid @RequestBody AlbumAtualizacaoRequestDTO request
+    ) {
+        return ResponseEntity.ok(
+                albumService.atualizarAlbum(idAlbum, request)
+        );
+    }
+
+    @DeleteMapping("/{idAlbum}")
+    public ResponseEntity<Void> excluir(
+            @PathVariable("idAlbum") Long idAlbum
+    ) {
+        albumService.excluirAlbum(idAlbum);
+
+        return ResponseEntity.noContent().build();
     }
 }

@@ -14,6 +14,8 @@ public interface MusicaRepository
 
     boolean existsByArtistasParticipantes_IdArtista(Long idArtista);
 
+    boolean existsByAlbum_IdAlbum(Long idAlbum);
+
     boolean existsByAlbumAndTituloIgnoreCase(
             Album album,
             String titulo
