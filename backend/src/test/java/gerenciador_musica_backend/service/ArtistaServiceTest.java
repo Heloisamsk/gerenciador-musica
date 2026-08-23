@@ -10,6 +10,9 @@ import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
+import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
+import gerenciador_musica_backend.repository.projection.ArtistaCatalogoResumoProjection;
+import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -269,6 +273,108 @@ class ArtistaServiceTest {
                 .isEqualTo("https://exemplo.com/queen.jpg");
 
         verify(artistaRepository).findById(1L);
+    }
+
+    @Test
+    void deveMontarDetalhesDoArtistaComAsTresViews() {
+        ArtistaCatalogoResumoProjection resumo = mock(
+                ArtistaCatalogoResumoProjection.class
+        );
+        AlbumCatalogoProjection album = mock(
+                AlbumCatalogoProjection.class
+        );
+        MusicaCatalogoProjection musica = mock(
+                MusicaCatalogoProjection.class
+        );
+
+        when(resumo.getIdArtista()).thenReturn(1L);
+        when(resumo.getNome()).thenReturn("Queen");
+        when(resumo.getNomeCompleto()).thenReturn("Queen");
+        when(resumo.getDescricao()).thenReturn("Banda britânica de rock.");
+        when(resumo.getFotoPerfilUrl()).thenReturn(null);
+        when(resumo.getTotalAlbuns()).thenReturn(1L);
+        when(resumo.getTotalMusicasPrincipais()).thenReturn(1L);
+        when(resumo.getTotalParticipacoes()).thenReturn(0L);
+        when(resumo.getDuracaoTotalSegundos()).thenReturn(354L);
+
+        when(album.getIdAlbum()).thenReturn(10L);
+        when(album.getIdArtista()).thenReturn(1L);
+        when(album.getNomeArtista()).thenReturn("Queen");
+        when(album.getTitulo()).thenReturn("A Night at the Opera");
+        when(album.getAnoLancamento()).thenReturn((short) 1975);
+        when(album.getCapaUrl()).thenReturn(null);
+        when(album.getTotalMusicas()).thenReturn(1L);
+        when(album.getDuracaoTotalSegundos()).thenReturn(354L);
+
+        when(musica.getIdMusica()).thenReturn(20L);
+        when(musica.getTitulo()).thenReturn("Bohemian Rhapsody");
+        when(musica.getDuracaoSegundos()).thenReturn(354);
+        when(musica.getAnoLancamento()).thenReturn((short) 1975);
+        when(musica.getIdArtistaPrincipal()).thenReturn(1L);
+        when(musica.getNomeArtistaPrincipal()).thenReturn("Queen");
+        when(musica.getIdAlbum()).thenReturn(10L);
+        when(musica.getTituloAlbum()).thenReturn("A Night at the Opera");
+        when(musica.getCapaUrl()).thenReturn(null);
+        when(musica.getGeneros()).thenReturn("Rock, Rock Progressivo");
+        when(musica.getPapelArtista()).thenReturn("PRINCIPAL");
+
+        when(artistaRepository.buscarResumoCatalogo(1L))
+                .thenReturn(Optional.of(resumo));
+        when(albumRepository.buscarCatalogoPorArtista(1L))
+                .thenReturn(List.of(album));
+        when(musicaRepository.buscarCatalogoPorArtista(1L))
+                .thenReturn(List.of(musica));
+
+        var detalhes = artistaService.buscarDetalhesCatalogo(1L);
+
+        assertThat(detalhes.artista().nome()).isEqualTo("Queen");
+        assertThat(detalhes.artista().totalAlbuns()).isEqualTo(1L);
+        assertThat(detalhes.albuns())
+                .singleElement()
+                .satisfies(item -> assertThat(item.titulo())
+                        .isEqualTo("A Night at the Opera"));
+        assertThat(detalhes.musicas())
+                .singleElement()
+                .satisfies(item -> {
+                    assertThat(item.titulo())
+                            .isEqualTo("Bohemian Rhapsody");
+                    assertThat(item.generos())
+                            .containsExactly("Rock", "Rock Progressivo");
+                    assertThat(item.papelArtista())
+                            .isEqualTo("PRINCIPAL");
+                });
+
+        verify(artistaRepository).buscarResumoCatalogo(1L);
+        verify(albumRepository).buscarCatalogoPorArtista(1L);
+        verify(musicaRepository).buscarCatalogoPorArtista(1L);
+    }
+
+    @Test
+    void deveRejeitarIdInvalidoAoBuscarDetalhesDoCatalogo() {
+        assertThatThrownBy(
+                () -> artistaService.buscarDetalhesCatalogo(0L)
+        )
+                .isInstanceOf(DadosArtistaInvalidosException.class)
+                .hasMessage("O ID do artista deve ser positivo.");
+
+        verify(artistaRepository, never()).buscarResumoCatalogo(any());
+        verify(albumRepository, never()).buscarCatalogoPorArtista(any());
+        verify(musicaRepository, never()).buscarCatalogoPorArtista(any());
+    }
+
+    @Test
+    void deveInformarQuandoArtistaDosDetalhesNaoExistir() {
+        when(artistaRepository.buscarResumoCatalogo(99L))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(
+                () -> artistaService.buscarDetalhesCatalogo(99L)
+        )
+                .isInstanceOf(ArtistaNaoEncontradoException.class)
+                .hasMessage("Artista não encontrado com o ID: 99");
+
+        verify(albumRepository, never()).buscarCatalogoPorArtista(any());
+        verify(musicaRepository, never()).buscarCatalogoPorArtista(any());
     }
 
     @Test

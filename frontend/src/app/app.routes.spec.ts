@@ -57,3 +57,15 @@ describe('rotas administrativas de músicas', () => {
     });
   }
 });
+
+describe('rota de detalhes do artista', () => {
+  it('deve carregar a página e exigir autenticação', () => {
+    const rota = routes.find(
+      item => item.path === 'artistas/:id'
+    );
+
+    expect(rota).toBeDefined();
+    expect(rota?.loadComponent).toBeDefined();
+    expect(rota?.canActivate).toContain(authGuard);
+  });
+});

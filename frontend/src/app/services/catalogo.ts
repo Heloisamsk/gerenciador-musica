@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
 import type { AlbumResponse } from '../models/AlbumResponse';
+import type { ArtistaDetalhe } from '../models/ArtistaDetalhe';
 import type { ArtistaResponse } from '../models/ArtistaResponse';
 import type { GeneroResumo } from '../models/MusicaResponse';
 import type { MusicaListagem } from '../models/MusicaListagem';
@@ -31,6 +32,14 @@ export class CatalogoService {
   listarArtistas(): Observable<ArtistaResponse[]> {
     return this.http.get<ArtistaResponse[]>(
       `${this.apiUrl}/artistas`
+    );
+  }
+
+  buscarDetalhesArtista(
+    idArtista: number
+  ): Observable<ArtistaDetalhe> {
+    return this.http.get<ArtistaDetalhe>(
+      `${this.apiUrl}/artistas/${idArtista}/detalhes`
     );
   }
 

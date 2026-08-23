@@ -77,7 +77,11 @@
         artista of artistas();
         track artista.idArtista
         ) {
-        <article class="artista-card">
+        <a
+          class="artista-card"
+          [routerLink]="['/artistas', artista.idArtista]"
+          [attr.aria-label]="'Ver detalhes de ' + artista.nome"
+        >
           <img
             class="artista-foto"
             [src]="
@@ -93,7 +97,7 @@
           <span class="artista-nome">
                 {{ artista.nome }}
               </span>
-        </article>
+        </a>
         } @empty {
         <p class="mensagem-estado">
           Nenhum artista encontrado.

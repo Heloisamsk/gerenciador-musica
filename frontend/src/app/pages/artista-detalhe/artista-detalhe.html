@@ -1,0 +1,180 @@
+<main class="pagina-artista">
+  <div class="conteudo">
+    <a class="voltar-link" routerLink="/home">
+      ← Voltar para o início
+    </a>
+
+    @if (carregando()) {
+      <output class="mensagem-estado" aria-live="polite">
+        Carregando detalhes do artista...
+      </output>
+    } @else if (mensagemErro()) {
+      <section class="mensagem-erro" role="alert">
+        <p>{{ mensagemErro() }}</p>
+
+        @if (idArtista() !== null) {
+          <button
+            type="button"
+            class="botao-secundario"
+            (click)="tentarNovamente()"
+          >
+            Tentar novamente
+          </button>
+        }
+      </section>
+    } @else if (detalhes(); as detalhesArtista) {
+      <header class="cabecalho-artista">
+        <img
+          class="foto-artista"
+          [src]="detalhesArtista.artista.fotoPerfilUrl || '/avatar-artista.png'"
+          [alt]="'Foto de ' + detalhesArtista.artista.nome"
+          referrerpolicy="no-referrer"
+          (error)="substituirImagem($event, '/avatar-artista.png')"
+        >
+
+        <div class="identidade-artista">
+          <span class="tipo-conteudo">Artista</span>
+          <h1>{{ detalhesArtista.artista.nome }}</h1>
+          <p class="nome-completo">
+            {{ detalhesArtista.artista.nomeCompleto }}
+          </p>
+          <p class="descricao">
+            {{ detalhesArtista.artista.descricao }}
+          </p>
+        </div>
+      </header>
+
+      <dl class="estatisticas" aria-label="Resumo do catálogo do artista">
+        <div class="estatistica">
+          <dt>Álbuns</dt>
+          <dd>{{ detalhesArtista.artista.totalAlbuns }}</dd>
+        </div>
+
+        <div class="estatistica">
+          <dt>Músicas principais</dt>
+          <dd>{{ detalhesArtista.artista.totalMusicasPrincipais }}</dd>
+        </div>
+
+        <div class="estatistica">
+          <dt>Participações</dt>
+          <dd>{{ detalhesArtista.artista.totalParticipacoes }}</dd>
+        </div>
+
+        <div class="estatistica">
+          <dt>Duração do catálogo principal</dt>
+          <dd>
+            {{ formatarDuracao(detalhesArtista.artista.duracaoTotalSegundos) }}
+          </dd>
+        </div>
+      </dl>
+
+      <section class="secao-catalogo" aria-labelledby="titulo-albuns">
+        <div class="cabecalho-secao">
+          <div>
+            <h2 id="titulo-albuns">Álbuns</h2>
+          </div>
+          <span class="quantidade">
+            {{ detalhesArtista.albuns.length }} no total
+          </span>
+        </div>
+
+        @if (detalhesArtista.albuns.length > 0) {
+          <ul class="grade-albuns" aria-label="Álbuns do artista">
+            @for (album of detalhesArtista.albuns; track album.idAlbum) {
+              <li class="cartao-album">
+                <img
+                  class="capa-album"
+                  [src]="album.capaUrl || '/capa-padrao.png'"
+                  [alt]="'Capa do álbum ' + album.titulo"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                  (error)="substituirImagem($event, '/capa-padrao.png')"
+                >
+
+                <div class="dados-album">
+                  <h3>{{ album.titulo }}</h3>
+                  <p>{{ album.anoLancamento }} · {{ album.nomeArtista }}</p>
+                  <p>
+                    {{ album.totalMusicas }}
+                    @if (album.totalMusicas === 1) {
+                      música
+                    } @else {
+                      músicas
+                    }
+                    · {{ formatarDuracao(album.duracaoTotalSegundos) }}
+                  </p>
+                </div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="lista-vazia">
+            Este artista ainda não possui álbuns cadastrados.
+          </p>
+        }
+      </section>
+
+      <section class="secao-catalogo" aria-labelledby="titulo-musicas">
+        <div class="cabecalho-secao">
+          <div>
+            <h2 id="titulo-musicas">Músicas</h2>
+          </div>
+          <span class="quantidade">
+            {{ detalhesArtista.musicas.length }} no total
+          </span>
+        </div>
+
+        @if (detalhesArtista.musicas.length > 0) {
+          <ul class="lista-musicas" aria-label="Músicas relacionadas ao artista">
+            @for (musica of detalhesArtista.musicas; track musica.idMusica) {
+              <li>
+                <a
+                  class="linha-musica"
+                  [routerLink]="['/musicas', musica.idMusica]"
+                  [attr.aria-label]="'Ver detalhes da música ' + musica.titulo"
+                >
+                  <img
+                    class="capa-musica"
+                    [src]="musica.capaUrl || '/capa-padrao.png'"
+                    [alt]="'Capa de ' + musica.titulo"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    (error)="substituirImagem($event, '/capa-padrao.png')"
+                  >
+
+                  <div class="dados-musica">
+                    <strong>{{ musica.titulo }}</strong>
+                    <span>
+                      {{ musica.nomeArtistaPrincipal }} ·
+                      {{ musica.tituloAlbum || 'Single' }}
+                    </span>
+
+                    @if (musica.generos.length > 0) {
+                      <div class="generos" aria-label="Gêneros da música">
+                        @for (genero of musica.generos; track genero) {
+                          <span class="genero">{{ genero }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+
+                  <div class="metadados-musica">
+                    <span class="papel-artista">
+                      {{ rotuloPapel(musica.papelArtista) }}
+                    </span>
+                    <span>{{ musica.anoLancamento }}</span>
+                    <span>{{ formatarDuracao(musica.duracaoSegundos) }}</span>
+                  </div>
+                </a>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="lista-vazia">
+            Este artista ainda não possui músicas relacionadas.
+          </p>
+        }
+      </section>
+    }
+  </div>
+</main>

@@ -1,5 +1,6 @@
 package gerenciador_musica_backend.controller;
 
+import gerenciador_musica_backend.dto.ArtistaDetalheDTO;
 import gerenciador_musica_backend.dto.ArtistaResponseDTO;
 import gerenciador_musica_backend.service.ArtistaService;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,15 @@ public class ArtistaController {
     ) {
         return ResponseEntity.ok(
                 artistaService.buscarPorId(idArtista)
+        );
+    }
+
+    @GetMapping("/{idArtista}/detalhes")
+    public ResponseEntity<ArtistaDetalheDTO> buscarDetalhesCatalogo(
+            @PathVariable("idArtista") Long idArtista
+    ) {
+        return ResponseEntity.ok(
+                artistaService.buscarDetalhesCatalogo(idArtista)
         );
     }
 }

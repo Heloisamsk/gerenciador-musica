@@ -1,7 +1,11 @@
 package gerenciador_musica_backend.service;
 
+import gerenciador_musica_backend.dto.AlbumCatalogoDTO;
+import gerenciador_musica_backend.dto.ArtistaCatalogoResumoDTO;
+import gerenciador_musica_backend.dto.ArtistaDetalheDTO;
 import gerenciador_musica_backend.dto.ArtistaRequestDTO;
 import gerenciador_musica_backend.dto.ArtistaResponseDTO;
+import gerenciador_musica_backend.dto.MusicaCatalogoDTO;
 import gerenciador_musica_backend.exception.ArtistaDuplicadoException;
 import gerenciador_musica_backend.exception.ArtistaEmUsoException;
 import gerenciador_musica_backend.exception.ArtistaNaoEncontradoException;
@@ -10,10 +14,14 @@ import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
+import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
+import gerenciador_musica_backend.repository.projection.ArtistaCatalogoResumoProjection;
+import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -121,6 +129,35 @@ public class ArtistaService {
         return converterParaResponse(artista);
     }
 
+    @Transactional(readOnly = true)
+    public ArtistaDetalheDTO buscarDetalhesCatalogo(Long idArtista) {
+        validarIdArtista(idArtista);
+
+        ArtistaCatalogoResumoProjection resumo = artistaRepository
+                .buscarResumoCatalogo(idArtista)
+                .orElseThrow(
+                        () -> new ArtistaNaoEncontradoException(idArtista)
+                );
+
+        List<AlbumCatalogoDTO> albuns = albumRepository
+                .buscarCatalogoPorArtista(idArtista)
+                .stream()
+                .map(this::converterAlbumCatalogo)
+                .toList();
+
+        List<MusicaCatalogoDTO> musicas = musicaRepository
+                .buscarCatalogoPorArtista(idArtista)
+                .stream()
+                .map(this::converterMusicaCatalogo)
+                .toList();
+
+        return new ArtistaDetalheDTO(
+                converterResumoCatalogo(resumo),
+                albuns,
+                musicas
+        );
+    }
+
     private String normalizarCampoObrigatorio(String valor, String nomeDoCampo){
         if (valor == null) {
             throw new DadosArtistaInvalidosException(
@@ -205,6 +242,66 @@ public class ArtistaService {
         );
     }
 
+    private ArtistaCatalogoResumoDTO converterResumoCatalogo(
+            ArtistaCatalogoResumoProjection resumo
+    ) {
+        return new ArtistaCatalogoResumoDTO(
+                resumo.getIdArtista(),
+                resumo.getNome(),
+                resumo.getNomeCompleto(),
+                resumo.getDescricao(),
+                resumo.getFotoPerfilUrl(),
+                resumo.getTotalAlbuns(),
+                resumo.getTotalMusicasPrincipais(),
+                resumo.getTotalParticipacoes(),
+                resumo.getDuracaoTotalSegundos()
+        );
+    }
+
+    private AlbumCatalogoDTO converterAlbumCatalogo(
+            AlbumCatalogoProjection album
+    ) {
+        return new AlbumCatalogoDTO(
+                album.getIdAlbum(),
+                album.getIdArtista(),
+                album.getNomeArtista(),
+                album.getTitulo(),
+                album.getAnoLancamento(),
+                album.getCapaUrl(),
+                album.getTotalMusicas(),
+                album.getDuracaoTotalSegundos()
+        );
+    }
+
+    private MusicaCatalogoDTO converterMusicaCatalogo(
+            MusicaCatalogoProjection musica
+    ) {
+        return new MusicaCatalogoDTO(
+                musica.getIdMusica(),
+                musica.getTitulo(),
+                musica.getDuracaoSegundos(),
+                musica.getAnoLancamento(),
+                musica.getIdArtistaPrincipal(),
+                musica.getNomeArtistaPrincipal(),
+                musica.getIdAlbum(),
+                musica.getTituloAlbum(),
+                musica.getCapaUrl(),
+                separarGeneros(musica.getGeneros()),
+                musica.getPapelArtista()
+        );
+    }
+
+    private List<String> separarGeneros(String generos) {
+        if (generos == null || generos.isBlank()) {
+            return List.of();
+        }
+
+        return Arrays.stream(generos.split(","))
+                .map(String::strip)
+                .filter(genero -> !genero.isBlank())
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public Artista buscarEntidadePorId(Long idArtista) {
         return obterEntidadePorId(idArtista);
@@ -249,16 +346,20 @@ public class ArtistaService {
     }
 
     private Artista obterEntidadePorId(Long idArtista) {
-        if (idArtista == null || idArtista <= 0) {
-            throw new DadosArtistaInvalidosException(
-                    "O ID do artista deve ser positivo."
-            );
-        }
+        validarIdArtista(idArtista);
 
         return artistaRepository
                 .findById(idArtista)
                 .orElseThrow(
                         () -> new ArtistaNaoEncontradoException(idArtista)
                 );
+    }
+
+    private void validarIdArtista(Long idArtista) {
+        if (idArtista == null || idArtista <= 0) {
+            throw new DadosArtistaInvalidosException(
+                    "O ID do artista deve ser positivo."
+            );
+        }
     }
 }

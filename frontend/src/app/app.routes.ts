@@ -189,6 +189,14 @@ export const routes: Routes = [
 },
 
 {
+  path: 'artistas/:id',
+  loadComponent: () =>
+    import('./pages/artista-detalhe/artista-detalhe')
+      .then(modulo => modulo.ArtistaDetalhePage),
+  canActivate: [authGuard]
+},
+
+{
   path: '**',
   redirectTo: 'login'
 }

@@ -64,4 +64,10 @@ class ArtistaEndpointSecurityTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.idArtista").value(1));
     }
+
+    @Test
+    void deveProtegerDetalhesDoArtistaSemAutenticacao() throws Exception {
+        mockMvc.perform(get("/api/artistas/1/detalhes"))
+                .andExpect(status().isUnauthorized());
+    }
 }
