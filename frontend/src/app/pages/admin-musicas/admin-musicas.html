@@ -35,6 +35,15 @@
       </button>
     </header>
 
+    @if (mensagemSucesso()) {
+    <output
+      class="feedback-sucesso"
+      aria-live="polite"
+    >
+      {{ mensagemSucesso() }}
+    </output>
+    }
+
     <div class="database-visual">
       <img
         src="/ari.gif"

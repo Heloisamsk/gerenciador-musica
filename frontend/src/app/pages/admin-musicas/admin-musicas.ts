@@ -4,6 +4,7 @@ import {
   signal
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { MusicaListagem } from '../../models/MusicaListagem';
@@ -20,12 +21,15 @@ export class AdminMusicas implements OnInit {
   musicas = signal<MusicaListagem[]>([]);
   carregando = signal(false);
   mensagemErro = signal('');
+  mensagemSucesso = signal('');
 
   constructor(
-    private readonly adminMusicaService: AdminMusicaService
+    private readonly adminMusicaService: AdminMusicaService,
+    private readonly router: Router
   ) {}
 
   ngOnInit(): void {
+    this.recuperarMensagemDaEdicao();
     this.carregarCatalogo();
   }
 
@@ -64,5 +68,16 @@ export class AdminMusicas implements OnInit {
     return musica.generos
       .map(genero => genero.nome)
       .join(', ');
+  }
+
+  private recuperarMensagemDaEdicao(): void {
+    const mensagem = this.router
+      .getCurrentNavigation()
+      ?.extras
+      .state?.['mensagemSucesso'];
+
+    if (typeof mensagem === 'string') {
+      this.mensagemSucesso.set(mensagem);
+    }
   }
 }

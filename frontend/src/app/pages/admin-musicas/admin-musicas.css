@@ -143,6 +143,16 @@
   margin-bottom: 2rem;
 }
 
+.feedback-sucesso {
+  display: block;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  color: #8ff0b1;
+  background-color: #193021;
+  border: 1px solid var(--primary);
+  border-radius: 0.75rem;
+}
+
 .database-visual img {
   display: block;
 
