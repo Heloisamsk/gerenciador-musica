@@ -1,0 +1,26 @@
+<div class="acoes-musica">
+  <button
+    type="button"
+    class="acao-button editar-button"
+    [disabled]="bloqueado()"
+    [attr.aria-label]="'Editar música ' + musica().titulo"
+    (click)="editar.emit(musica().id)"
+  >
+    Editar
+  </button>
+
+  <button
+    type="button"
+    class="acao-button excluir-button"
+    [disabled]="bloqueado()"
+    [attr.aria-label]="'Excluir música ' + musica().titulo"
+    [attr.aria-busy]="excluindo() ? true : null"
+    (click)="excluir.emit(musica())"
+  >
+    @if (excluindo()) {
+      Excluindo...
+    } @else {
+      Excluir
+    }
+  </button>
+</div>

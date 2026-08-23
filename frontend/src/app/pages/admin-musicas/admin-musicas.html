@@ -25,7 +25,7 @@
         class="atualizar-button"
         type="button"
         (click)="carregarCatalogo()"
-        [disabled]="carregando()"
+        [disabled]="operacaoEmAndamento()"
       >
         @if (carregando()) {
         Carregando...
@@ -42,6 +42,15 @@
     >
       {{ mensagemSucesso() }}
     </output>
+    }
+
+    @if (mensagemErroExclusao()) {
+    <div
+      class="feedback-erro"
+      role="alert"
+    >
+      {{ mensagemErroExclusao() }}
+    </div>
     }
 
     <div class="database-visual">
@@ -114,6 +123,7 @@
           <th scope="col">Gênero</th>
           <th scope="col">Ano</th>
           <th scope="col">Duração</th>
+          <th scope="col">Ações</th>
         </tr>
         </thead>
 
@@ -142,6 +152,16 @@
 
           <td data-label="Duração">
             {{ musica.duracaoSegundos }}s
+          </td>
+
+          <td data-label="Ações">
+            <app-acoes-musica
+              [musica]="musica"
+              [bloqueado]="operacaoEmAndamento()"
+              [excluindo]="excluindoId() === musica.id"
+              (editar)="editarMusica($event)"
+              (excluir)="excluirMusica($event)"
+            />
           </td>
         </tr>
         }
