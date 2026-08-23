@@ -101,10 +101,6 @@
   resize: vertical;
 }
 
-.selecao-multipla {
-  min-height: 8rem;
-}
-
 .form-input:disabled {
   color: #c7c7c7;
   background-color: #242424;

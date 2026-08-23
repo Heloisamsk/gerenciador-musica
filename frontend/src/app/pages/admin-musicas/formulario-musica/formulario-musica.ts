@@ -33,6 +33,7 @@ import type { MusicaRequest } from '../../../models/MusicaRequest';
 import type { MusicaResponse } from '../../../models/MusicaResponse';
 import { AdminAlbumService } from '../../../services/admin-album.service';
 import { AdminArtistaService } from '../../../services/admin-artista';
+import { SeletorParticipantes } from './seletor-participantes/seletor-participantes';
 
 export type ModoFormularioMusica = 'cadastro' | 'edicao';
 
@@ -85,7 +86,8 @@ const validarGeneros: ValidatorFn = (
   selector: 'app-formulario-musica',
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SeletorParticipantes
   ],
   templateUrl: './formulario-musica.html',
   styleUrl: './formulario-musica.css'
@@ -220,6 +222,13 @@ export class FormularioMusica implements OnInit {
     return this.artistas().filter(
       artista => artista.idArtista !== idPrincipal
     );
+  }
+
+  atualizarParticipantes(idsParticipantes: number[]): void {
+    this.formulario.controls.artistasParticipantesIds.setValue(
+      idsParticipantes
+    );
+    this.formulario.controls.artistasParticipantesIds.markAsDirty();
   }
 
   submeter(): void {
