@@ -76,6 +76,17 @@ export const routes: Routes = [
   }
   },
   {
+    path: 'admin/banco/musicas/:id/editar',
+    loadComponent: () =>
+      import(
+        './pages/admin-musicas/editar-musica/editar-musica'
+      ).then(modulo => modulo.EditarMusica),
+    canActivate: [authGuard],
+    data: {
+      expectedRole: 'ADMIN'
+    }
+  },
+  {
     path: 'admin/banco/artistas',
     loadComponent: () =>
       import('./pages/admin-artistas/admin-artistas')
