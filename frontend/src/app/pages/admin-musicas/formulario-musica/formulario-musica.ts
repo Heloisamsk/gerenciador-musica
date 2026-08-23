@@ -251,7 +251,7 @@ export class FormularioMusica implements OnInit {
     const valores = this.formulario.getRawValue();
     const artistaPrincipalId = Number(valores.artistaPrincipalId);
     const participantes = valores.artistasParticipantesIds
-      .map(id => Number(id));
+      .map(Number);
 
     if (!this.artistaValido(artistaPrincipalId)) {
       this.erroFormulario.set(

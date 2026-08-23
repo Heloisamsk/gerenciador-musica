@@ -223,12 +223,14 @@ describe('FormularioMusica', () => {
     campo.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
-    const sugestao = elemento.querySelector<HTMLButtonElement>(
-      '.sugestao-participante'
+    const sugestao = elemento.querySelector<HTMLOptionElement>(
+      'datalist option'
     );
     expect(sugestao?.textContent).toContain('Artista Participante');
 
-    sugestao?.click();
+    campo.value = artistaParticipante.nome;
+    campo.dispatchEvent(new Event('input'));
+    campo.dispatchEvent(new Event('change'));
     fixture.detectChanges();
 
     expect(component.formulario.controls.artistasParticipantesIds.value)

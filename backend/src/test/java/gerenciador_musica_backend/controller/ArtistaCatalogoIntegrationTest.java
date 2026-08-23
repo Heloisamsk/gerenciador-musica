@@ -138,23 +138,11 @@ class ArtistaCatalogoIntegrationTest {
                         .equals(artista.idArtista()))
                 .containsExactly(artistaAtualizado);
 
-        AlbumResponseDTO albumDepoisDaEdicao = buscarAlbum(
-                album.idAlbum()
+        validarAssociacoesPreservadas(
+                artistaAtualizado,
+                album,
+                musica
         );
-        assertThat(albumDepoisDaEdicao.artista().id())
-                .isEqualTo(artista.idArtista());
-        assertThat(albumDepoisDaEdicao.artista().nome())
-                .isEqualTo(artistaAtualizado.nome());
-
-        MusicaResponseDTO musicaDepoisDaEdicao = buscarMusica(
-                musica.id()
-        );
-        assertThat(musicaDepoisDaEdicao.artistaPrincipal().id())
-                .isEqualTo(artista.idArtista());
-        assertThat(musicaDepoisDaEdicao.artistaPrincipal().nome())
-                .isEqualTo(artistaAtualizado.nome());
-        assertThat(musicaDepoisDaEdicao.album().id())
-                .isEqualTo(album.idAlbum());
 
         mockMvc.perform(delete(
                         "/api/admin/artistas/{id}",
@@ -195,6 +183,30 @@ class ArtistaCatalogoIntegrationTest {
                 )
                         .header("Authorization", tokenAutorizacao()))
                 .andExpect(status().isNotFound());
+    }
+
+    private void validarAssociacoesPreservadas(
+            ArtistaResponseDTO artistaAtualizado,
+            AlbumResponseDTO album,
+            MusicaResponseDTO musica
+    ) throws Exception {
+        AlbumResponseDTO albumDepoisDaEdicao = buscarAlbum(
+                album.idAlbum()
+        );
+        assertThat(albumDepoisDaEdicao.artista().id())
+                .isEqualTo(artistaAtualizado.idArtista());
+        assertThat(albumDepoisDaEdicao.artista().nome())
+                .isEqualTo(artistaAtualizado.nome());
+
+        MusicaResponseDTO musicaDepoisDaEdicao = buscarMusica(
+                musica.id()
+        );
+        assertThat(musicaDepoisDaEdicao.artistaPrincipal().id())
+                .isEqualTo(artistaAtualizado.idArtista());
+        assertThat(musicaDepoisDaEdicao.artistaPrincipal().nome())
+                .isEqualTo(artistaAtualizado.nome());
+        assertThat(musicaDepoisDaEdicao.album().id())
+                .isEqualTo(album.idAlbum());
     }
 
     private ArtistaResponseDTO cadastrarArtista(

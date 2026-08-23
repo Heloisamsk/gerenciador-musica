@@ -169,7 +169,7 @@ describe('FormularioArtista', () => {
       'output[aria-live="polite"]'
     );
 
-    expect(mensagensPolidas.length).toBe(2);
+    expect(mensagensPolidas).toHaveLength(2);
     expect(elemento.querySelector('[role="alert"]')?.textContent)
       .toContain('Não foi possível salvar o artista.');
     expect(elemento.querySelector('button')?.textContent)

@@ -63,6 +63,24 @@ export class SeletorParticipantes {
     }
   }
 
+  selecionarSugestao(evento: Event): void {
+    const campo = evento.target;
+
+    if (!(campo instanceof HTMLInputElement)) {
+      return;
+    }
+
+    this.busca.set(campo.value);
+    const valorSelecionado = this.normalizarParaBusca(campo.value);
+    const artistaSelecionado = this.sugestoes().find(
+      artista => this.normalizarParaBusca(artista.nome) === valorSelecionado
+    );
+
+    if (artistaSelecionado) {
+      this.adicionar(artistaSelecionado);
+    }
+  }
+
   adicionar(artista: ArtistaResponse): void {
     if (
       this.desabilitado()

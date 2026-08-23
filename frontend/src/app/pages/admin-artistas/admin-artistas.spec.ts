@@ -79,7 +79,7 @@ describe('AdminArtistas', () => {
     );
 
     expect(listarArtistas).toHaveBeenCalledOnce();
-    expect(cards.length).toBe(2);
+    expect(cards).toHaveLength(2);
     expect(elemento.textContent).toContain('Total de artistas:');
     expect(elemento.textContent).toContain('2');
     expect(elemento.textContent).toContain('Queen');
@@ -153,7 +153,7 @@ describe('AdminArtistas', () => {
     elemento = fixture.nativeElement as HTMLElement;
 
     expect(listarArtistas).toHaveBeenCalledTimes(2);
-    expect(elemento.querySelectorAll('.artista-card').length).toBe(2);
+    expect(elemento.querySelectorAll('.artista-card')).toHaveLength(2);
   });
 
   it.each([
