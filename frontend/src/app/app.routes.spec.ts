@@ -19,3 +19,22 @@ describe('rotas administrativas de artistas', () => {
     });
   }
 });
+
+describe('rotas administrativas de álbuns', () => {
+  const caminhos = [
+    'admin/banco/albuns',
+    'admin/banco/albuns/novo',
+    'admin/banco/albuns/:id/editar'
+  ];
+
+  for (const caminho of caminhos) {
+    it(`deve proteger a rota ${caminho} para ADMIN`, () => {
+      const rota = routes.find(item => item.path === caminho);
+
+      expect(rota).toBeDefined();
+      expect(rota?.loadComponent).toBeDefined();
+      expect(rota?.canActivate).toContain(authGuard);
+      expect(rota?.data?.['expectedRole']).toBe('ADMIN');
+    });
+  }
+});

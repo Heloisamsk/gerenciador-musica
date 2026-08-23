@@ -476,9 +476,160 @@ class AlbumServiceTest {
         assertThat(resultado.anoLancamento()).isEqualTo((short) 1975);
         assertThat(resultado.capaUrl()).isNull();
         assertThat(resultado.artista().id()).isEqualTo(1L);
+        assertThat(album.getTitulo())
+                .isEqualTo("A Night at the Opera");
+        assertThat(album.getAnoLancamento()).isEqualTo((short) 1975);
+        assertThat(album.getCapaUrl()).isNull();
         assertThat(album.getArtista()).isSameAs(artista);
         verify(albumRepository, never()).save(any());
         verify(artistaService, never()).buscarEntidadePorId(any());
+    }
+
+    @Test
+    void deveAtualizarENormalizarUrlDaCapa() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "A Night at the Opera",
+                (short) 1975,
+                null
+        );
+        album.setIdAlbum(10L);
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        "A Night at the Opera",
+                        (short) 1975,
+                        "  https://example.com/nova-capa.jpg  "
+                );
+
+        when(albumRepository.findById(10L))
+                .thenReturn(Optional.of(album));
+        when(albumRepository
+                .existsByTituloIgnoreCaseAndArtistaIdArtistaAndAnoLancamentoAndIdAlbumNot(
+                        "A Night at the Opera",
+                        1L,
+                        (short) 1975,
+                        10L
+                ))
+                .thenReturn(false);
+
+        AlbumResponseDTO resultado = albumService.atualizarAlbum(
+                10L,
+                request
+        );
+
+        assertThat(resultado.capaUrl())
+                .isEqualTo("https://example.com/nova-capa.jpg");
+        assertThat(album.getCapaUrl())
+                .isEqualTo("https://example.com/nova-capa.jpg");
+        assertThat(album.getArtista()).isSameAs(artista);
+        verify(albumRepository, never()).save(any());
+    }
+
+    @Test
+    void deveRejeitarAtualizacaoQuandoRequestForNull() {
+        assertThatThrownBy(() -> albumService.atualizarAlbum(
+                10L,
+                null
+        ))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage("Os dados do álbum são obrigatórios.");
+
+        verify(albumRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveRejeitarAtualizacaoQuandoTituloForNull() {
+        Artista artista = montarArtista(1L, "Queen");
+        Album album = new Album(
+                artista,
+                "A Night at the Opera",
+                (short) 1975,
+                null
+        );
+        album.setIdAlbum(10L);
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        null,
+                        (short) 1975,
+                        null
+                );
+
+        when(albumRepository.findById(10L))
+                .thenReturn(Optional.of(album));
+
+        assertThatThrownBy(() -> albumService.atualizarAlbum(
+                10L,
+                request
+        ))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage("O título do álbum é obrigatório.");
+
+        assertThat(album.getTitulo())
+                .isEqualTo("A Night at the Opera");
+    }
+
+    @Test
+    void deveRejeitarAtualizacaoQuandoAnoForNull() {
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        "A Night at the Opera",
+                        null,
+                        null
+                );
+
+        assertThatThrownBy(() -> albumService.atualizarAlbum(
+                10L,
+                request
+        ))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage(
+                        "O ano do álbum deve estar entre 1800 e 2100."
+                );
+
+        verify(albumRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveRejeitarAtualizacaoQuandoAnoForMenorQueOMinimo() {
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        "A Night at the Opera",
+                        (short) 1799,
+                        null
+                );
+
+        assertThatThrownBy(() -> albumService.atualizarAlbum(
+                10L,
+                request
+        ))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage(
+                        "O ano do álbum deve estar entre 1800 e 2100."
+                );
+
+        verify(albumRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveRejeitarAtualizacaoQuandoAnoForMaiorQueOMaximo() {
+        AlbumAtualizacaoRequestDTO request =
+                new AlbumAtualizacaoRequestDTO(
+                        "A Night at the Opera",
+                        (short) 2101,
+                        null
+                );
+
+        assertThatThrownBy(() -> albumService.atualizarAlbum(
+                10L,
+                request
+        ))
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage(
+                        "O ano do álbum deve estar entre 1800 e 2100."
+                );
+
+        verify(albumRepository, never()).findById(any());
     }
 
     @Test
