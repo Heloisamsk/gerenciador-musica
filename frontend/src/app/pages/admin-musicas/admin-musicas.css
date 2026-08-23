@@ -143,14 +143,24 @@
   margin-bottom: 2rem;
 }
 
-.feedback-sucesso {
+.feedback-sucesso,
+.feedback-erro {
   display: block;
   padding: 1rem;
   margin-bottom: 1.25rem;
+  border-radius: 0.75rem;
+}
+
+.feedback-sucesso {
   color: #8ff0b1;
   background-color: #193021;
   border: 1px solid var(--primary);
-  border-radius: 0.75rem;
+}
+
+.feedback-erro {
+  color: #ff9c9c;
+  background-color: #3b2424;
+  border: 1px solid #7a3535;
 }
 
 .database-visual img {
@@ -227,7 +237,7 @@
 
 .musicas-table {
   width: 100%;
-  min-width: 42rem;
+  min-width: 54rem;
 
   border-collapse: collapse;
 }
@@ -307,4 +317,5 @@
   .musicas-title h1 {
     font-size: 2rem;
   }
+
 }
