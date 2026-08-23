@@ -108,11 +108,32 @@ export const routes: Routes = [
     }
   },
   {
+    path: 'admin/banco/albuns',
+    loadComponent: () =>
+      import('./pages/admin-albuns/admin-albuns')
+        .then(modulo => modulo.AdminAlbuns),
+    canActivate: [authGuard],
+    data: {
+      expectedRole: 'ADMIN'
+    }
+  },
+  {
     path: 'admin/banco/albuns/novo',
     loadComponent: () =>
       import(
         './pages/admin-albuns/cadastro-album/cadastro-album'
       ).then(modulo => modulo.CadastroAlbum),
+    canActivate: [authGuard],
+    data: {
+      expectedRole: 'ADMIN'
+    }
+  },
+  {
+    path: 'admin/banco/albuns/:id/editar',
+    loadComponent: () =>
+      import(
+        './pages/admin-albuns/editar-album/editar-album'
+      ).then(modulo => modulo.EditarAlbum),
     canActivate: [authGuard],
     data: {
       expectedRole: 'ADMIN'
