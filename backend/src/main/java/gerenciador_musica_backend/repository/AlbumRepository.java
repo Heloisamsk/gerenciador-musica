@@ -1,7 +1,10 @@
 package gerenciador_musica_backend.repository;
 
 import gerenciador_musica_backend.model.Album;
+import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -24,5 +27,23 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
             Long idArtista,
             Short anoLancamento,
             Long idAlbum
+    );
+
+    @Query(value = """
+            SELECT
+                id_album AS "idAlbum",
+                id_artista AS "idArtista",
+                nome_artista AS "nomeArtista",
+                titulo,
+                ano_lancamento AS "anoLancamento",
+                capa_url AS "capaUrl",
+                total_musicas AS "totalMusicas",
+                duracao_total_segundos AS "duracaoTotalSegundos"
+            FROM vw_albuns_artista_catalogo
+            WHERE id_artista = :idArtista
+            ORDER BY ano_lancamento DESC, titulo ASC, id_album ASC
+            """, nativeQuery = true)
+    List<AlbumCatalogoProjection> buscarCatalogoPorArtista(
+            @Param("idArtista") Long idArtista
     );
 }
