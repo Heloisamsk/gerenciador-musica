@@ -1,7 +1,11 @@
 package gerenciador_musica_backend.controller;
 
 import gerenciador_musica_backend.config.JwtAuthenticationFilter;
+import gerenciador_musica_backend.dto.AlbumCatalogoDTO;
+import gerenciador_musica_backend.dto.ArtistaCatalogoResumoDTO;
+import gerenciador_musica_backend.dto.ArtistaDetalheDTO;
 import gerenciador_musica_backend.dto.ArtistaResponseDTO;
+import gerenciador_musica_backend.dto.MusicaCatalogoDTO;
 import gerenciador_musica_backend.exception.ArtistaNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosArtistaInvalidosException;
 import gerenciador_musica_backend.service.ArtistaService;
@@ -77,6 +81,76 @@ class ArtistaControllerTest {
                         .value("https://exemplo.com/queen.jpg"));
 
         verify(artistaService).buscarPorId(1L);
+    }
+
+    @Test
+    void deveBuscarDetalhesDoCatalogoPelasViews() throws Exception {
+        ArtistaDetalheDTO detalhes = new ArtistaDetalheDTO(
+                new ArtistaCatalogoResumoDTO(
+                        1L,
+                        "Queen",
+                        "Queen",
+                        "Banda britânica de rock.",
+                        null,
+                        1L,
+                        1L,
+                        0L,
+                        354L
+                ),
+                List.of(new AlbumCatalogoDTO(
+                        10L,
+                        1L,
+                        "Queen",
+                        "A Night at the Opera",
+                        (short) 1975,
+                        null,
+                        1L,
+                        354L
+                )),
+                List.of(new MusicaCatalogoDTO(
+                        20L,
+                        "Bohemian Rhapsody",
+                        354,
+                        (short) 1975,
+                        1L,
+                        "Queen",
+                        10L,
+                        "A Night at the Opera",
+                        null,
+                        List.of("Rock"),
+                        "PRINCIPAL"
+                ))
+        );
+
+        when(artistaService.buscarDetalhesCatalogo(1L))
+                .thenReturn(detalhes);
+
+        mockMvc.perform(get("/api/artistas/1/detalhes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.artista.nome").value("Queen"))
+                .andExpect(jsonPath("$.artista.totalAlbuns").value(1))
+                .andExpect(jsonPath("$.albuns[0].titulo")
+                        .value("A Night at the Opera"))
+                .andExpect(jsonPath("$.musicas[0].titulo")
+                        .value("Bohemian Rhapsody"))
+                .andExpect(jsonPath("$.musicas[0].generos[0]")
+                        .value("Rock"))
+                .andExpect(jsonPath("$.musicas[0].papelArtista")
+                        .value("PRINCIPAL"));
+
+        verify(artistaService).buscarDetalhesCatalogo(1L);
+    }
+
+    @Test
+    void deveRetornar404QuandoDetalhesDoArtistaNaoExistirem()
+            throws Exception {
+        when(artistaService.buscarDetalhesCatalogo(99L))
+                .thenThrow(new ArtistaNaoEncontradoException(99L));
+
+        mockMvc.perform(get("/api/artistas/99/detalhes"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message")
+                        .value("Artista não encontrado com o ID: 99"));
     }
 
     @Test
