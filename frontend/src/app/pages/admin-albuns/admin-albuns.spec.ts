@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
@@ -11,8 +11,10 @@ import { AdminAlbuns } from './admin-albuns';
 describe('AdminAlbuns', () => {
   let component: AdminAlbuns;
   let fixture: ComponentFixture<AdminAlbuns>;
+  let router: Router;
 
   const listarAlbuns = vi.fn();
+  const excluirAlbum = vi.fn();
   const albuns: AlbumResponse[] = [
     {
       idAlbum: 1,
@@ -44,6 +46,7 @@ describe('AdminAlbuns', () => {
 
   beforeEach(async () => {
     listarAlbuns.mockReset();
+    excluirAlbum.mockReset();
 
     await TestBed.configureTestingModule({
       imports: [AdminAlbuns],
@@ -51,10 +54,17 @@ describe('AdminAlbuns', () => {
         provideRouter([]),
         {
           provide: AdminAlbumService,
-          useValue: { listarAlbuns }
+          useValue: { listarAlbuns, excluirAlbum }
         }
       ]
     }).compileComponents();
+
+    router = TestBed.inject(Router);
+    vi.spyOn(router, 'navigate').mockResolvedValue(true);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   function criarComponente(): void {
@@ -73,6 +83,12 @@ describe('AdminAlbuns', () => {
     const capas = elemento.querySelectorAll<HTMLImageElement>(
       '.album-capa'
     );
+    const botoesEditar = elemento.querySelectorAll<HTMLButtonElement>(
+      'button[aria-label^="Editar álbum"]'
+    );
+    const botoesExcluir = elemento.querySelectorAll<HTMLButtonElement>(
+      'button[aria-label^="Excluir álbum"]'
+    );
 
     expect(listarAlbuns).toHaveBeenCalledOnce();
     expect(cards).toHaveLength(2);
@@ -90,6 +106,12 @@ describe('AdminAlbuns', () => {
       .toBe('/capa-padrao.png');
     expect(capas[0].getAttribute('alt'))
       .toBe('Capa do álbum A Night at the Opera');
+    expect(botoesEditar).toHaveLength(2);
+    expect(botoesExcluir).toHaveLength(2);
+    expect(botoesEditar[0].getAttribute('aria-label'))
+      .toBe('Editar álbum A Night at the Opera de Queen');
+    expect(botoesExcluir[0].getAttribute('aria-label'))
+      .toBe('Excluir álbum A Night at the Opera de Queen');
   });
 
   it('deve exibir carregamento e impedir chamadas duplicadas', () => {
@@ -174,6 +196,167 @@ describe('AdminAlbuns', () => {
     imagem?.dispatchEvent(new Event('error'));
 
     expect(imagem?.src).toMatch(/\/capa-padrao\.png$/);
+  });
+
+  it('deve navegar para a edição do álbum selecionado', () => {
+    listarAlbuns.mockReturnValue(of(albuns));
+    criarComponente();
+
+    const botaoEditar = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>(
+        'button[aria-label="Editar álbum A Night at the Opera de Queen"]'
+      );
+
+    botaoEditar?.click();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      '/admin/banco/albuns',
+      1,
+      'editar'
+    ]);
+  });
+
+  it('não deve excluir quando a confirmação for cancelada', () => {
+    listarAlbuns.mockReturnValue(of(albuns));
+    const confirmar = vi.spyOn(window, 'confirm')
+      .mockReturnValue(false);
+    criarComponente();
+
+    const botaoExcluir = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>(
+        'button[aria-label="Excluir álbum A Night at the Opera de Queen"]'
+      );
+
+    botaoExcluir?.click();
+
+    expect(confirmar).toHaveBeenCalledWith(
+      'Tem certeza que deseja excluir o álbum ' +
+      '"A Night at the Opera", de Queen?'
+    );
+    expect(excluirAlbum).not.toHaveBeenCalled();
+  });
+
+  it('deve excluir após confirmação e atualizar a listagem', () => {
+    listarAlbuns
+      .mockReturnValueOnce(of(albuns))
+      .mockReturnValueOnce(of([albuns[1]]));
+    excluirAlbum.mockReturnValue(of(undefined));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    criarComponente();
+
+    const botaoExcluir = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>(
+        'button[aria-label="Excluir álbum A Night at the Opera de Queen"]'
+      );
+
+    botaoExcluir?.click();
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    expect(excluirAlbum).toHaveBeenCalledOnce();
+    expect(excluirAlbum).toHaveBeenCalledWith(1);
+    expect(listarAlbuns).toHaveBeenCalledTimes(2);
+    expect(elemento.querySelectorAll('.album-card')).toHaveLength(1);
+    expect(elemento.textContent)
+      .toContain('Álbum A Night at the Opera excluído com sucesso!');
+  });
+
+  it('deve bloquear as ações enquanto a exclusão estiver em andamento', () => {
+    const respostaExclusao = new Subject<void>();
+    listarAlbuns.mockReturnValue(of(albuns));
+    excluirAlbum.mockReturnValue(respostaExclusao.asObservable());
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    criarComponente();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    const botaoExcluir = elemento.querySelector<HTMLButtonElement>(
+      'button[aria-label="Excluir álbum A Night at the Opera de Queen"]'
+    );
+
+    botaoExcluir?.click();
+    fixture.detectChanges();
+
+    const botoesDosCards = Array.from(
+      elemento.querySelectorAll<HTMLButtonElement>('.card-button')
+    );
+    expect(botoesDosCards.every(botao => botao.disabled)).toBe(true);
+    expect(botaoExcluir?.getAttribute('aria-busy')).toBe('true');
+    expect(botaoExcluir?.textContent).toContain('Excluindo...');
+
+    component.editarAlbum(2);
+    component.excluirAlbum(albuns[1]);
+
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(excluirAlbum).toHaveBeenCalledOnce();
+
+    respostaExclusao.complete();
+    fixture.detectChanges();
+
+    expect(component.operacaoEmAndamento()).toBe(false);
+  });
+
+  it('deve manter o álbum e exibir a mensagem da API no conflito', () => {
+    listarAlbuns.mockReturnValue(of(albuns));
+    excluirAlbum.mockReturnValue(throwError(() =>
+      new HttpErrorResponse({
+        status: 409,
+        error: {
+          message: 'Não é possível excluir: existem músicas associadas.'
+        }
+      })
+    ));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    criarComponente();
+
+    const botaoExcluir = (fixture.nativeElement as HTMLElement)
+      .querySelector<HTMLButtonElement>(
+        'button[aria-label="Excluir álbum A Night at the Opera de Queen"]'
+      );
+
+    botaoExcluir?.click();
+    fixture.detectChanges();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    expect(component.mensagemErroExclusao()).toBe(
+      'Não é possível excluir: existem músicas associadas.'
+    );
+    expect(elemento.querySelectorAll('.album-card')).toHaveLength(2);
+    expect(listarAlbuns).toHaveBeenCalledOnce();
+  });
+
+  it('deve explicar o conflito quando a API não enviar uma mensagem', () => {
+    listarAlbuns.mockReturnValue(of(albuns));
+    excluirAlbum.mockReturnValue(throwError(() =>
+      new HttpErrorResponse({ status: 409 })
+    ));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    criarComponente();
+
+    component.excluirAlbum(albuns[0]);
+
+    expect(component.mensagemErroExclusao())
+      .toContain('possui músicas associadas');
+  });
+
+  it.each([
+    [0, 'Não foi possível conectar ao servidor.'],
+    [401, 'Sua sessão expirou. Faça login novamente.'],
+    [403, 'Você não possui permissão para excluir álbuns.'],
+    [404, 'O álbum não foi encontrado. Atualize a listagem.'],
+    [500, 'Ocorreu um erro no servidor ao excluir o álbum.'],
+    [418, 'Não foi possível excluir o álbum.']
+  ])('deve tratar o erro HTTP %i ao excluir', (status, mensagem) => {
+    listarAlbuns.mockReturnValue(of(albuns));
+    excluirAlbum.mockReturnValue(throwError(() =>
+      new HttpErrorResponse({ status })
+    ));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    criarComponente();
+
+    component.excluirAlbum(albuns[0]);
+
+    expect(component.mensagemErroExclusao()).toBe(mensagem);
+    expect(component.albuns()).toEqual(albuns);
   });
 
   it('deve oferecer navegação para painel e cadastro', () => {

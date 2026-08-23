@@ -29,7 +29,7 @@
         <button
           class="secondary-button"
           type="button"
-          [disabled]="carregando()"
+          [disabled]="operacaoEmAndamento()"
           (click)="carregarAlbuns()"
         >
           Atualizar lista
@@ -44,6 +44,15 @@
       >
         {{ mensagemSucesso() }}
       </output>
+    }
+
+    @if (mensagemErroExclusao()) {
+      <div
+        class="feedback error-feedback"
+        role="alert"
+      >
+        {{ mensagemErroExclusao() }}
+      </div>
     }
 
     @if (carregando()) {
@@ -105,6 +114,41 @@
                   <p class="album-ano">
                     Lançamento: {{ album.anoLancamento }}
                   </p>
+                </div>
+
+                <div class="card-actions">
+                  <button
+                    class="card-button"
+                    type="button"
+                    [disabled]="operacaoEmAndamento()"
+                    [attr.aria-label]="
+                      'Editar álbum ' + album.titulo +
+                      ' de ' + album.artista.nome
+                    "
+                    (click)="editarAlbum(album.idAlbum)"
+                  >
+                    Editar
+                  </button>
+
+                  <button
+                    class="card-button delete-button"
+                    type="button"
+                    [disabled]="operacaoEmAndamento()"
+                    [attr.aria-busy]="
+                      excluindoId() === album.idAlbum
+                    "
+                    [attr.aria-label]="
+                      'Excluir álbum ' + album.titulo +
+                      ' de ' + album.artista.nome
+                    "
+                    (click)="excluirAlbum(album)"
+                  >
+                    @if (excluindoId() === album.idAlbum) {
+                      Excluindo...
+                    } @else {
+                      Excluir
+                    }
+                  </button>
                 </div>
               </article>
             </li>

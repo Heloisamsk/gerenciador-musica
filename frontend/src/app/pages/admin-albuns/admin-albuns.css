@@ -71,7 +71,8 @@
 
 .primary-link,
 .primary-button,
-.secondary-button {
+.secondary-button,
+.card-button {
   display: inline-flex;
   min-height: 2.75rem;
   align-items: center;
@@ -90,20 +91,23 @@
   border: 1px solid #1ed760;
 }
 
-.secondary-button {
+.secondary-button,
+.card-button {
   color: #ffffff;
   background-color: transparent;
   border: 1px solid #727272;
 }
 
-.secondary-button:disabled {
+.secondary-button:disabled,
+.card-button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
 .primary-link:focus-visible,
 .primary-button:focus-visible,
-.secondary-button:focus-visible {
+.secondary-button:focus-visible,
+.card-button:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 3px;
 }
@@ -119,6 +123,12 @@
   color: #8ff0b1;
   background-color: #193021;
   border: 1px solid #1db954;
+}
+
+.error-feedback {
+  color: #ff8f8f;
+  background-color: #3b2424;
+  border: 1px solid #7a3535;
 }
 
 .state-card {
@@ -166,7 +176,7 @@
 
 .album-card {
   display: grid;
-  grid-template-columns: 9rem minmax(0, 1fr);
+  grid-template-columns: 9rem minmax(0, 1fr) auto;
   gap: 1.25rem;
   height: 100%;
   padding: 1.25rem;
@@ -214,6 +224,22 @@
   margin: 0.75rem 0 0;
 }
 
+.card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-button {
+  min-height: 2.5rem;
+  padding: 0.55rem 1rem;
+}
+
+.delete-button {
+  color: #ff8f8f;
+  border-color: #7a3535;
+}
+
 @media (max-width: 860px) {
   .albuns-grid {
     grid-template-columns: 1fr;
@@ -233,6 +259,24 @@
   .header-actions,
   .primary-link,
   .secondary-button {
+    width: 100%;
+  }
+
+  .album-card {
+    grid-template-columns: 7rem minmax(0, 1fr);
+  }
+
+  .album-capa {
+    width: 7rem;
+    height: 7rem;
+  }
+
+  .card-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+
+  .card-button {
     width: 100%;
   }
 }
