@@ -81,6 +81,7 @@ class ArtistaViewsIntegrationTest {
         assertThat(detalhesPrincipal.artista().totalAlbuns()).isEqualTo(1L);
         assertThat(detalhesPrincipal.artista().totalMusicasPrincipais())
                 .isEqualTo(1L);
+        assertThat(detalhesPrincipal.artista().totalParticipacoes()).isZero();
         assertThat(detalhesPrincipal.artista().duracaoTotalSegundos())
                 .isEqualTo(210L);
         assertThat(detalhesPrincipal.albuns())
