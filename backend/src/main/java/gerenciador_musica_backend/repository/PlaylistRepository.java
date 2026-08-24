@@ -18,15 +18,14 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
      * é feita no service, pra diferenciar 404 (não existe)
      * de 403 (existe, mas não é sua).
      *
-     * JOIN FETCH evita N+1 ao acessar playlist.getMusicas()
-     * e cada musica.getArtistaPrincipal().
+     * JOIN FETCH evita N+1 ao acessar playlist.getMusicas(). Os créditos
+     * dos artistas usam carregamento em lote no mapeamento de Musica.
      */
     @Query("""
             SELECT DISTINCT p
             FROM Playlist p
             LEFT JOIN FETCH p.musicas pm
             LEFT JOIN FETCH pm.musica m
-            LEFT JOIN FETCH m.artistaPrincipal
             WHERE p.id = :id
             """)
     Optional<Playlist> buscarComMusicasPorId(@Param("id") Long id);

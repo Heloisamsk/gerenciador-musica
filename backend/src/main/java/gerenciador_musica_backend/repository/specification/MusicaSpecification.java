@@ -1,9 +1,9 @@
 package gerenciador_musica_backend.repository.specification;
 
 import gerenciador_musica_backend.dto.MusicaFiltroDTO;
-import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Genero;
 import gerenciador_musica_backend.model.Musica;
+import gerenciador_musica_backend.model.MusicaArtista;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
@@ -50,14 +50,14 @@ public class MusicaSpecification {
         }
 
         return (root, query, cb) -> {
-            Join<Musica, Artista> participantes = root.join(
-                    "artistasParticipantes",
+            Join<Musica, MusicaArtista> creditos = root.join(
+                    "creditosArtistas",
                     JoinType.LEFT
             );
 
-            return cb.or(
-                    cb.equal(root.get("artistaPrincipal").get("idArtista"), artistaId),
-                    cb.equal(participantes.get("idArtista"), artistaId)
+            return cb.equal(
+                    creditos.get("artista").get("idArtista"),
+                    artistaId
             );
         };
     }
