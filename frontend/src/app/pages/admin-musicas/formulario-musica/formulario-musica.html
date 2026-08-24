@@ -136,6 +136,45 @@
           </div>
 
           <div class="form-group campo-largo">
+            <label for="youtubeUrl">Link da música no YouTube</label>
+            <input
+              id="youtubeUrl"
+              class="form-input"
+              type="url"
+              formControlName="youtubeUrl"
+              maxlength="2048"
+              placeholder="https://www.youtube.com/watch?v=..."
+              autocomplete="url"
+              aria-describedby="ajuda-youtube"
+              [class.input-invalido]="
+                formulario.controls.youtubeUrl.invalid
+                && formulario.controls.youtubeUrl.touched
+              "
+            >
+            <small id="ajuda-youtube" class="campo-opcional">
+              Campo opcional. Aceita links youtube.com, youtu.be e Shorts.
+            </small>
+
+            @if (
+              formulario.controls.youtubeUrl.touched
+              && formulario.controls.youtubeUrl.hasError('maxlength')
+            ) {
+              <small class="error-message">
+                O link deve possuir no máximo 2048 caracteres.
+              </small>
+            }
+
+            @if (
+              formulario.controls.youtubeUrl.touched
+              && formulario.controls.youtubeUrl.hasError('youtubeInvalido')
+            ) {
+              <small class="error-message">
+                Informe um link válido de vídeo do YouTube.
+              </small>
+            }
+          </div>
+
+          <div class="form-group campo-largo">
             <label for="generosTexto">Gêneros *</label>
             <input
               id="generosTexto"

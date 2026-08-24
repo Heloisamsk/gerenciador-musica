@@ -33,6 +33,10 @@ import type { MusicaRequest } from '../../../models/MusicaRequest';
 import type { MusicaResponse } from '../../../models/MusicaResponse';
 import { AdminAlbumService } from '../../../services/admin-album.service';
 import { AdminArtistaService } from '../../../services/admin-artista';
+import {
+  criarLinkYoutube,
+  extrairYoutubeVideoId
+} from '../../../shared/youtube-video';
 import { SeletorParticipantes } from './seletor-participantes/seletor-participantes';
 
 export type ModoFormularioMusica = 'cadastro' | 'edicao';
@@ -80,6 +84,20 @@ const validarGeneros: ValidatorFn = (
   return nomesUnicos.size === generos.length
     ? null
     : { generoDuplicado: true };
+};
+
+const validarYoutubeUrl: ValidatorFn = (
+  control: AbstractControl
+): ValidationErrors | null => {
+  const valor = control.value;
+
+  if (typeof valor !== 'string' || valor.trim().length === 0) {
+    return null;
+  }
+
+  return extrairYoutubeVideoId(valor) === null
+    ? { youtubeInvalido: true }
+    : null;
 };
 
 @Component({
@@ -153,6 +171,13 @@ export class FormularioMusica implements OnInit {
       ]
     ],
     letra: [''],
+    youtubeUrl: [
+      '',
+      [
+        Validators.maxLength(2048),
+        validarYoutubeUrl
+      ]
+    ],
     duracaoSegundos: [
       null as number | null,
       [
@@ -297,7 +322,8 @@ export class FormularioMusica implements OnInit {
       artistaPrincipalId,
       artistasParticipantesIds: participantes,
       albumId,
-      generos: this.normalizarGeneros(valores.generosTexto)
+      generos: this.normalizarGeneros(valores.generosTexto),
+      youtubeUrl: valores.youtubeUrl.trim() || null
     });
   }
 
@@ -398,6 +424,7 @@ export class FormularioMusica implements OnInit {
       {
         titulo: dados.titulo,
         letra: dados.letra ?? '',
+        youtubeUrl: criarLinkYoutube(dados.youtubeVideoId),
         duracaoSegundos: dados.duracaoSegundos,
         anoLancamento: dados.anoLancamento,
         generosTexto: dados.generos
@@ -465,6 +492,7 @@ export class FormularioMusica implements OnInit {
     this.formulario.reset({
       titulo: '',
       letra: '',
+      youtubeUrl: '',
       duracaoSegundos: null,
       anoLancamento: null,
       generosTexto: '',

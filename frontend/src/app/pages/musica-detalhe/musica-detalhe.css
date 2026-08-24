@@ -95,6 +95,10 @@
   color: #b3b3b3;
 }
 
+.secao-player {
+  max-width: 640px;
+}
+
 .letra {
   white-space: pre-line;
   line-height: 1.6;

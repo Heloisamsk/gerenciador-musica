@@ -39,6 +39,16 @@
       </div>
     </div>
 
+    @if (musica.youtubeVideoId) {
+      <section class="secao secao-player" aria-labelledby="titulo-player">
+        <h2 id="titulo-player">Ouvir música</h2>
+        <app-youtube-player
+          [videoId]="musica.youtubeVideoId"
+          [titulo]="musica.titulo"
+        />
+      </section>
+    }
+
     @if (musica.artistasParticipantes.length > 0) {
       <section class="secao">
         <h2>Participações</h2>

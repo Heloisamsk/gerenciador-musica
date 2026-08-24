@@ -6,10 +6,11 @@ import { finalize } from 'rxjs';
 import { MusicaService } from '../../services/musica';
 import { MusicaResponse } from '../../models/MusicaResponse';
 import { formatarDuracao } from '../../shared/formatar-duracao';
+import { YoutubePlayer } from '../../shared/youtube-player/youtube-player';
 
 @Component({
   selector: 'app-musica-detalhe',
-  imports: [RouterLink],
+  imports: [RouterLink, YoutubePlayer],
   templateUrl: './musica-detalhe.html',
   styleUrls: ['./musica-detalhe.css']
 })
