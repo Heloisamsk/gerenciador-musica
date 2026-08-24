@@ -1,21 +1,21 @@
 # 🎧 — Sistema Gerenciador de Músicas
 
 <details>
-<summary><strong>👥 » Integrantes</strong></summary>
+<summary><strong><h2>👥 » Integrantes</strong></summary>
 
 #### [Álvaro Henrique Nunes de Andrade](https://github.com/alwvaro) | [Arthur Oliveira Ramos](https://github.com/thuramos) | [Maria Heloisa da Silva Montebelo](https://github.com/Heloisamsk) | [Vinicius Freire Pereira](https://github.com/VinFpe)
 
 </details>
 
 <details>
-<summary><strong>📍 » Sobre o Projeto</strong></summary>
+<summary><strong><h2>📍 » Sobre o Projeto</strong></summary>
 
 Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playlists, desenvolvido para as disciplinas de Engenharia de Software, ministrada pela professora [Thais Burity](https://github.com/taburity), e Banco de Dados, ministrada pela professora Priscilla Kelly, da UFAPE, referente ao período de 2026.1, com intuito de avaliação para a 2ª Verificação de Aprendizagem.
 
 </details>
 
 <details>
-<summary><strong>🚀 » Aplicação em Produção</strong></summary>
+<summary><strong><h2>🚀 » Aplicação em Produção</strong></summary>
 
 - **Frontend:** [gerenciador-musica.onrender.com](https://gerenciador-musica.onrender.com)
 - **Backend:** [gerenciador-musica-1.onrender.com](https://gerenciador-musica-1.onrender.com)
@@ -26,10 +26,10 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 </details>
 
 <details>
-<summary><strong>🤖 » Tecnologias</strong></summary>
+<summary><strong><h2>🤖 » Tecnologias</strong></summary>
 
 <details>
-<summary><strong>Frontend</strong></summary>
+<summary><strong><h3>Frontend</strong></summary>
 
 <p>
   <img src="https://skillicons.dev/icons?i=angular,ts,html,css,reactivex,nodejs,express,npm&theme=dark" alt="Angular, TypeScript, HTML5, CSS3, RxJS, Node.js, Express e npm" />
@@ -72,7 +72,7 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 </details>
 
 <details>
-<summary><strong>Backend</strong></summary>
+<summary><strong><h3>Backend</strong></summary>
 
 <p>
   <img src="https://skillicons.dev/icons?i=java,spring,hibernate,maven&theme=dark" alt="Java, Spring Boot, Hibernate e Maven" />
@@ -138,7 +138,7 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 </details>
 
 <details>
-<summary><strong>Banco de dados, infraestrutura e deploy</strong></summary>
+<summary><strong><h3>Banco de dados, infraestrutura e deploy</strong></summary>
 
 <p>
   <img src="https://skillicons.dev/icons?i=postgres,docker,nginx&theme=dark" alt="PostgreSQL, Docker e Nginx" />
@@ -171,7 +171,7 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 </details>
 
 <details>
-<summary><strong>Testes, qualidade e automação</strong></summary>
+<summary><strong><h3>Testes, qualidade e automação</strong></summary>
 
 <p>
   <img src="https://skillicons.dev/icons?i=git,github,githubactions,vitest&theme=dark" alt="Git, GitHub, GitHub Actions e Vitest" />
@@ -221,21 +221,21 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 </details>
 
 <details>
-<summary><strong>🎶 » Status do Projeto</strong></summary>
+<summary><strong><h2>🎶 » Status do Projeto</strong></summary>
 
 - Em andamento
 
 </details>
 
 <details>
-<summary><strong>🎏 » Diagrama UML</strong></summary>
+<summary><strong><h2>🎏 » Diagrama UML</strong></summary>
 
-![Diagrama_Spotify_BD.drawio (2).png](../../../../../Downloads/Diagrama_Spotify_BD.drawio%20%282%29.png)
+<img width="3462" height="1792" alt="Diagrama_Spotify_BD drawio (2)" src="https://github.com/user-attachments/assets/5f0af97e-1fb0-42f2-bbb7-4adfad160c89" />
 
 </details>
 
 <details>
-<summary><strong>🗄️ » Configuração do Banco de Dados</strong></summary>
+<summary><strong><h2>🗄️ » Configuração do Banco de Dados</strong></summary>
 
 O projeto usa **PostgreSQL 18** como SGBD, executado via Docker (serviço `postgres` do `docker-compose.yml`).
 
@@ -252,7 +252,7 @@ A estrutura do banco é criada e atualizada automaticamente pelo [Flyway](https:
 </details>
 
 <details>
-<summary><strong>🌱 » Metodologia de Povoamento</strong></summary>
+<summary><strong><h2>🌱 » Metodologia de Povoamento</strong></summary>
 
 O banco é povoado automaticamente pela migration [`V11__popular_dados_iniciais.sql`](backend/src/main/resources/db/migration/V11__popular_dados_iniciais.sql), que roda junto com as demais assim que o container do backend sobe — não é preciso nenhum passo manual.
 
@@ -267,10 +267,10 @@ Todos os usuários fictícios usam a mesma senha para testes: **`Senha@123`**.
 </details>
 
 <details>
-<summary><strong>🔖 » Dicionário de Dados</strong></summary>
+<summary><strong><h2>🔖 » Dicionário de Dados</strong></summary>
 
 <details>
-<summary><strong>ARTISTA</strong></summary>
+<summary><strong><h3>ARTISTA</strong></summary>
 
 Armazena os artistas cadastrados no sistema.
 
@@ -285,7 +285,7 @@ Armazena os artistas cadastrados no sistema.
 </details>
 
 <details>
-<summary><strong>USUARIO</strong></summary>
+<summary><strong><h3>USUARIO</strong></summary>
 
 Armazena os usuários cadastrados, seus dados de autenticação e nível de acesso.
 
@@ -302,7 +302,7 @@ Armazena os usuários cadastrados, seus dados de autenticação e nível de aces
 </details>
 
 <details>
-<summary><strong>MUSICA</strong></summary>
+<summary><strong><h3>MUSICA</strong></summary>
 
 Armazena somente os dados próprios da música. A autoria e as participações são representadas pela tabela associativa `musica_artista`.
 
@@ -320,7 +320,7 @@ O artista principal não é armazenado diretamente em `musica`. Essa informaçã
 </details>
 
 <details>
-<summary><strong>ALBUM</strong></summary>
+<summary><strong><h3>ALBUM</strong></summary>
 
 Armazena os álbuns cadastrados, com artista responsável, título e ano de lançamento.
 
@@ -339,7 +339,7 @@ informado, a API valida se o álbum pertence ao artista principal selecionado.
 </details>
 
 <details>
-<summary><strong>GENERO</strong></summary>
+<summary><strong><h3>GENERO</strong></summary>
 
 Armazena os gêneros musicais cadastrados no sistema.
 
@@ -351,7 +351,7 @@ Armazena os gêneros musicais cadastrados no sistema.
 </details>
 
 <details>
-<summary><strong>PERFIL</strong></summary>
+<summary><strong><h3>PERFIL</strong></summary>
 
 Armazena a personalização do perfil de cada usuário (foto, banner, biografia e destaques opcionais).
 
@@ -370,7 +370,7 @@ Armazena a personalização do perfil de cada usuário (foto, banner, biografia 
 </details>
 
 <details>
-<summary><strong>REVIEW</strong></summary>
+<summary><strong><h3>REVIEW</strong></summary>
 
 Armazena as avaliações dos usuários sobre músicas.
 
@@ -387,7 +387,7 @@ Armazena as avaliações dos usuários sobre músicas.
 </details>
 
 <details>
-<summary><strong>PLAYLIST</strong></summary>
+<summary><strong><h3>PLAYLIST</strong></summary>
 
 Armazena as playlists criadas pelos usuários.
 
@@ -402,7 +402,7 @@ Armazena as playlists criadas pelos usuários.
 </details>
 
 <details>
-<summary><strong>REPRODUCAO</strong></summary>
+<summary><strong><h3>REPRODUCAO</strong></summary>
 
 Armazena o histórico de reproduções de músicas pelos usuários.
 
@@ -417,7 +417,7 @@ Armazena o histórico de reproduções de músicas pelos usuários.
 </details>
 
 <details>
-<summary><strong>MUSICA_ARTISTA (associativa)</strong></summary>
+<summary><strong><h3>MUSICA_ARTISTA (associativa)</strong></summary>
 
 Relaciona as músicas a todos os seus artistas creditados, incluindo o artista principal e os artistas participantes.
 
@@ -434,7 +434,7 @@ Atualmente, o cadastro e a edição de músicas utilizam os papéis `PRINCIPAL` 
 </details>
 
 <details>
-<summary><strong>MUSICA_GENERO (associativa)</strong></summary>
+<summary><strong><h3>MUSICA_GENERO (associativa)</strong></summary>
 
 Relaciona músicas aos seus gêneros musicais.
 
@@ -446,7 +446,7 @@ Relaciona músicas aos seus gêneros musicais.
 </details>
 
 <details>
-<summary><strong>PLAYLIST_MUSICA (associativa)</strong></summary>
+<summary><strong><h3>PLAYLIST_MUSICA (associativa)</strong></summary>
 
 Relaciona músicas às playlists, com ordem de exibição.
 
@@ -460,7 +460,7 @@ Relaciona músicas às playlists, com ordem de exibição.
 </details>
 
 <details>
-<summary><strong>CURTIDA_MUSICA (associativa)</strong></summary>
+<summary><strong><h3>CURTIDA_MUSICA (associativa)</strong></summary>
 
 Registra as curtidas dos usuários em músicas.
 
@@ -473,7 +473,7 @@ Registra as curtidas dos usuários em músicas.
 </details>
 
 <details>
-<summary><strong>USUARIO_SEGUE_USUARIO (associativa)</strong></summary>
+<summary><strong><h3>USUARIO_SEGUE_USUARIO (associativa)</strong></summary>
 
 Registra relações de seguidores entre usuários.
 
@@ -486,7 +486,7 @@ Registra relações de seguidores entre usuários.
 </details>
 
 <details>
-<summary><strong>USUARIO_SEGUE_ARTISTA (associativa)</strong></summary>
+<summary><strong><h3>USUARIO_SEGUE_ARTISTA (associativa)</strong></summary>
 
 Registra os artistas seguidos pelos usuários.
 
@@ -501,12 +501,12 @@ Registra os artistas seguidos pelos usuários.
 </details>
 
 <details>
-<summary><strong>🗺️ » Como executar</strong></summary>
+<summary><strong><h2>🗺️ » Como executar</strong></summary>
 
 **Pré-requisitos:** [Git](https://git-scm.com/) e [Docker Desktop](https://www.docker.com/products/docker-desktop/). Para execução local, também são necessários Java 21, Node.js e npm.
 
 <details>
-<summary><strong>Clonar e iniciar com Docker</strong></summary>
+<summary><strong><h3>Clonar e iniciar com Docker</strong></summary>
 
 ```bash
 git clone https://github.com/projeto-gerenciador-musica/gerenciador-musica.git
@@ -534,7 +534,7 @@ Serviços disponíveis após a inicialização:
 </details>
 
 <details>
-<summary><strong>Executar localmente para desenvolvimento</strong></summary>
+<summary><strong><h3>Executar localmente para desenvolvimento</strong></summary>
 
 Inicie apenas o PostgreSQL com Docker:
 
@@ -567,7 +567,7 @@ npm start
 </details>
 
 <details>
-<summary><strong>Executar os testes</strong></summary>
+<summary><strong><h3>Executar os testes</strong></summary>
 
 Backend:
 
@@ -589,7 +589,7 @@ npm run build
 </details>
 
 <details>
-<summary><strong>Atualizar alterações no Docker</strong></summary>
+<summary><strong><h3>Atualizar alterações no Docker</strong></summary>
 
 Caso uma alteração não apareça ao utilizar Docker, reconstrua o respectivo serviço e atualize a página com `Ctrl + F5`.
 
@@ -598,14 +598,14 @@ Caso uma alteração não apareça ao utilizar Docker, reconstrua o respectivo s
 </details>
 
 <details>
-<summary><strong>🔗 » Endpoints principais</strong></summary>
+<summary><strong><h2>🔗 » Endpoints principais</strong></summary>
 
 As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 
 `Authorization: Bearer <token>`
 
 <details>
-<summary><strong>Autenticação</strong></summary>
+<summary><strong><h3>Autenticação</strong></summary>
 
 | Método | Endpoint | Acesso | Descrição |
 |:------:|----------|--------|-----------|
@@ -616,7 +616,7 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 </details>
 
 <details>
-<summary><strong>Catálogo</strong></summary>
+<summary><strong><h3>Catálogo</strong></summary>
 
 | Método | Endpoint | Acesso | Descrição |
 |:------:|----------|--------|-----------|
@@ -631,7 +631,7 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 </details>
 
 <details>
-<summary><strong>Administração</strong></summary>
+<summary><strong><h3>Administração</strong></summary>
 
 | Método | Endpoint | Acesso | Descrição |
 |:------:|----------|--------|-----------|
@@ -653,7 +653,7 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 </details>
 
 <details>
-<summary><strong>👁️ » Views SQL do catálogo de artistas</strong></summary>
+<summary><strong><h2>👁️ » Views SQL do catálogo de artistas</strong></summary>
 
 A página de detalhes do artista utiliza três views SQL para esconder a complexidade dos relacionamentos entre artistas, músicas, álbuns e gêneros. As views não armazenam cópias dos dados: seus resultados são calculados a partir das tabelas atuais sempre que são consultadas.
 
@@ -664,7 +664,7 @@ A página de detalhes do artista utiliza três views SQL para esconder a complex
 | `vw_musicas_artista_catalogo` | `musica`, `musica_artista`, `artista`, `album`, `musica_genero` e `genero`, incluindo `STRING_AGG` | Retornar as músicas relacionadas ao artista, identificando se ele é principal ou participante e reunindo álbum, capa e gêneros.          |
 
 <details>
-<summary><strong>Uso das views no site</strong></summary>
+<summary><strong><h3>Uso das views no site</strong></summary>
 
 Na página inicial, cada cartão de artista possui um link para a rota `/artistas/{id}`. Ao selecionar um artista, o frontend solicita o endpoint `GET /api/artistas/{id}/detalhes`.
 
