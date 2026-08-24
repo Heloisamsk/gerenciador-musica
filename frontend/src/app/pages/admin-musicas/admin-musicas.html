@@ -105,7 +105,14 @@
     <div class="table-information">
       <p>
         Total de músicas:
-        <strong>{{ musicas().length }}</strong>
+        <strong>{{ totalItens() }}</strong>
+      </p>
+
+      <p>
+        Exibindo
+        <strong>
+          {{ primeiroItemExibido() }}–{{ ultimoItemExibido() }}
+        </strong>
       </p>
     </div>
 
@@ -180,6 +187,60 @@
         </tbody>
       </table>
     </div>
+
+    @if (totalPaginas() > 1) {
+    <nav class="paginacao" aria-label="Paginação das músicas">
+      <button
+        type="button"
+        class="paginacao-button"
+        aria-label="Ir para a primeira página"
+        [disabled]="operacaoEmAndamento() || paginaAtual() === 0"
+        (click)="irParaPrimeiraPagina()"
+      >
+        « Primeira
+      </button>
+
+      <button
+        type="button"
+        class="paginacao-button"
+        aria-label="Ir para a página anterior"
+        [disabled]="operacaoEmAndamento() || paginaAtual() === 0"
+        (click)="irParaPaginaAnterior()"
+      >
+        ‹ Anterior
+      </button>
+
+      <span class="paginacao-status" aria-live="polite">
+        Página {{ paginaAtual() + 1 }} de {{ totalPaginas() }}
+      </span>
+
+      <button
+        type="button"
+        class="paginacao-button"
+        aria-label="Ir para a próxima página"
+        [disabled]="
+          operacaoEmAndamento()
+          || paginaAtual() + 1 >= totalPaginas()
+        "
+        (click)="irParaProximaPagina()"
+      >
+        Próxima ›
+      </button>
+
+      <button
+        type="button"
+        class="paginacao-button"
+        aria-label="Ir para a última página"
+        [disabled]="
+          operacaoEmAndamento()
+          || paginaAtual() + 1 >= totalPaginas()
+        "
+        (click)="irParaUltimaPagina()"
+      >
+        Última »
+      </button>
+    </nav>
+    }
     }
 
   </div>

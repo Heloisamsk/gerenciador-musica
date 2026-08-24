@@ -71,13 +71,15 @@ describe('AdminMusicaService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('deve buscar a lista de músicas cadastradas', () => {
-    service.listarMusicas().subscribe((musicas) => {
-      expect(musicas).toHaveLength(1);
-      expect(musicas[0].titulo).toBe('Bohemian Rhapsody');
+  it('deve buscar uma página de músicas com seus metadados', () => {
+    service.listarMusicas(2, 25).subscribe((pagina) => {
+      expect(pagina.itens).toHaveLength(1);
+      expect(pagina.itens[0].titulo).toBe('Bohemian Rhapsody');
+      expect(pagina.paginaAtual).toBe(2);
+      expect(pagina.totalItens).toBe(51);
     });
 
-    const requisicao = httpMock.expectOne(`${apiUrl}?size=100`);
+    const requisicao = httpMock.expectOne(`${apiUrl}?page=2&size=25`);
 
     expect(requisicao.request.method).toBe('GET');
 
@@ -94,10 +96,10 @@ describe('AdminMusicaService', () => {
           generos: [{ id: 1, nome: 'Rock' }],
         } as MusicaListagem,
       ],
-      paginaAtual: 0,
-      tamanhoPagina: 100,
-      totalItens: 1,
-      totalPaginas: 1,
+      paginaAtual: 2,
+      tamanhoPagina: 25,
+      totalItens: 51,
+      totalPaginas: 3,
     });
   });
 

@@ -5,6 +5,7 @@ import { Subject, of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
 import type { MusicaListagem } from '../../models/MusicaListagem';
+import type { PaginaResponse } from '../../models/PaginaResponse';
 import { AdminMusicaService } from '../../services/admin-musica';
 import { AdminMusicas } from './admin-musicas';
 
@@ -57,13 +58,28 @@ describe('AdminMusicas', () => {
     }
   ];
 
+  function criarPagina(
+    itens: MusicaListagem[] = musicas,
+    paginaAtual = 0,
+    totalItens = itens.length,
+    totalPaginas = totalItens === 0 ? 0 : 1
+  ): PaginaResponse<MusicaListagem> {
+    return {
+      itens,
+      paginaAtual,
+      tamanhoPagina: 20,
+      totalItens,
+      totalPaginas
+    };
+  }
+
   beforeEach(async () => {
     listarMusicas.mockReset();
     excluirMusica.mockReset();
     navigate.mockReset();
     currentNavigation.mockReset();
 
-    listarMusicas.mockReturnValue(of(musicas));
+    listarMusicas.mockReturnValue(of(criarPagina()));
     excluirMusica.mockReturnValue(of(undefined));
     navigate.mockResolvedValue(true);
     currentNavigation.mockReturnValue(null);
@@ -111,7 +127,7 @@ describe('AdminMusicas', () => {
       'button[aria-label^="Excluir música"]'
     );
 
-    expect(listarMusicas).toHaveBeenCalledOnce();
+    expect(listarMusicas).toHaveBeenCalledWith(0, 20);
     expect(linhas).toHaveLength(2);
     expect(elemento.querySelectorAll('thead th')).toHaveLength(9);
     expect(elemento.textContent).toContain('Total de músicas:');
@@ -136,6 +152,55 @@ describe('AdminMusicas', () => {
       ?.textContent).toContain('Música sem álbum');
   });
 
+  it('deve navegar por todas as páginas e manter o total real', () => {
+    listarMusicas
+      .mockReturnValueOnce(of(criarPagina(musicas, 0, 45, 3)))
+      .mockReturnValueOnce(of(criarPagina([musicas[1]], 1, 45, 3)))
+      .mockReturnValueOnce(of(criarPagina(musicas, 0, 45, 3)))
+      .mockReturnValueOnce(of(criarPagina([musicas[0]], 2, 45, 3)))
+      .mockReturnValueOnce(of(criarPagina(musicas, 0, 45, 3)));
+    criarComponente();
+
+    const elemento = fixture.nativeElement as HTMLElement;
+    expect(elemento.querySelector('.table-information')?.textContent)
+      .toContain('45');
+    expect(elemento.querySelector('.paginacao-status')?.textContent)
+      .toContain('Página 1 de 3');
+
+    elemento.querySelector<HTMLButtonElement>(
+      'button[aria-label="Ir para a próxima página"]'
+    )?.click();
+    fixture.detectChanges();
+
+    expect(listarMusicas).toHaveBeenNthCalledWith(2, 1, 20);
+    expect(component.paginaAtual()).toBe(1);
+    expect(component.primeiroItemExibido()).toBe(21);
+    expect(component.ultimoItemExibido()).toBe(40);
+
+    elemento.querySelector<HTMLButtonElement>(
+      'button[aria-label="Ir para a página anterior"]'
+    )?.click();
+    fixture.detectChanges();
+    elemento.querySelector<HTMLButtonElement>(
+      'button[aria-label="Ir para a última página"]'
+    )?.click();
+    fixture.detectChanges();
+    elemento.querySelector<HTMLButtonElement>(
+      'button[aria-label="Ir para a primeira página"]'
+    )?.click();
+    fixture.detectChanges();
+
+    expect(listarMusicas).toHaveBeenNthCalledWith(3, 0, 20);
+    expect(listarMusicas).toHaveBeenNthCalledWith(4, 2, 20);
+    expect(listarMusicas).toHaveBeenNthCalledWith(5, 0, 20);
+    expect(component.paginaAtual()).toBe(0);
+
+    component.irParaPagina(-1);
+    component.irParaPagina(3);
+    component.irParaPagina(0);
+    expect(listarMusicas).toHaveBeenCalledTimes(5);
+  });
+
   it('deve substituir uma capa inválida pela imagem alternativa', () => {
     criarComponente();
     const elemento = fixture.nativeElement as HTMLElement;
@@ -152,7 +217,7 @@ describe('AdminMusicas', () => {
   });
 
   it('deve exibir carregamento e impedir chamadas duplicadas', () => {
-    const resposta = new Subject<MusicaListagem[]>();
+    const resposta = new Subject<PaginaResponse<MusicaListagem>>();
     listarMusicas.mockReturnValue(resposta.asObservable());
 
     criarComponente();
@@ -164,7 +229,7 @@ describe('AdminMusicas', () => {
     component.carregarCatalogo();
     expect(listarMusicas).toHaveBeenCalledOnce();
 
-    resposta.next(musicas);
+    resposta.next(criarPagina());
     resposta.complete();
     fixture.detectChanges();
 
@@ -173,7 +238,7 @@ describe('AdminMusicas', () => {
   });
 
   it('deve exibir o estado de lista vazia', () => {
-    listarMusicas.mockReturnValue(of([]));
+    listarMusicas.mockReturnValue(of(criarPagina([])));
 
     criarComponente();
 
@@ -186,7 +251,7 @@ describe('AdminMusicas', () => {
       .mockReturnValueOnce(throwError(() =>
         new HttpErrorResponse({ status: 500 })
       ))
-      .mockReturnValueOnce(of(musicas));
+      .mockReturnValueOnce(of(criarPagina()));
 
     criarComponente();
 
@@ -273,8 +338,8 @@ describe('AdminMusicas', () => {
 
   it('deve excluir após confirmação e atualizar a listagem', () => {
     listarMusicas
-      .mockReturnValueOnce(of(musicas))
-      .mockReturnValueOnce(of([musicas[1]]));
+      .mockReturnValueOnce(of(criarPagina()))
+      .mockReturnValueOnce(of(criarPagina([musicas[1]])));
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     criarComponente();
 
@@ -293,6 +358,19 @@ describe('AdminMusicas', () => {
     expect(elemento.querySelectorAll('tbody tr')).toHaveLength(1);
     expect(elemento.querySelector('.feedback-sucesso')?.textContent)
       .toContain('Música Música de Teste Um excluída com sucesso!');
+  });
+
+  it('deve voltar uma página ao excluir o único item da página atual', () => {
+    listarMusicas
+      .mockReturnValueOnce(of(criarPagina([musicas[0]], 1, 21, 2)))
+      .mockReturnValueOnce(of(criarPagina(musicas, 0, 20, 1)));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    criarComponente();
+
+    component.excluirMusica(musicas[0]);
+
+    expect(listarMusicas).toHaveBeenNthCalledWith(2, 0, 20);
+    expect(component.paginaAtual()).toBe(0);
   });
 
   it('deve bloquear as ações durante a exclusão', () => {

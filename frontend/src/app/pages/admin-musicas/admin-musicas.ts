@@ -30,7 +30,13 @@ interface ErroApi {
 })
 export class AdminMusicas implements OnInit {
 
+  private static readonly TAMANHO_PAGINA = 20;
+
   readonly musicas = signal<MusicaListagem[]>([]);
+  readonly paginaAtual = signal(0);
+  readonly tamanhoPagina = signal(AdminMusicas.TAMANHO_PAGINA);
+  readonly totalItens = signal(0);
+  readonly totalPaginas = signal(0);
   readonly carregando = signal(false);
   readonly excluindoId = signal<number | null>(null);
   readonly mensagemErro = signal('');
@@ -39,6 +45,15 @@ export class AdminMusicas implements OnInit {
   readonly operacaoEmAndamento = computed(
     () => this.carregando() || this.excluindoId() !== null
   );
+  readonly primeiroItemExibido = computed(() =>
+    this.totalItens() === 0
+      ? 0
+      : this.paginaAtual() * this.tamanhoPagina() + 1
+  );
+  readonly ultimoItemExibido = computed(() => Math.min(
+    (this.paginaAtual() + 1) * this.tamanhoPagina(),
+    this.totalItens()
+  ));
 
   constructor(
     private readonly adminMusicaService: AdminMusicaService,
@@ -50,7 +65,7 @@ export class AdminMusicas implements OnInit {
     this.carregarCatalogo();
   }
 
-  carregarCatalogo(): void {
+  carregarCatalogo(pagina = this.paginaAtual()): void {
     if (this.carregando()) {
       return;
     }
@@ -58,19 +73,58 @@ export class AdminMusicas implements OnInit {
     this.carregando.set(true);
     this.mensagemErro.set('');
 
-    this.adminMusicaService.listarMusicas()
+    this.adminMusicaService
+      .listarMusicas(pagina, AdminMusicas.TAMANHO_PAGINA)
       .pipe(
         finalize(() => this.carregando.set(false))
       )
       .subscribe({
         next: dados => {
-          this.musicas.set(dados);
+          this.musicas.set(dados.itens);
+          this.paginaAtual.set(dados.paginaAtual);
+          this.tamanhoPagina.set(dados.tamanhoPagina);
+          this.totalItens.set(dados.totalItens);
+          this.totalPaginas.set(dados.totalPaginas);
         },
         error: (erro: HttpErrorResponse) => {
           this.musicas.set([]);
+          this.totalItens.set(0);
+          this.totalPaginas.set(0);
           this.mensagemErro.set(this.mensagemParaErroDeListagem(erro));
         }
       });
+  }
+
+  irParaPagina(pagina: number): void {
+    const paginaValida = Number.isInteger(pagina)
+      && pagina >= 0
+      && pagina < this.totalPaginas();
+
+    if (
+      !paginaValida
+      || pagina === this.paginaAtual()
+      || this.operacaoEmAndamento()
+    ) {
+      return;
+    }
+
+    this.carregarCatalogo(pagina);
+  }
+
+  irParaPrimeiraPagina(): void {
+    this.irParaPagina(0);
+  }
+
+  irParaPaginaAnterior(): void {
+    this.irParaPagina(this.paginaAtual() - 1);
+  }
+
+  irParaProximaPagina(): void {
+    this.irParaPagina(this.paginaAtual() + 1);
+  }
+
+  irParaUltimaPagina(): void {
+    this.irParaPagina(this.totalPaginas() - 1);
   }
 
   editarMusica(id: number): void {
@@ -110,7 +164,12 @@ export class AdminMusicas implements OnInit {
           this.mensagemSucesso.set(
             `Música ${musica.titulo} excluída com sucesso!`
           );
-          this.carregarCatalogo();
+          const paginaAposExclusao =
+            this.musicas().length === 1 && this.paginaAtual() > 0
+              ? this.paginaAtual() - 1
+              : this.paginaAtual();
+
+          this.carregarCatalogo(paginaAposExclusao);
         },
         error: (erro: HttpErrorResponse) => {
           this.mensagemErroExclusao.set(
