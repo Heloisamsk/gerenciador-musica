@@ -1,8 +1,8 @@
-@if (urlSegura(); as url) {
+@if (deveExibirPlayer()) {
   <div class="player-container">
     <iframe
+      #playerFrame
       class="player-frame"
-      [src]="url"
       [title]="'Player do YouTube para ' + titulo()"
       loading="lazy"
       referrerpolicy="strict-origin-when-cross-origin"

@@ -167,8 +167,17 @@ describe('AdminMusicas', () => {
     expect(elemento.querySelector('.paginacao-status')?.textContent)
       .toContain('Página 1 de 3');
 
+    const botoesPaginacao = Array.from(
+      elemento.querySelectorAll<HTMLButtonElement>('.paginacao-button')
+    );
+
+    for (const botao of botoesPaginacao) {
+      expect(botao.getAttribute('aria-label'))
+        .toBe(botao.textContent?.trim());
+    }
+
     elemento.querySelector<HTMLButtonElement>(
-      'button[aria-label="Ir para a próxima página"]'
+      'button[aria-label="Próxima"]'
     )?.click();
     fixture.detectChanges();
 
@@ -178,15 +187,15 @@ describe('AdminMusicas', () => {
     expect(component.ultimoItemExibido()).toBe(40);
 
     elemento.querySelector<HTMLButtonElement>(
-      'button[aria-label="Ir para a página anterior"]'
+      'button[aria-label="Anterior"]'
     )?.click();
     fixture.detectChanges();
     elemento.querySelector<HTMLButtonElement>(
-      'button[aria-label="Ir para a última página"]'
+      'button[aria-label="Última"]'
     )?.click();
     fixture.detectChanges();
     elemento.querySelector<HTMLButtonElement>(
-      'button[aria-label="Ir para a primeira página"]'
+      'button[aria-label="Primeira"]'
     )?.click();
     fixture.detectChanges();
 
