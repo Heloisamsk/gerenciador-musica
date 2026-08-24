@@ -48,7 +48,7 @@ public class MusicaService {
 
     @Transactional
     public MusicaResponseDTO cadastrarMusica(MusicaRequestDTO request) {
-        validarRegrasDeNegocio(request);
+        String youtubeVideoId = validarRegrasDeNegocio(request);
 
         Artista artistaPrincipal = artistaService.buscarEntidadePorId(
                 request.artistaPrincipalId()
@@ -77,7 +77,8 @@ public class MusicaService {
                 artistaPrincipal,
                 album,
                 participantes,
-                generos
+                generos,
+                youtubeVideoId
         );
 
         Musica musicaSalva = musicaRepository.save(musica);
@@ -90,7 +91,7 @@ public class MusicaService {
             Long idMusica,
             MusicaRequestDTO request
     ) {
-        validarRegrasDeNegocio(request);
+        String youtubeVideoId = validarRegrasDeNegocio(request);
 
         Musica musica = obterEntidadePorId(idMusica);
 
@@ -123,7 +124,8 @@ public class MusicaService {
                 artistaPrincipal,
                 album,
                 participantes,
-                generos
+                generos,
+                youtubeVideoId
         );
 
         return converterParaResponse(musica);
@@ -141,7 +143,7 @@ public class MusicaService {
         musicaRepository.delete(musica);
     }
 
-    private void validarRegrasDeNegocio(MusicaRequestDTO request) {
+    private String validarRegrasDeNegocio(MusicaRequestDTO request) {
         if (request == null) {
             throw new DadosMusicaInvalidosException(
                     "Os dados da música são obrigatórios."
@@ -162,6 +164,8 @@ public class MusicaService {
         );
 
         validarGeneros(request.generos());
+
+        return YoutubeUrlParser.extrairVideoId(request.youtubeUrl());
     }
 
     private Set<Artista> buscarParticipantes(
@@ -318,7 +322,8 @@ public class MusicaService {
             Artista artistaPrincipal,
             Album album,
             Set<Artista> artistasParticipantes,
-            Set<Genero> generos
+            Set<Genero> generos,
+            String youtubeVideoId
     ) {
         String tituloNormalizado = normalizarTexto(request.titulo());
         String letraNormalizada = normalizarLetra(request.letra());
@@ -334,6 +339,7 @@ public class MusicaService {
 
         musica.setArtistasParticipantes(artistasParticipantes);
         musica.setGeneros(generos);
+        musica.setYoutubeVideoId(youtubeVideoId);
 
         return musica;
     }
@@ -344,7 +350,8 @@ public class MusicaService {
             Artista artistaPrincipal,
             Album album,
             Set<Artista> artistasParticipantes,
-            Set<Genero> generos
+            Set<Genero> generos,
+            String youtubeVideoId
     ) {
         musica.setTitulo(normalizarTexto(request.titulo()));
         musica.setLetra(normalizarLetra(request.letra()));
@@ -356,6 +363,7 @@ public class MusicaService {
         );
         musica.setAlbum(album);
         musica.setGeneros(generos);
+        musica.setYoutubeVideoId(youtubeVideoId);
     }
 
     private MusicaResponseDTO converterParaResponse(Musica musica) {
@@ -386,7 +394,8 @@ public class MusicaService {
                 artistaPrincipal,
                 album,
                 participantes,
-                generos
+                generos,
+                musica.getYoutubeVideoId()
         );
     }
 
