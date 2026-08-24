@@ -1,13 +1,11 @@
 import {
   Component,
   computed,
-  inject,
-  input
+  effect,
+  ElementRef,
+  input,
+  viewChild
 } from '@angular/core';
-import {
-  DomSanitizer,
-  SafeResourceUrl
-} from '@angular/platform-browser';
 
 import { criarLinkEmbedYoutube } from '../youtube-video';
 
@@ -18,16 +16,29 @@ import { criarLinkEmbedYoutube } from '../youtube-video';
 })
 export class YoutubePlayer {
 
-  private readonly sanitizer = inject(DomSanitizer);
+  private readonly playerFrame =
+    viewChild<ElementRef<HTMLIFrameElement>>('playerFrame');
 
   readonly videoId = input.required<string>();
   readonly titulo = input.required<string>();
 
-  readonly urlSegura = computed<SafeResourceUrl | null>(() => {
-    const url = criarLinkEmbedYoutube(this.videoId());
+  readonly deveExibirPlayer = computed(
+    () => criarLinkEmbedYoutube(this.videoId()) !== null
+  );
 
-    return url === null
-      ? null
-      : this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  });
+  constructor() {
+    effect(() => {
+      const iframe = this.playerFrame()?.nativeElement;
+      const url = criarLinkEmbedYoutube(this.videoId());
+
+      if (iframe && url) {
+        /*
+         * O valor atribuído nunca é o link recebido do usuário. O helper
+         * aceita somente IDs de 11 caracteres e fixa o domínio oficial
+         * youtube-nocookie.com, impedindo a injeção de outra origem.
+         */
+        iframe.src = url;
+      }
+    });
+  }
 }

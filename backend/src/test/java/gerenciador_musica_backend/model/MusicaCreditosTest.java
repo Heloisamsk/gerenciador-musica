@@ -152,10 +152,10 @@ class MusicaCreditosTest {
         assertThat(segundo.getMusica()).isEqualTo(1L);
         assertThat(segundo.getArtista()).isEqualTo(2L);
         assertThat(primeiro)
+                .isNotNull()
                 .isEqualTo(segundo)
                 .hasSameHashCodeAs(segundo)
                 .isNotEqualTo(new MusicaArtistaId(2L, 1L))
-                .isNotEqualTo(null)
                 .isNotEqualTo("1-2");
     }
 

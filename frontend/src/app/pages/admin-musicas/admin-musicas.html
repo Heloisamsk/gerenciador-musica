@@ -193,21 +193,21 @@
       <button
         type="button"
         class="paginacao-button"
-        aria-label="Ir para a primeira página"
+        aria-label="Primeira"
         [disabled]="operacaoEmAndamento() || paginaAtual() === 0"
         (click)="irParaPrimeiraPagina()"
       >
-        « Primeira
+        Primeira
       </button>
 
       <button
         type="button"
         class="paginacao-button"
-        aria-label="Ir para a página anterior"
+        aria-label="Anterior"
         [disabled]="operacaoEmAndamento() || paginaAtual() === 0"
         (click)="irParaPaginaAnterior()"
       >
-        ‹ Anterior
+        Anterior
       </button>
 
       <span class="paginacao-status" aria-live="polite">
@@ -217,27 +217,27 @@
       <button
         type="button"
         class="paginacao-button"
-        aria-label="Ir para a próxima página"
+        aria-label="Próxima"
         [disabled]="
           operacaoEmAndamento()
           || paginaAtual() + 1 >= totalPaginas()
         "
         (click)="irParaProximaPagina()"
       >
-        Próxima ›
+        Próxima
       </button>
 
       <button
         type="button"
         class="paginacao-button"
-        aria-label="Ir para a última página"
+        aria-label="Última"
         [disabled]="
           operacaoEmAndamento()
           || paginaAtual() + 1 >= totalPaginas()
         "
         (click)="irParaUltimaPagina()"
       >
-        Última »
+        Última
       </button>
     </nav>
     }

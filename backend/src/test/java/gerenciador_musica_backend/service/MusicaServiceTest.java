@@ -36,6 +36,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -562,6 +563,20 @@ class MusicaServiceTest {
         MusicaResponseDTO resultado = musicaService.buscarPorId(1L);
 
         assertThat(resultado.titulo()).isEqualTo("Bohemian Rhapsody");
+    }
+
+    @Test
+    void deveRejeitarMusicaComCreditoDeArtistaInvalido() {
+        Musica musica = mock(Musica.class);
+
+        when(musicaRepository.findById(1L))
+                .thenReturn(Optional.of(musica));
+
+        assertThatThrownBy(() -> musicaService.buscarPorId(1L))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(
+                        "A música possui um crédito de artista inválido."
+                );
     }
 
     @Test

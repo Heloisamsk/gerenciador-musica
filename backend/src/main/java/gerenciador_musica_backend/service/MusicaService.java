@@ -486,6 +486,12 @@ public class MusicaService {
     }
 
     private ArtistaResumoDTO converterArtistaParaResumo(Artista artista) {
+        if (artista == null) {
+            throw new IllegalStateException(
+                    "A música possui um crédito de artista inválido."
+            );
+        }
+
         return new ArtistaResumoDTO(
                 artista.getIdArtista(),
                 artista.getNome(),
