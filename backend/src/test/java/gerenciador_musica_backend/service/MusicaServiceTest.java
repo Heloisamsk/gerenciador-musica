@@ -566,17 +566,17 @@ class MusicaServiceTest {
     }
 
     @Test
-    void deveRejeitarMusicaComCreditoDeArtistaInvalido() {
-        Musica musica = mock(Musica.class);
+    void deveConverterDetalheSemArtistaPrincipalSemLancarExcecao() {
+        Musica musica = montarMusicaSemArtistaPrincipal();
 
         when(musicaRepository.findById(1L))
                 .thenReturn(Optional.of(musica));
 
-        assertThatThrownBy(() -> musicaService.buscarPorId(1L))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage(
-                        "A música possui um crédito de artista inválido."
-                );
+        MusicaResponseDTO resultado = musicaService.buscarPorId(1L);
+
+        assertThat(resultado.artistaPrincipal().id()).isNull();
+        assertThat(resultado.artistaPrincipal().nome())
+                .isEqualTo("Artista não informado");
     }
 
     @Test
@@ -649,6 +649,15 @@ class MusicaServiceTest {
         return musica;
     }
 
+    private Musica montarMusicaSemArtistaPrincipal() {
+        Musica musica = mock(Musica.class);
+
+        when(musica.getArtistasParticipantes()).thenReturn(Set.of());
+        when(musica.getGeneros()).thenReturn(Set.of());
+
+        return musica;
+    }
+
     @SuppressWarnings("unchecked")
     @Test
     void devePesquisarMusicasAplicandoPaginacaoPadraoQuandoParametrosNaoInformados() {
@@ -685,6 +694,27 @@ class MusicaServiceTest {
                 .extracting(ArtistaResumoDTO::nome)
                 .containsExactly("Artista Participante");
         assertThat(item.generos()).hasSize(1);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void deveConverterListagemSemArtistaPrincipalSemLancarExcecao() {
+        Musica musica = montarMusicaSemArtistaPrincipal();
+        Page<Musica> pagina = new PageImpl<>(List.of(musica));
+
+        when(musicaRepository.findAll(
+                any(Specification.class),
+                any(Pageable.class)
+        )).thenReturn(pagina);
+
+        PaginaResponseDTO<MusicaListagemDTO> resultado =
+                musicaService.pesquisarMusicas(null, 0, 20, null);
+
+        assertThat(resultado.itens())
+                .singleElement()
+                .extracting(MusicaListagemDTO::artistaPrincipal)
+                .extracting(ArtistaResumoDTO::nome)
+                .isEqualTo("Artista não informado");
     }
 
     @SuppressWarnings("unchecked")

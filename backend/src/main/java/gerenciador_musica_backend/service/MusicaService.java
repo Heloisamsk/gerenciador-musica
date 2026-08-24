@@ -29,6 +29,15 @@ public class MusicaService {
     private static final ZoneId FUSO_APLICACAO =
             ZoneId.of("America/Recife");
 
+    private static final ArtistaResumoDTO ARTISTA_NAO_INFORMADO =
+            new ArtistaResumoDTO(
+                    null,
+                    "Artista não informado",
+                    null,
+                    null,
+                    null
+            );
+
     private final MusicaRepository musicaRepository;
     private final AlbumService albumService;
     private final ArtistaService artistaService;
@@ -487,9 +496,7 @@ public class MusicaService {
 
     private ArtistaResumoDTO converterArtistaParaResumo(Artista artista) {
         if (artista == null) {
-            throw new IllegalStateException(
-                    "A música possui um crédito de artista inválido."
-            );
+            return ARTISTA_NAO_INFORMADO;
         }
 
         return new ArtistaResumoDTO(
