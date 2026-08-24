@@ -1,31 +1,35 @@
 # 🎧 — Sistema Gerenciador de Músicas
 
-
-
-
-## 👥 » Integrantes
+<details>
+<summary><strong>👥 » Integrantes</strong></summary>
 
 #### [Álvaro Henrique Nunes de Andrade](https://github.com/alwvaro) | [Arthur Oliveira Ramos](https://github.com/thuramos) | [Maria Heloisa da Silva Montebelo](https://github.com/Heloisamsk) | [Vinicius Freire Pereira](https://github.com/VinFpe)
 
-## 📍 » Sobre o Projeto
+</details>
+
+<details>
+<summary><strong>📍 » Sobre o Projeto</strong></summary>
 
 Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playlists, desenvolvido para as disciplinas de Engenharia de Software, ministrada pela professora [Thais Burity](https://github.com/taburity), e Banco de Dados, ministrada pela professora Priscilla Kelly, da UFAPE, referente ao período de 2026.1, com intuito de avaliação para a 2ª Verificação de Aprendizagem.
 
+</details>
 
-
-## 🚀 » Aplicação em Produção
+<details>
+<summary><strong>🚀 » Aplicação em Produção</strong></summary>
 
 - **Frontend:** [gerenciador-musica.onrender.com](https://gerenciador-musica.onrender.com)
 - **Backend:** [gerenciador-musica-1.onrender.com](https://gerenciador-musica-1.onrender.com)
 
-→ Acesso ADMIN: 
-*Email*: eloa93@example.net | *Senha*: Senha@123
+→ Acesso ADMIN:
+**Email**: eloa93@example.net | **Senha**: Senha@123
 
+</details>
 
+<details>
+<summary><strong>🤖 » Tecnologias</strong></summary>
 
-## 🤖 » Tecnologias
-
-### Frontend
+<details>
+<summary><strong>Frontend</strong></summary>
 
 <p>
   <img src="https://skillicons.dev/icons?i=angular,ts,html,css,reactivex,nodejs,express,npm&theme=dark" alt="Angular, TypeScript, HTML5, CSS3, RxJS, Node.js, Express e npm" />
@@ -65,7 +69,10 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 
 ---
 
-### Backend
+</details>
+
+<details>
+<summary><strong>Backend</strong></summary>
 
 <p>
   <img src="https://skillicons.dev/icons?i=java,spring,hibernate,maven&theme=dark" alt="Java, Spring Boot, Hibernate e Maven" />
@@ -128,7 +135,10 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 
 ---
 
-### Banco de dados, infraestrutura e deploy
+</details>
+
+<details>
+<summary><strong>Banco de dados, infraestrutura e deploy</strong></summary>
 
 <p>
   <img src="https://skillicons.dev/icons?i=postgres,docker,nginx&theme=dark" alt="PostgreSQL, Docker e Nginx" />
@@ -158,7 +168,10 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 
 ---
 
-### Testes, qualidade e automação
+</details>
+
+<details>
+<summary><strong>Testes, qualidade e automação</strong></summary>
 
 <p>
   <img src="https://skillicons.dev/icons?i=git,github,githubactions,vitest&theme=dark" alt="Git, GitHub, GitHub Actions e Vitest" />
@@ -203,17 +216,26 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 - Padronização da formatação dos arquivos do frontend.
 - Manutenção de um estilo consistente no código TypeScript, HTML e CSS.
 
-## 🎶 » Status do Projeto
+</details>
+
+</details>
+
+<details>
+<summary><strong>🎶 » Status do Projeto</strong></summary>
 
 - Em andamento
 
+</details>
 
+<details>
+<summary><strong>🎏 » Diagrama UML</strong></summary>
 
-## 🎏 » Diagrama UML
-<img width="3332" height="1792" alt="Diagrama_Spotify_BD drawio (1)" src="https://github.com/user-attachments/assets/86e71045-87ff-470c-8384-f3484625b186" />
+![Diagrama_Spotify_BD.drawio (2).png](../../../../../Downloads/Diagrama_Spotify_BD.drawio%20%282%29.png)
 
+</details>
 
-## 🗄️ » Configuração do Banco de Dados
+<details>
+<summary><strong>🗄️ » Configuração do Banco de Dados</strong></summary>
 
 O projeto usa **PostgreSQL 18** como SGBD, executado via Docker (serviço `postgres` do `docker-compose.yml`).
 
@@ -225,10 +247,12 @@ O projeto usa **PostgreSQL 18** como SGBD, executado via Docker (serviço `postg
 | Usuário | `gerenciador` |
 | Senha | `gerenciador` |
 
-A estrutura das tabelas é criada automaticamente pelo [Flyway](https://flywaydb.org/) a partir dos scripts em [`backend/src/main/resources/db/migration`](backend/src/main/resources/db/migration), toda vez que o backend sobe. O script DDL consolidado (só criação de tabelas e índices, sem a lógica de migração incremental) também está disponível em [`schema.sql`](schema.sql).
+A estrutura do banco é criada e atualizada automaticamente pelo [Flyway](https://flywaydb.org/) a partir das migrations disponíveis em [`backend/src/main/resources/db/migration`](backend/src/main/resources/db/migration), executadas quando o backend é iniciado.
 
+</details>
 
-## 🌱 » Metodologia de Povoamento
+<details>
+<summary><strong>🌱 » Metodologia de Povoamento</strong></summary>
 
 O banco é povoado automaticamente pela migration [`V11__popular_dados_iniciais.sql`](backend/src/main/resources/db/migration/V11__popular_dados_iniciais.sql), que roda junto com as demais assim que o container do backend sobe — não é preciso nenhum passo manual.
 
@@ -240,10 +264,14 @@ Um segundo script ([`scripts/povoamento/gerar_sql.py`](scripts/povoamento/gerar_
 
 Todos os usuários fictícios usam a mesma senha para testes: **`Senha@123`**.
 
+</details>
 
-## 🔖 » Dicionário de Dados
+<details>
+<summary><strong>🔖 » Dicionário de Dados</strong></summary>
 
-### ARTISTA
+<details>
+<summary><strong>ARTISTA</strong></summary>
+
 Armazena os artistas cadastrados no sistema.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -254,7 +282,11 @@ Armazena os artistas cadastrados no sistema.
 | foto_perfil_url | VARCHAR(2048) | — | URL da foto de perfil do artista. |
 | nome_completo | VARCHAR(255) | NOT NULL | Nome completo do artista. |
 
-### USUARIO
+</details>
+
+<details>
+<summary><strong>USUARIO</strong></summary>
+
 Armazena os usuários cadastrados, seus dados de autenticação e nível de acesso.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -267,20 +299,29 @@ Armazena os usuários cadastrados, seus dados de autenticação e nível de aces
 | username | VARCHAR(30) | UNIQUE (case-insensitive), permite NULL, formato `^[a-z0-9._]{3,30}$` | Nome de usuário opcional, usado para identificação pública. |
 | data_cadastro | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data e horário de cadastro do usuário. |
 
-### MUSICA
-Armazena as músicas cadastradas, com artista principal, álbum, duração e ano de lançamento.
+</details>
 
-| Atributo | Tipo de Dado | Restrições | Semântica |
-|---|---|---|---|
-| id_musica | BIGINT | PK | Identificador único da música. |
-| id_artista | BIGINT | NOT NULL, FK → artista | Artista principal responsável pela música. |
-| id_album | BIGINT | FK → album, permite NULL | Álbum ao qual a música pertence (pode não ter álbum). |
-| titulo | VARCHAR(255) | NOT NULL | Título da música. |
-| letra | TEXT | — | Letra da música. |
-| duracao_segundos | INTEGER | NOT NULL, CHECK (> 0) | Duração da música em segundos. |
-| ano_lancamento | SMALLINT | NOT NULL, CHECK (entre 1800 e 2100) | Ano de lançamento da música. |
+<details>
+<summary><strong>MUSICA</strong></summary>
 
-### ALBUM
+Armazena somente os dados próprios da música. A autoria e as participações são representadas pela tabela associativa `musica_artista`.
+
+| Atributo         | Tipo de Dado | Restrições                          | Semântica                                                                                  |
+| ---------------- | ------------ | ----------------------------------- | ------------------------------------------------------------------------------------------ |
+| id_musica        | BIGINT       | PK                                  | Identificador único da música.                                                             |
+| id_album         | BIGINT       | FK → album, permite NULL            | Álbum ao qual a música pertence. O valor `NULL` representa uma música lançada como single. |
+| titulo           | VARCHAR(255) | NOT NULL                            | Título da música.                                                                          |
+| letra            | TEXT         | —                                   | Letra opcional da música.                                                                  |
+| duracao_segundos | INTEGER      | NOT NULL, CHECK (> 0)               | Duração da música em segundos.                                                             |
+| ano_lancamento   | SMALLINT     | NOT NULL, CHECK (entre 1800 e 2100) | Ano de lançamento da música.                                                               |
+
+O artista principal não é armazenado diretamente em `musica`. Essa informação é representada por um registro em `musica_artista` com `papel_participacao = 'PRINCIPAL'`, evitando dois caminhos diferentes para representar a autoria da mesma música.
+
+</details>
+
+<details>
+<summary><strong>ALBUM</strong></summary>
+
 Armazena os álbuns cadastrados, com artista responsável, título e ano de lançamento.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -295,7 +336,11 @@ A combinação de artista, título e ano é única, sem diferenciar letras
 maiúsculas e minúsculas. No cadastro de música, `albumId` é opcional; quando
 informado, a API valida se o álbum pertence ao artista principal selecionado.
 
-### GENERO
+</details>
+
+<details>
+<summary><strong>GENERO</strong></summary>
+
 Armazena os gêneros musicais cadastrados no sistema.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -303,7 +348,11 @@ Armazena os gêneros musicais cadastrados no sistema.
 | id_genero | BIGINT | PK | Identificador único do gênero. |
 | nome | VARCHAR(100) | NOT NULL, UNIQUE | Nome do gênero musical, único no sistema. |
 
-### PERFIL
+</details>
+
+<details>
+<summary><strong>PERFIL</strong></summary>
+
 Armazena a personalização do perfil de cada usuário (foto, banner, biografia e destaques opcionais).
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -318,7 +367,11 @@ Armazena a personalização do perfil de cada usuário (foto, banner, biografia 
 | id_album_destaque | BIGINT | FK → album, permite NULL (ON DELETE SET NULL) | Álbum em destaque no perfil, se houver. |
 | id_musica_destaque | BIGINT | FK → musica, permite NULL (ON DELETE SET NULL) | Música em destaque no perfil, se houver. |
 
-### REVIEW
+</details>
+
+<details>
+<summary><strong>REVIEW</strong></summary>
+
 Armazena as avaliações dos usuários sobre músicas.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -331,7 +384,11 @@ Armazena as avaliações dos usuários sobre músicas.
 | criada_em | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data de criação da avaliação. |
 | atualizada_em | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data da última atualização (atualizada automaticamente por trigger a cada edição). |
 
-### PLAYLIST
+</details>
+
+<details>
+<summary><strong>PLAYLIST</strong></summary>
+
 Armazena as playlists criadas pelos usuários.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -342,7 +399,11 @@ Armazena as playlists criadas pelos usuários.
 | descricao | TEXT | — | Descrição opcional da playlist. |
 | data_criacao | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data de criação da playlist. |
 
-### REPRODUCAO
+</details>
+
+<details>
+<summary><strong>REPRODUCAO</strong></summary>
+
 Armazena o histórico de reproduções de músicas pelos usuários.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -353,15 +414,28 @@ Armazena o histórico de reproduções de músicas pelos usuários.
 | reproduzida_em | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data e horário da reprodução. |
 | segundos_ouvidos | INTEGER | NOT NULL, CHECK (>= 0) | Quantos segundos da música foram ouvidos. |
 
-### MUSICA_ARTISTA (associativa)
-Relaciona músicas aos artistas participantes (parcerias/feats).
+</details>
 
-| Atributo | Tipo de Dado | Restrições | Semântica |
-|---|---|---|---|
-| id_musica | BIGINT | PK, FK → musica | Música associada. |
-| id_artista | BIGINT | PK, FK → artista | Artista participante da música. |
+<details>
+<summary><strong>MUSICA_ARTISTA (associativa)</strong></summary>
 
-### MUSICA_GENERO (associativa)
+Relaciona as músicas a todos os seus artistas creditados, incluindo o artista principal e os artistas participantes.
+
+| Atributo           | Tipo de Dado | Restrições                                           | Semântica                                  |
+| ------------------ | ------------ | ---------------------------------------------------- | ------------------------------------------ |
+| id_musica          | BIGINT       | PK composta, FK → musica, ON DELETE CASCADE          | Música associada ao crédito.               |
+| id_artista         | BIGINT       | PK composta, FK → artista, ON DELETE CASCADE         | Artista creditado na música.               |
+| papel_participacao | VARCHAR(20)  | NOT NULL, CHECK IN (`PRINCIPAL`, `FEAT`, `PRODUTOR`) | Papel desempenhado pelo artista na música. |
+
+A chave primária composta impede que o mesmo artista seja associado mais de uma vez à mesma música. Gatilhos de restrição adiáveis garantem que toda música possua exatamente um artista com o papel `PRINCIPAL`.
+
+Atualmente, o cadastro e a edição de músicas utilizam os papéis `PRINCIPAL` e `FEAT`. O papel `PRODUTOR` está previsto no modelo para futuras extensões. Na API, um crédito `FEAT` é apresentado ao frontend como uma participação.
+
+</details>
+
+<details>
+<summary><strong>MUSICA_GENERO (associativa)</strong></summary>
+
 Relaciona músicas aos seus gêneros musicais.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -369,7 +443,11 @@ Relaciona músicas aos seus gêneros musicais.
 | id_musica | BIGINT | PK, FK → musica | Música associada. |
 | id_genero | BIGINT | PK, FK → genero | Gênero associado à música. |
 
-### PLAYLIST_MUSICA (associativa)
+</details>
+
+<details>
+<summary><strong>PLAYLIST_MUSICA (associativa)</strong></summary>
+
 Relaciona músicas às playlists, com ordem de exibição.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -379,7 +457,11 @@ Relaciona músicas às playlists, com ordem de exibição.
 | ordem | INTEGER | NOT NULL, CHECK (> 0), UNIQUE junto com id_playlist | Posição da música dentro da playlist. |
 | data_criacao | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data em que a música foi adicionada à playlist. |
 
-### CURTIDA_MUSICA (associativa)
+</details>
+
+<details>
+<summary><strong>CURTIDA_MUSICA (associativa)</strong></summary>
+
 Registra as curtidas dos usuários em músicas.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -388,7 +470,11 @@ Registra as curtidas dos usuários em músicas.
 | id_musica | BIGINT | PK, FK → musica | Música curtida. |
 | curtida_em | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data da curtida. |
 
-### USUARIO_SEGUE_USUARIO (associativa)
+</details>
+
+<details>
+<summary><strong>USUARIO_SEGUE_USUARIO (associativa)</strong></summary>
+
 Registra relações de seguidores entre usuários.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -397,7 +483,11 @@ Registra relações de seguidores entre usuários.
 | id_seguido | BIGINT | PK, FK → usuario | Usuário que é seguido. |
 | seguido_em | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data em que a relação começou. |
 
-### USUARIO_SEGUE_ARTISTA (associativa)
+</details>
+
+<details>
+<summary><strong>USUARIO_SEGUE_ARTISTA (associativa)</strong></summary>
+
 Registra os artistas seguidos pelos usuários.
 
 | Atributo | Tipo de Dado | Restrições | Semântica |
@@ -406,288 +496,116 @@ Registra os artistas seguidos pelos usuários.
 | id_artista | BIGINT | PK, FK → artista | Artista seguido. |
 | seguido_em | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data em que a relação começou. |
 
+</details>
 
-## 🗺️ » Como executar
+</details>
 
-A aplicação pode ser executada completamente com Docker ou localmente para desenvolvimento.
+<details>
+<summary><strong>🗺️ » Como executar</strong></summary>
 
-### Pré-requisitos
+**Pré-requisitos:** [Git](https://git-scm.com/) e [Docker Desktop](https://www.docker.com/products/docker-desktop/). Para execução local, também são necessários Java 21, Node.js e npm.
 
-Para executar com Docker:
-
-- [Git](https://git-scm.com/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-
-Para executar localmente:
-
-- Java 21
-- Node.js e npm
-- PostgreSQL, que também pode ser iniciado pelo Docker
-
----
-
-### Clonar o repositório
+<details>
+<summary><strong>Clonar e iniciar com Docker</strong></summary>
 
 ```bash
 git clone https://github.com/projeto-gerenciador-musica/gerenciador-musica.git
 cd gerenciador-musica
-```
-
----
-
-### Executar com Docker
-
-Esta é a forma recomendada para iniciar o projeto completo.
-
-Certifique-se de que o Docker Desktop está aberto e, na raiz do projeto, execute:
-
-```bash
 docker compose up -d --build
 ```
 
-Esse comando constrói e inicia os containers do:
+Serviços disponíveis após a inicialização:
 
-- frontend Angular;
-- backend Spring Boot;
-- banco de dados PostgreSQL.
+* Frontend: `http://localhost:4200`
+* Backend: `http://localhost:8080`
+* PostgreSQL: `localhost:5432`
 
-Para verificar o estado dos containers:
+| Ação                       | Comando                                 |
+| -------------------------- | --------------------------------------- |
+| Verificar containers       | `docker compose ps`                     |
+| Visualizar logs            | `docker compose logs -f`                |
+| Reconstruir frontend       | `docker compose up -d --build frontend` |
+| Reconstruir backend        | `docker compose up -d --build backend`  |
+| Parar os serviços          | `docker compose stop`                   |
+| Parar e remover containers | `docker compose down`                   |
 
-```bash
-docker compose ps
-```
+> `docker compose down` mantém os dados do PostgreSQL. Utilize `docker compose down -v` somente quando desejar apagar também o volume do banco.
 
-Após a inicialização, a aplicação estará disponível nos seguintes endereços:
+</details>
 
-- Frontend: `http://localhost:4200`
-- Backend: `http://localhost:8080`
-- PostgreSQL: `localhost:5432`
+<details>
+<summary><strong>Executar localmente para desenvolvimento</strong></summary>
 
-#### Visualizar os logs
-
-Todos os serviços:
-
-```bash
-docker compose logs -f
-```
-
-Somente o backend:
-
-```bash
-docker compose logs -f backend
-```
-
-Somente o frontend:
-
-```bash
-docker compose logs -f frontend
-```
-
-Somente o PostgreSQL:
-
-```bash
-docker compose logs -f postgres
-```
-
-Utilize `Ctrl + C` para sair da visualização dos logs. Os containers continuarão em execução.
-
-#### Reconstruir os containers
-
-Após alterações no frontend ou backend:
-
-```bash
-docker compose up -d --build backend frontend
-```
-
-Somente o frontend:
-
-```bash
-docker compose up -d --build frontend
-```
-
-Somente o backend:
-
-```bash
-docker compose up -d --build backend
-```
-
-Para reconstruir sem utilizar o cache:
-
-```bash
-docker compose build --no-cache backend frontend
-docker compose up -d --force-recreate backend frontend
-```
-
-#### Parar a aplicação
-
-Para apenas parar os containers:
-
-```bash
-docker compose stop
-```
-
-Para parar e remover os containers e a rede criada pelo Compose:
-
-```bash
-docker compose down
-```
-
-> O comando `docker compose down` mantém os dados persistidos no volume do PostgreSQL. Evite utilizar `docker compose down -v`, pois o parâmetro `-v` remove os volumes e pode apagar os dados do banco.
-
----
-
-### Executar localmente
-
-Para desenvolvimento, é possível executar somente o PostgreSQL com Docker e iniciar o frontend e o backend nos terminais locais.
-
-#### 1. Iniciar o PostgreSQL
-
-Na raiz do projeto:
+Inicie apenas o PostgreSQL com Docker:
 
 ```bash
 docker compose up -d postgres
 ```
 
-Verifique se o banco está funcionando:
-
-```bash
-docker compose ps postgres
-```
-
-#### 2. Iniciar o backend
-
-Abra outro terminal e acesse a pasta do backend:
+Em outro terminal, inicie o backend:
 
 ```bash
 cd backend
-```
-
-No Linux ou macOS:
-
-```bash
 ./mvnw spring-boot:run
 ```
 
-No Windows PowerShell:
+No Windows PowerShell, utilize:
 
 ```powershell
+cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
-O backend ficará disponível em:
-
-```text
-http://localhost:8080
-```
-
-#### 3. Iniciar o frontend
-
-Abra outro terminal e acesse a pasta do frontend:
+Em um terceiro terminal, inicie o frontend:
 
 ```bash
 cd frontend
-```
-
-Na primeira execução, instale as dependências:
-
-```bash
 npm install
-```
-
-Inicie o servidor de desenvolvimento:
-
-```bash
 npm start
 ```
 
-O frontend ficará disponível em:
+</details>
 
-```text
-http://localhost:4200
-```
+<details>
+<summary><strong>Executar os testes</strong></summary>
 
----
-
-### Executar os testes
-
-#### Backend
-
-No Linux ou macOS:
+Backend:
 
 ```bash
 cd backend
 ./mvnw test
 ```
 
-No Windows PowerShell:
+No Windows PowerShell, substitua o último comando por `.\mvnw.cmd test`.
 
-```powershell
-cd backend
-.\mvnw.cmd test
-```
-
-#### Frontend
+Frontend:
 
 ```bash
 cd frontend
 npm test -- --watch=false
-```
-
-Para validar também o build do frontend:
-
-```bash
 npm run build
 ```
 
----
+</details>
 
-### Problemas comuns
+<details>
+<summary><strong>Atualizar alterações no Docker</strong></summary>
 
-#### Alterações do frontend não aparecem
+Caso uma alteração não apareça ao utilizar Docker, reconstrua o respectivo serviço e atualize a página com `Ctrl + F5`.
 
-Reconstrua o container:
+</details>
 
-```bash
-docker compose up -d --build frontend
-```
+</details>
 
-Depois atualize a página utilizando `Ctrl + F5`.
-
-#### Backend indisponível ou reiniciando
-
-Consulte os logs:
-
-```bash
-docker compose logs -f backend
-```
-
-#### Banco de dados indisponível
-
-Verifique o container e seus logs:
-
-```bash
-docker compose ps postgres
-docker compose logs -f postgres
-```
-
-#### Porta já utilizada
-
-Confirme se não existe outra aplicação utilizando:
-
-- `4200`, para o frontend;
-- `8080`, para o backend;
-- `5432`, para o PostgreSQL.
-
-Evite executar localmente um serviço que já esteja ativo em um container na mesma porta.
-
-
-## 🔗 » Endpoints principais
+<details>
+<summary><strong>🔗 » Endpoints principais</strong></summary>
 
 As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 
 `Authorization: Bearer <token>`
 
-### Autenticação
+<details>
+<summary><strong>Autenticação</strong></summary>
 
 | Método | Endpoint | Acesso | Descrição |
 |:------:|----------|--------|-----------|
@@ -695,18 +613,25 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 | `POST` | `/api/auth/login` | Público | Autenticar o usuário e gerar o token JWT |
 | `POST` | `/api/auth/logout` | Autenticado | Encerrar a sessão do usuário |
 
-### Catálogo
+</details>
+
+<details>
+<summary><strong>Catálogo</strong></summary>
 
 | Método | Endpoint | Acesso | Descrição |
 |:------:|----------|--------|-----------|
 | `GET` | `/api/artistas` | `USER` ou `ADMIN` | Listar os artistas disponíveis no catálogo |
 | `GET` | `/api/artistas/{id}` | `USER` ou `ADMIN` | Consultar os dados completos de um artista pelo ID |
+| `GET` | `/api/artistas/{id}/detalhes` | `USER` ou `ADMIN` | Consultar o resumo, os álbuns e as músicas de um artista utilizando as views do catálogo |
 | `GET` | `/api/albuns` | `USER` ou `ADMIN` | Listar álbuns; aceita o filtro `?artistaId={id}` |
 | `GET` | `/api/albuns/{id}` | `USER` ou `ADMIN` | Consultar um álbum por ID |
 | `GET` | `/api/musicas` | `USER` ou `ADMIN` | Listar as músicas disponíveis no catálogo |
 | `GET` | `/api/musicas/{id}` | `USER` ou `ADMIN` | Consultar os dados completos de uma música pelo ID |
 
-### Administração
+</details>
+
+<details>
+<summary><strong>Administração</strong></summary>
 
 | Método | Endpoint | Acesso | Descrição |
 |:------:|----------|--------|-----------|
@@ -723,3 +648,38 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 
 > Os endpoints iniciados por `/api/admin` são protegidos e podem ser acessados somente por usuários com a role `ADMIN`. Usuários autenticados com a role `USER` recebem a resposta `403 Forbidden` ao tentar acessar essas rotas.
 
+</details>
+
+</details>
+
+<details>
+<summary><strong>👁️ » Views SQL do catálogo de artistas</strong></summary>
+
+A página de detalhes do artista utiliza três views SQL para esconder a complexidade dos relacionamentos entre artistas, músicas, álbuns e gêneros. As views não armazenam cópias dos dados: seus resultados são calculados a partir das tabelas atuais sempre que são consultadas.
+
+| View                          | Tabelas e operações utilizadas                                                                     | Finalidade                                                                                                                               |
+| ----------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `vw_artista_resumo_catalogo`  | `artista`, `album`, `musica_artista` e `musica`, com `COUNT`, `SUM` e agrupamentos                 | Retornar os dados do artista, quantidade de álbuns, músicas como artista principal, participações e duração total do catálogo principal. |
+| `vw_albuns_artista_catalogo`  | `album`, `artista` e `musica`, com agrupamento por álbum                                           | Retornar os álbuns do artista junto com capa, ano, quantidade de músicas e duração total.                                                |
+| `vw_musicas_artista_catalogo` | `musica`, `musica_artista`, `artista`, `album`, `musica_genero` e `genero`, incluindo `STRING_AGG` | Retornar as músicas relacionadas ao artista, identificando se ele é principal ou participante e reunindo álbum, capa e gêneros.          |
+
+<details>
+<summary><strong>Uso das views no site</strong></summary>
+
+Na página inicial, cada cartão de artista possui um link para a rota `/artistas/{id}`. Ao selecionar um artista, o frontend solicita o endpoint `GET /api/artistas/{id}/detalhes`.
+
+O backend consulta as três views e combina seus resultados em uma única resposta composta por:
+
+* `artista`: informações pessoais e totais calculados por `vw_artista_resumo_catalogo`;
+* `albuns`: cartões obtidos de `vw_albuns_artista_catalogo`;
+* `musicas`: listagem obtida de `vw_musicas_artista_catalogo`.
+
+Na interface, a primeira view alimenta o cabeçalho e os indicadores do artista, a segunda alimenta a seção de álbuns e a terceira alimenta a seção de músicas. Cada música também informa se o artista consultado aparece como artista principal ou como participação.
+
+Essa abordagem concentra os múltiplos `JOINs`, agrupamentos e cálculos no banco de dados. O frontend recebe uma estrutura simplificada, enquanto o backend não precisa repetir as mesmas consultas complexas em diferentes repositories.
+
+A migration [`V17__criar_views_catalogo_artista.sql`](backend/src/main/resources/db/migration/V17__criar_views_catalogo_artista.sql) cria as três views utilizadas pela página de detalhes do artista. Posteriormente, a migration [`V18__normalizar_creditos_artistas_musica.sql`](backend/src/main/resources/db/migration/V18__normalizar_creditos_artistas_musica.sql) normaliza os créditos das músicas, consolida registros duplicados do povoamento e recria as views de acordo com o novo modelo.
+
+</details>
+
+</details>
