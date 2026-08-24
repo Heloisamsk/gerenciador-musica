@@ -71,7 +71,8 @@ class MusicaServiceTest {
                 1L,
                 Set.of(),
                 1L,
-                Set.of("Rock")
+                Set.of("Rock"),
+                "https://youtu.be/dQw4w9WgXcQ"
         );
     }
 
@@ -121,6 +122,7 @@ class MusicaServiceTest {
         assertThat(response.artistaPrincipal().nomeCompleto()).isEqualTo("Queen");
         assertThat(response.album().titulo()).isEqualTo("A Night at the Opera");
         assertThat(response.generos()).hasSize(1);
+        assertThat(response.youtubeVideoId()).isEqualTo("dQw4w9WgXcQ");
 
         verify(artistaService).buscarEntidadePorId(1L);
         verify(musicaRepository).save(any(Musica.class));
@@ -142,6 +144,27 @@ class MusicaServiceTest {
         assertThatThrownBy(() -> musicaService.cadastrarMusica(request))
                 .isInstanceOf(DadosMusicaInvalidosException.class)
                 .hasMessage("O ID do artista principal deve ser válido.");
+
+        verify(musicaRepository, never()).save(any());
+    }
+
+    @Test
+    void deveRejeitarLinkQueNaoSejaDeVideoDoYoutube() {
+        MusicaRequestDTO request = new MusicaRequestDTO(
+                "Título",
+                null,
+                200,
+                (short) 2020,
+                1L,
+                Set.of(),
+                null,
+                Set.of("Pop"),
+                "https://example.com/video"
+        );
+
+        assertThatThrownBy(() -> musicaService.cadastrarMusica(request))
+                .isInstanceOf(DadosMusicaInvalidosException.class)
+                .hasMessage("Informe um link válido de vídeo do YouTube.");
 
         verify(musicaRepository, never()).save(any());
     }
@@ -238,7 +261,8 @@ class MusicaServiceTest {
                 2L,
                 Set.of(3L),
                 2L,
-                Set.of("  Pop  ")
+                Set.of("  Pop  "),
+                "https://www.youtube.com/embed/M7lc1UVf-VE"
         );
 
         when(musicaRepository.findById(10L))
@@ -276,12 +300,14 @@ class MusicaServiceTest {
         assertThat(response.generos())
                 .extracting(genero -> genero.nome())
                 .containsExactly("Pop");
+        assertThat(response.youtubeVideoId()).isEqualTo("M7lc1UVf-VE");
         assertThat(musica.getIdMusica()).isEqualTo(10L);
         assertThat(musica.getArtistaPrincipal()).isSameAs(artistaNovo);
         assertThat(musica.getAlbum()).isSameAs(albumNovo);
         assertThat(musica.getArtistasParticipantes())
                 .containsExactly(participante)
                 .doesNotContain(participanteAnterior);
+        assertThat(musica.getYoutubeVideoId()).isEqualTo("M7lc1UVf-VE");
 
         verify(musicaRepository, never()).save(any());
     }

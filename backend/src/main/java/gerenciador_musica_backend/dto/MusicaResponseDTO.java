@@ -15,6 +15,32 @@ public record MusicaResponseDTO(
         ArtistaResumoDTO artistaPrincipal,
         AlbumResumoDTO album,
         Set<ArtistaResumoDTO> artistasParticipantes,
-        Set<GeneroResumoDTO> generos
+        Set<GeneroResumoDTO> generos,
+        String youtubeVideoId
 ) {
+
+    public MusicaResponseDTO(
+            Long id,
+            String titulo,
+            String letra,
+            Integer duracaoSegundos,
+            Short anoLancamento,
+            ArtistaResumoDTO artistaPrincipal,
+            AlbumResumoDTO album,
+            Set<ArtistaResumoDTO> artistasParticipantes,
+            Set<GeneroResumoDTO> generos
+    ) {
+        this(
+                id,
+                titulo,
+                letra,
+                duracaoSegundos,
+                anoLancamento,
+                artistaPrincipal,
+                album,
+                artistasParticipantes,
+                generos,
+                null
+        );
+    }
 }

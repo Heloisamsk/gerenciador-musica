@@ -7,4 +7,5 @@ export interface MusicaRequest {
   artistasParticipantesIds: number[];
   albumId: number | null;
   generos: string[];
+  youtubeUrl?: string | null;
 }

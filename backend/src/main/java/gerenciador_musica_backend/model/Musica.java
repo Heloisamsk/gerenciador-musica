@@ -70,6 +70,9 @@ public class Musica {
     @Column(name = "ano_lancamento", nullable = false)
     private Short anoLancamento;
 
+    @Column(name = "youtube_video_id", length = 11)
+    private String youtubeVideoId;
+
     protected Musica() {
     }
 
@@ -289,5 +292,13 @@ public class Musica {
 
     public void setAnoLancamento(Short anoLancamento) {
         this.anoLancamento = anoLancamento;
+    }
+
+    public String getYoutubeVideoId() {
+        return youtubeVideoId;
+    }
+
+    public void setYoutubeVideoId(String youtubeVideoId) {
+        this.youtubeVideoId = youtubeVideoId;
     }
 }

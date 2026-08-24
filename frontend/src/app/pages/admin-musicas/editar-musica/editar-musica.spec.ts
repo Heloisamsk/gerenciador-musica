@@ -54,7 +54,8 @@ describe('EditarMusica', () => {
     generos: [
       { id: 1, nome: 'Gênero Um' },
       { id: 2, nome: 'Gênero Dois' }
-    ]
+    ],
+    youtubeVideoId: 'dQw4w9WgXcQ'
   };
 
   const requestAtualizado: MusicaRequest = {
@@ -65,7 +66,8 @@ describe('EditarMusica', () => {
     artistaPrincipalId: 7,
     artistasParticipantesIds: [8],
     albumId: 11,
-    generos: ['Gênero Um', 'Gênero Dois']
+    generos: ['Gênero Um', 'Gênero Dois'],
+    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
   };
 
   const responseAtualizada: MusicaResponse = {
@@ -174,6 +176,7 @@ describe('EditarMusica', () => {
     expect(formulario.formulario.getRawValue()).toEqual({
       titulo: musica.titulo,
       letra: musica.letra,
+      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       duracaoSegundos: musica.duracaoSegundos,
       anoLancamento: musica.anoLancamento,
       generosTexto: 'Gênero Um, Gênero Dois',

@@ -8,6 +8,7 @@ export interface MusicaResponse {
   album: AlbumResumo | null;
   artistasParticipantes: ArtistaResumo[];
   generos: GeneroResumo[];
+  youtubeVideoId?: string | null;
 }
 
 export interface GeneroResumo {

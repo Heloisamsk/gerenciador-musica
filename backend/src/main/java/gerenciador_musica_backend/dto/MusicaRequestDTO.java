@@ -61,6 +61,35 @@ public record MusicaRequestDTO(
                         message = "O gênero deve possuir no máximo 100 caracteres"
                 )
                         String
-                > generos
+                > generos,
+
+        @Size(
+                max = 2048,
+                message = "O link do YouTube deve possuir no máximo 2048 caracteres"
+        )
+        String youtubeUrl
 ) {
+
+    public MusicaRequestDTO(
+            String titulo,
+            String letra,
+            Integer duracaoSegundos,
+            Short anoLancamento,
+            Long artistaPrincipalId,
+            Set<Long> artistasParticipantesIds,
+            Long albumId,
+            Set<String> generos
+    ) {
+        this(
+                titulo,
+                letra,
+                duracaoSegundos,
+                anoLancamento,
+                artistaPrincipalId,
+                artistasParticipantesIds,
+                albumId,
+                generos,
+                null
+        );
+    }
 }

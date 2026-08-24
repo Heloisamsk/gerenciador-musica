@@ -1,0 +1,13 @@
+@if (urlSegura(); as url) {
+  <div class="player-container">
+    <iframe
+      class="player-frame"
+      [src]="url"
+      [title]="'Player do YouTube para ' + titulo()"
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+    ></iframe>
+  </div>
+}

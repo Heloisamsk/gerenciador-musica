@@ -79,7 +79,8 @@ describe('FormularioMusica', () => {
     generos: [
       { id: 1, nome: 'Gênero Um' },
       { id: 2, nome: 'Gênero Dois' }
-    ]
+    ],
+    youtubeVideoId: 'dQw4w9WgXcQ'
   };
 
   beforeEach(async () => {
@@ -129,6 +130,7 @@ describe('FormularioMusica', () => {
     component.formulario.patchValue({
       titulo: '  Música   Normalizada  ',
       letra: '  Texto criado para o teste.  ',
+      youtubeUrl: ' https://youtu.be/dQw4w9WgXcQ ',
       duracaoSegundos: 240,
       anoLancamento: 2025,
       generosTexto: '  Gênero Um, Gênero   Dois ',
@@ -147,6 +149,7 @@ describe('FormularioMusica', () => {
     expect(elemento.querySelector('.formulario-btn')?.textContent)
       .toContain('Cadastrar música');
     expect(elemento.querySelector('#letra')).not.toBeNull();
+    expect(elemento.querySelector('#youtubeUrl')).not.toBeNull();
     expect(elemento.querySelector('#artistasParticipantesIds'))
       .not.toBeNull();
   });
@@ -173,7 +176,8 @@ describe('FormularioMusica', () => {
     component.formulario.patchValue({
       titulo: 'a'.repeat(256),
       anoLancamento: 2101,
-      generosTexto: 'a'.repeat(101)
+      generosTexto: 'a'.repeat(101),
+      youtubeUrl: 'https://example.com/video'
     });
 
     expect(component.formulario.controls.titulo
@@ -182,6 +186,8 @@ describe('FormularioMusica', () => {
       .hasError('max')).toBe(true);
     expect(component.formulario.controls.generosTexto
       .hasError('generoMuitoLongo')).toBe(true);
+    expect(component.formulario.controls.youtubeUrl
+      .hasError('youtubeInvalido')).toBe(true);
   });
 
   it('deve emitir um payload normalizado com todas as associações', () => {
@@ -200,7 +206,8 @@ describe('FormularioMusica', () => {
       artistaPrincipalId: 7,
       artistasParticipantesIds: [8],
       albumId: 11,
-      generos: ['Gênero Um', 'Gênero Dois']
+      generos: ['Gênero Um', 'Gênero Dois'],
+      youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ'
     });
   });
 
@@ -254,6 +261,7 @@ describe('FormularioMusica', () => {
     preencherFormularioValido(null);
     component.formulario.patchValue({
       letra: '   ',
+      youtubeUrl: '   ',
       artistasParticipantesIds: []
     });
 
@@ -261,6 +269,7 @@ describe('FormularioMusica', () => {
 
     expect(enviar.mock.calls[0][0]).toMatchObject({
       letra: null,
+      youtubeUrl: null,
       artistasParticipantesIds: [],
       albumId: null
     });
@@ -326,6 +335,7 @@ describe('FormularioMusica', () => {
     expect(component.formulario.getRawValue()).toEqual({
       titulo: musica.titulo,
       letra: musica.letra,
+      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       duracaoSegundos: musica.duracaoSegundos,
       anoLancamento: musica.anoLancamento,
       generosTexto: 'Gênero Um, Gênero Dois',

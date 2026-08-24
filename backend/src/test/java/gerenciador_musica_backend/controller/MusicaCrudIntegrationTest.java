@@ -112,11 +112,14 @@ class MusicaCrudIntegrationTest {
                         artistaInicial.getIdArtista(),
                         Set.of(),
                         null,
-                        Set.of("Gênero inicial " + sufixo)
+                        Set.of("Gênero inicial " + sufixo),
+                        "https://www.youtube.com/watch?v=M7lc1UVf-VE"
                 )
         );
 
         assertThat(cadastrada.id()).isNotNull();
+        assertThat(cadastrada.youtubeVideoId())
+                .isEqualTo("M7lc1UVf-VE");
 
         entityManager.flush();
         entityManager.clear();
@@ -134,7 +137,8 @@ class MusicaCrudIntegrationTest {
                         artistaAtualizado.getIdArtista(),
                         Set.of(participante.getIdArtista()),
                         albumAtualizado.getIdAlbum(),
-                        Set.of("  Gênero atualizado " + sufixo + "  ")
+                        Set.of("  Gênero atualizado " + sufixo + "  "),
+                        "https://youtube.com/shorts/dQw4w9WgXcQ"
                 )
         );
 
@@ -155,6 +159,8 @@ class MusicaCrudIntegrationTest {
         assertThat(atualizada.generos())
                 .extracting(genero -> genero.nome())
                 .containsExactly("Gênero atualizado " + sufixo);
+        assertThat(atualizada.youtubeVideoId())
+                .isEqualTo("dQw4w9WgXcQ");
 
         entityManager.flush();
         entityManager.clear();

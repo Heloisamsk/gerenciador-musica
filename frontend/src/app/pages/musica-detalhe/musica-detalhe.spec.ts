@@ -71,6 +71,35 @@ describe('MusicaDetalhe', () => {
     expect(component.mensagemErro()).toBe('Música não encontrada.');
   });
 
+  it('deve exibir o player quando a música possuir vídeo', () => {
+    configurarTestBed();
+    fixture.detectChanges();
+
+    httpMock.expectOne(musicaUrl).flush({
+      ...musicaDeExemplo(),
+      youtubeVideoId: 'dQw4w9WgXcQ'
+    });
+    fixture.detectChanges();
+
+    const iframe = fixture.nativeElement
+      .querySelector('iframe') as HTMLIFrameElement | null;
+
+    expect(iframe).not.toBeNull();
+    expect(iframe?.src)
+      .toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+    expect(fixture.nativeElement.textContent).toContain('Ouvir música');
+  });
+
+  it('não deve exibir o player sem um vídeo associado', () => {
+    configurarTestBed();
+    fixture.detectChanges();
+
+    httpMock.expectOne(musicaUrl).flush(musicaDeExemplo());
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('iframe')).toBeNull();
+  });
+
   function musicaDeExemplo() {
     return {
       id: 1,
