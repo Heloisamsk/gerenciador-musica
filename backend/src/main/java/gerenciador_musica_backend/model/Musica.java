@@ -1,5 +1,6 @@
 package gerenciador_musica_backend.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,10 +11,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.BatchSize;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "musica")
@@ -24,27 +30,17 @@ public class Musica {
     @Column(name = "id_musica")
     private Long idMusica;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_artista", nullable = false)
-    private Artista artistaPrincipal;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "id_album", nullable = true)
     private Album album;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "musica_artista",
-            joinColumns = @JoinColumn(
-                    name = "id_musica",
-                    nullable = false
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = "id_artista",
-                    nullable = false
-            )
+    @OneToMany(
+            mappedBy = "musica",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
-    private Set<Artista> artistasParticipantes =
+    @BatchSize(size = 50)
+    private Set<MusicaArtista> creditosArtistas =
             new LinkedHashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -89,7 +85,7 @@ public class Musica {
         this.letra = letra;
         this.duracaoSegundos = duracaoSegundos;
         this.anoLancamento = anoLancamento;
-        this.artistaPrincipal = artistaPrincipal;
+        definirCreditosArtistas(artistaPrincipal, Set.of());
         this.album = album;
     }
 
@@ -102,11 +98,22 @@ public class Musica {
     }
 
     public Artista getArtistaPrincipal() {
-        return artistaPrincipal;
+        return creditosArtistas.stream()
+                .filter(credito -> credito.getPapel()
+                        == PapelArtistaMusica.PRINCIPAL)
+                .map(MusicaArtista::getArtista)
+                .findFirst()
+                .orElse(null);
     }
 
     public void setArtistaPrincipal(Artista artistaPrincipal) {
-        this.artistaPrincipal = artistaPrincipal;
+        Set<Artista> participantes = getArtistasParticipantes();
+        participantes.removeIf(artista -> mesmoArtista(
+                artista,
+                artistaPrincipal
+        ));
+
+        definirCreditosArtistas(artistaPrincipal, participantes);
     }
 
     public Album getAlbum() {
@@ -118,18 +125,125 @@ public class Musica {
     }
 
     public Set<Artista> getArtistasParticipantes() {
-        return artistasParticipantes;
+        return creditosArtistas.stream()
+                .filter(credito -> credito.getPapel()
+                        == PapelArtistaMusica.FEAT)
+                .map(MusicaArtista::getArtista)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void setArtistasParticipantes(
             Set<Artista> artistasParticipantes
     ) {
-        Set<Artista> novosParticipantes = artistasParticipantes == null
+        definirCreditosArtistas(
+                getArtistaPrincipal(),
+                artistasParticipantes
+        );
+    }
+
+    public void definirCreditosArtistas(
+            Artista artistaPrincipal,
+            Set<Artista> artistasParticipantes
+    ) {
+        Objects.requireNonNull(
+                artistaPrincipal,
+                "O artista principal é obrigatório."
+        );
+
+        Set<Artista> participantes = artistasParticipantes == null
                 ? Set.of()
                 : new LinkedHashSet<>(artistasParticipantes);
 
-        this.artistasParticipantes.clear();
-        this.artistasParticipantes.addAll(novosParticipantes);
+        participantes.forEach(participante -> Objects.requireNonNull(
+                participante,
+                "O artista participante não pode ser nulo."
+        ));
+
+        boolean principalEntreParticipantes = participantes.stream()
+                .anyMatch(artista -> mesmoArtista(
+                        artista,
+                        artistaPrincipal
+                ));
+
+        if (principalEntreParticipantes) {
+            throw new IllegalArgumentException(
+                    "O artista principal não pode ser participante."
+            );
+        }
+
+        atualizarCreditosExistentes(artistaPrincipal, participantes);
+        adicionarCreditoAusente(
+                artistaPrincipal,
+                PapelArtistaMusica.PRINCIPAL
+        );
+
+        participantes.forEach(participante -> adicionarCreditoAusente(
+                participante,
+                PapelArtistaMusica.FEAT
+        ));
+    }
+
+    public Set<MusicaArtista> getCreditosArtistas() {
+        return Collections.unmodifiableSet(creditosArtistas);
+    }
+
+    private void atualizarCreditosExistentes(
+            Artista artistaPrincipal,
+            Set<Artista> participantes
+    ) {
+        creditosArtistas.removeIf(credito -> {
+            if (mesmoArtista(credito.getArtista(), artistaPrincipal)) {
+                credito.setPapel(PapelArtistaMusica.PRINCIPAL);
+                return false;
+            }
+
+            boolean continuaParticipante = participantes.stream()
+                    .anyMatch(artista -> mesmoArtista(
+                            artista,
+                            credito.getArtista()
+                    ));
+
+            if (continuaParticipante) {
+                credito.setPapel(PapelArtistaMusica.FEAT);
+                return false;
+            }
+
+            return credito.getPapel() != PapelArtistaMusica.PRODUTOR;
+        });
+    }
+
+    private void adicionarCreditoAusente(
+            Artista artista,
+            PapelArtistaMusica papel
+    ) {
+        boolean creditoJaExiste = creditosArtistas.stream()
+                .anyMatch(credito -> mesmoArtista(
+                        credito.getArtista(),
+                        artista
+                ));
+
+        if (!creditoJaExiste) {
+            creditosArtistas.add(new MusicaArtista(this, artista, papel));
+        }
+    }
+
+    private static boolean mesmoArtista(
+            Artista primeiro,
+            Artista segundo
+    ) {
+        if (primeiro == segundo) {
+            return true;
+        }
+
+        if (primeiro == null || segundo == null) {
+            return false;
+        }
+
+        return primeiro.getIdArtista() != null
+                && Objects.equals(
+                        primeiro.getIdArtista(),
+                        segundo.getIdArtista()
+                );
     }
 
     public Set<Genero> getGeneros() {

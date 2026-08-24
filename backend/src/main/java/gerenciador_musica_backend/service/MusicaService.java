@@ -350,9 +350,11 @@ public class MusicaService {
         musica.setLetra(normalizarLetra(request.letra()));
         musica.setDuracaoSegundos(request.duracaoSegundos());
         musica.setAnoLancamento(request.anoLancamento());
-        musica.setArtistaPrincipal(artistaPrincipal);
+        musica.definirCreditosArtistas(
+                artistaPrincipal,
+                artistasParticipantes
+        );
         musica.setAlbum(album);
-        musica.setArtistasParticipantes(artistasParticipantes);
         musica.setGeneros(generos);
     }
 

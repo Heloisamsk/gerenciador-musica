@@ -15,9 +15,27 @@ public interface MusicaRepository
         extends JpaRepository<Musica, Long>,
         JpaSpecificationExecutor<Musica> {
 
-    boolean existsByArtistaPrincipal_IdArtista(Long idArtista);
+    @Query("""
+            SELECT CASE WHEN COUNT(credito) > 0 THEN true ELSE false END
+            FROM Musica musica
+            JOIN musica.creditosArtistas credito
+            WHERE credito.artista.idArtista = :idArtista
+              AND credito.papel = gerenciador_musica_backend.model.PapelArtistaMusica.PRINCIPAL
+            """)
+    boolean existsByArtistaPrincipal_IdArtista(
+            @Param("idArtista") Long idArtista
+    );
 
-    boolean existsByArtistasParticipantes_IdArtista(Long idArtista);
+    @Query("""
+            SELECT CASE WHEN COUNT(credito) > 0 THEN true ELSE false END
+            FROM Musica musica
+            JOIN musica.creditosArtistas credito
+            WHERE credito.artista.idArtista = :idArtista
+              AND credito.papel <> gerenciador_musica_backend.model.PapelArtistaMusica.PRINCIPAL
+            """)
+    boolean existsByArtistasParticipantes_IdArtista(
+            @Param("idArtista") Long idArtista
+    );
 
     boolean existsByAlbum_IdAlbum(Long idAlbum);
 
@@ -32,17 +50,38 @@ public interface MusicaRepository
             Long idMusica
     );
 
+    @Query("""
+            SELECT CASE WHEN COUNT(musica) > 0 THEN true ELSE false END
+            FROM Musica musica
+            JOIN musica.creditosArtistas credito
+            WHERE musica.album IS NULL
+              AND credito.artista = :artistaPrincipal
+              AND credito.papel = gerenciador_musica_backend.model.PapelArtistaMusica.PRINCIPAL
+              AND LOWER(musica.titulo) = LOWER(:titulo)
+              AND musica.anoLancamento = :anoLancamento
+            """)
     boolean existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamento(
-            Artista artistaPrincipal,
-            String titulo,
-            Short anoLancamento
+            @Param("artistaPrincipal") Artista artistaPrincipal,
+            @Param("titulo") String titulo,
+            @Param("anoLancamento") Short anoLancamento
     );
 
+    @Query("""
+            SELECT CASE WHEN COUNT(musica) > 0 THEN true ELSE false END
+            FROM Musica musica
+            JOIN musica.creditosArtistas credito
+            WHERE musica.album IS NULL
+              AND credito.artista = :artistaPrincipal
+              AND credito.papel = gerenciador_musica_backend.model.PapelArtistaMusica.PRINCIPAL
+              AND LOWER(musica.titulo) = LOWER(:titulo)
+              AND musica.anoLancamento = :anoLancamento
+              AND musica.idMusica <> :idMusica
+            """)
     boolean existsByAlbumIsNullAndArtistaPrincipalAndTituloIgnoreCaseAndAnoLancamentoAndIdMusicaNot(
-            Artista artistaPrincipal,
-            String titulo,
-            Short anoLancamento,
-            Long idMusica
+            @Param("artistaPrincipal") Artista artistaPrincipal,
+            @Param("titulo") String titulo,
+            @Param("anoLancamento") Short anoLancamento,
+            @Param("idMusica") Long idMusica
     );
 
     @Query(value = """
