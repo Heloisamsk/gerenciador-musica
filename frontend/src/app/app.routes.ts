@@ -197,6 +197,14 @@ export const routes: Routes = [
 },
 
 {
+  path: 'albuns/:id',
+  loadComponent: () =>
+    import('./pages/album-detalhe/album-detalhe')
+      .then(modulo => modulo.AlbumDetalhePage),
+  canActivate: [authGuard]
+},
+
+{
   path: '**',
   redirectTo: 'login'
 }

@@ -1,8 +1,11 @@
 package gerenciador_musica_backend.controller;
 
 import gerenciador_musica_backend.config.JwtAuthenticationFilter;
+import gerenciador_musica_backend.dto.AlbumCatalogoDTO;
+import gerenciador_musica_backend.dto.AlbumDetalheDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.dto.ArtistaResumoDTO;
+import gerenciador_musica_backend.dto.MusicaAlbumDTO;
 import gerenciador_musica_backend.exception.AlbumNaoEncontradoException;
 import gerenciador_musica_backend.service.AlbumService;
 import org.junit.jupiter.api.Test;
@@ -88,6 +91,55 @@ class AlbumControllerTest {
         mockMvc.perform(get("/api/albuns/10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.idAlbum").value(10));
+    }
+
+    @Test
+    void deveBuscarDetalhesDoAlbumPelasViews() throws Exception {
+        AlbumDetalheDTO detalhes = new AlbumDetalheDTO(
+                new AlbumCatalogoDTO(
+                        10L,
+                        1L,
+                        "Queen",
+                        "A Night at the Opera",
+                        (short) 1975,
+                        null,
+                        1L,
+                        354L
+                ),
+                List.of("Rock"),
+                List.of(new MusicaAlbumDTO(
+                        20L,
+                        "Bohemian Rhapsody",
+                        354,
+                        List.of("Rock")
+                ))
+        );
+
+        when(albumService.buscarDetalhesCatalogo(10L))
+                .thenReturn(detalhes);
+
+        mockMvc.perform(get("/api/albuns/10/detalhes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.album.titulo")
+                        .value("A Night at the Opera"))
+                .andExpect(jsonPath("$.album.totalMusicas").value(1))
+                .andExpect(jsonPath("$.generos[0]").value("Rock"))
+                .andExpect(jsonPath("$.musicas[0].titulo")
+                        .value("Bohemian Rhapsody"));
+
+        verify(albumService).buscarDetalhesCatalogo(10L);
+    }
+
+    @Test
+    void deveRetornar404QuandoDetalhesDoAlbumNaoExistirem()
+            throws Exception {
+        when(albumService.buscarDetalhesCatalogo(99L))
+                .thenThrow(new AlbumNaoEncontradoException(99L));
+
+        mockMvc.perform(get("/api/albuns/99/detalhes"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message")
+                        .value("Álbum não encontrado com o ID: 99"));
     }
 
     @Test

@@ -14,14 +14,11 @@ import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
-import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
 import gerenciador_musica_backend.repository.projection.ArtistaCatalogoResumoProjection;
-import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -142,13 +139,13 @@ public class ArtistaService {
         List<AlbumCatalogoDTO> albuns = albumRepository
                 .buscarCatalogoPorArtista(idArtista)
                 .stream()
-                .map(this::converterAlbumCatalogo)
+                .map(CatalogoProjectionMapper::converterAlbum)
                 .toList();
 
         List<MusicaCatalogoDTO> musicas = musicaRepository
                 .buscarCatalogoPorArtista(idArtista)
                 .stream()
-                .map(this::converterMusicaCatalogo)
+                .map(CatalogoProjectionMapper::converterMusica)
                 .toList();
 
         return new ArtistaDetalheDTO(
@@ -256,50 +253,6 @@ public class ArtistaService {
                 resumo.getTotalParticipacoes(),
                 resumo.getDuracaoTotalSegundos()
         );
-    }
-
-    private AlbumCatalogoDTO converterAlbumCatalogo(
-            AlbumCatalogoProjection album
-    ) {
-        return new AlbumCatalogoDTO(
-                album.getIdAlbum(),
-                album.getIdArtista(),
-                album.getNomeArtista(),
-                album.getTitulo(),
-                album.getAnoLancamento(),
-                album.getCapaUrl(),
-                album.getTotalMusicas(),
-                album.getDuracaoTotalSegundos()
-        );
-    }
-
-    private MusicaCatalogoDTO converterMusicaCatalogo(
-            MusicaCatalogoProjection musica
-    ) {
-        return new MusicaCatalogoDTO(
-                musica.getIdMusica(),
-                musica.getTitulo(),
-                musica.getDuracaoSegundos(),
-                musica.getAnoLancamento(),
-                musica.getIdArtistaPrincipal(),
-                musica.getNomeArtistaPrincipal(),
-                musica.getIdAlbum(),
-                musica.getTituloAlbum(),
-                musica.getCapaUrl(),
-                separarGeneros(musica.getGeneros()),
-                musica.getPapelArtista()
-        );
-    }
-
-    private List<String> separarGeneros(String generos) {
-        if (generos == null || generos.isBlank()) {
-            return List.of();
-        }
-
-        return Arrays.stream(generos.split(","))
-                .map(String::strip)
-                .filter(genero -> !genero.isBlank())
-                .toList();
     }
 
     @Transactional(readOnly = true)

@@ -8,8 +8,8 @@ import { finalize } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
 import { CatalogoService } from '../../services/catalogo';
+import type { AlbumResponse } from '../../models/AlbumResponse';
 import type { ArtistaResponse } from '../../models/ArtistaResponse';
-import type { MusicaListagem } from '../../models/MusicaListagem';
 
 @Component({
   selector: 'app-home',
@@ -24,13 +24,13 @@ export class Home implements OnInit {
   termoBusca = signal('');
 
   artistas = signal<ArtistaResponse[]>([]);
-  musicas = signal<MusicaListagem[]>([]);
+  albuns = signal<AlbumResponse[]>([]);
 
   carregandoArtistas = signal(false);
-  carregandoMusicas = signal(false);
+  carregandoAlbuns = signal(false);
 
   erroArtistas = signal('');
-  erroMusicas = signal('');
+  erroAlbuns = signal('');
 
   constructor(
     private readonly authService: AuthService,
@@ -40,7 +40,7 @@ export class Home implements OnInit {
 
   ngOnInit(): void {
     this.carregarArtistas();
-    this.carregarMusicas();
+    this.carregarAlbuns();
   }
 
   isAdmin(): boolean {
@@ -112,25 +112,25 @@ export class Home implements OnInit {
       });
   }
 
-  private carregarMusicas(): void {
-    this.carregandoMusicas.set(true);
-    this.erroMusicas.set('');
+  private carregarAlbuns(): void {
+    this.carregandoAlbuns.set(true);
+    this.erroAlbuns.set('');
 
     this.catalogoService
-      .listarMusicas()
+      .listarAlbuns()
       .pipe(
         finalize(() =>
-          this.carregandoMusicas.set(false)
+          this.carregandoAlbuns.set(false)
         )
       )
       .subscribe({
-        next: musicas => {
-          this.musicas.set(musicas);
+        next: albuns => {
+          this.albuns.set(albuns);
         },
         error: () => {
-          this.musicas.set([]);
-          this.erroMusicas.set(
-            'Não foi possível carregar as músicas.'
+          this.albuns.set([]);
+          this.erroAlbuns.set(
+            'Não foi possível carregar os álbuns.'
           );
         }
       });

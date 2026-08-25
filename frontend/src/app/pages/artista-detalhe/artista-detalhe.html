@@ -1,4 +1,4 @@
-<main class="pagina-artista">
+<main class="pagina-detalhe">
   <div class="conteudo">
     <a class="voltar-link" routerLink="/home">
       ← Voltar para o início
@@ -82,28 +82,34 @@
           <ul class="grade-albuns" aria-label="Álbuns do artista">
             @for (album of detalhesArtista.albuns; track album.idAlbum) {
               <li class="cartao-album">
-                <img
-                  class="capa-album"
-                  [src]="album.capaUrl || '/capa-padrao.png'"
-                  [alt]="'Capa do álbum ' + album.titulo"
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                  (error)="substituirImagem($event, '/capa-padrao.png')"
+                <a
+                  class="link-album"
+                  [routerLink]="['/albuns', album.idAlbum]"
+                  [attr.aria-label]="'Ver detalhes do álbum ' + album.titulo"
                 >
+                  <img
+                    class="capa-album"
+                    [src]="album.capaUrl || '/capa-padrao.png'"
+                    [alt]="'Capa do álbum ' + album.titulo"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    (error)="substituirImagem($event, '/capa-padrao.png')"
+                  >
 
-                <div class="dados-album">
-                  <h3>{{ album.titulo }}</h3>
-                  <p>{{ album.anoLancamento }} · {{ album.nomeArtista }}</p>
-                  <p>
-                    {{ album.totalMusicas }}
-                    @if (album.totalMusicas === 1) {
-                      música
-                    } @else {
-                      músicas
-                    }
-                    · {{ formatarDuracao(album.duracaoTotalSegundos) }}
-                  </p>
-                </div>
+                  <div class="dados-album">
+                    <h3>{{ album.titulo }}</h3>
+                    <p>{{ album.anoLancamento }} · {{ album.nomeArtista }}</p>
+                    <p>
+                      {{ album.totalMusicas }}
+                      @if (album.totalMusicas === 1) {
+                        música
+                      } @else {
+                        músicas
+                      }
+                      · {{ formatarDuracao(album.duracaoTotalSegundos) }}
+                    </p>
+                  </div>
+                </a>
               </li>
             }
           </ul>

@@ -69,3 +69,15 @@ describe('rota de detalhes do artista', () => {
     expect(rota?.canActivate).toContain(authGuard);
   });
 });
+
+describe('rota de detalhes do álbum', () => {
+  it('deve carregar a página e exigir autenticação', () => {
+    const rota = routes.find(
+      item => item.path === 'albuns/:id'
+    );
+
+    expect(rota).toBeDefined();
+    expect(rota?.loadComponent).toBeDefined();
+    expect(rota?.canActivate).toContain(authGuard);
+  });
+});

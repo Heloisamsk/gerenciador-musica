@@ -104,4 +104,26 @@ public interface MusicaRepository
     List<MusicaCatalogoProjection> buscarCatalogoPorArtista(
             @Param("idArtista") Long idArtista
     );
+
+    @Query(value = """
+            SELECT
+                id_musica AS "idMusica",
+                titulo,
+                duracao_segundos AS "duracaoSegundos",
+                ano_lancamento AS "anoLancamento",
+                id_artista_principal AS "idArtistaPrincipal",
+                nome_artista_principal AS "nomeArtistaPrincipal",
+                id_album AS "idAlbum",
+                titulo_album AS "tituloAlbum",
+                capa_url AS "capaUrl",
+                generos,
+                papel_artista AS "papelArtista"
+            FROM vw_musicas_artista_catalogo
+            WHERE id_album = :idAlbum
+              AND papel_artista = 'PRINCIPAL'
+            ORDER BY titulo ASC, id_musica ASC
+            """, nativeQuery = true)
+    List<MusicaCatalogoProjection> buscarCatalogoPorAlbum(
+            @Param("idAlbum") Long idAlbum
+    );
 }

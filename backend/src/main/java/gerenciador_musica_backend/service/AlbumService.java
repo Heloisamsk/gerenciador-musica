@@ -1,9 +1,11 @@
 package gerenciador_musica_backend.service;
 
 import gerenciador_musica_backend.dto.AlbumAtualizacaoRequestDTO;
+import gerenciador_musica_backend.dto.AlbumDetalheDTO;
 import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.dto.ArtistaResumoDTO;
+import gerenciador_musica_backend.dto.MusicaAlbumDTO;
 import gerenciador_musica_backend.exception.AlbumDuplicadoException;
 import gerenciador_musica_backend.exception.AlbumEmUsoException;
 import gerenciador_musica_backend.exception.AlbumNaoEncontradoException;
@@ -12,6 +14,7 @@ import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
+import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -146,6 +149,32 @@ public class AlbumService {
         Album album = obterEntidadePorId(idAlbum);
 
         return converterParaResponse(album);
+    }
+
+    @Transactional(readOnly = true)
+    public AlbumDetalheDTO buscarDetalhesCatalogo(Long idAlbum) {
+        validarIdPositivo(
+                idAlbum,
+                "O ID do álbum deve ser válido."
+        );
+
+        var album = albumRepository
+                .buscarCatalogoPorId(idAlbum)
+                .orElseThrow(
+                        () -> new AlbumNaoEncontradoException(idAlbum)
+                );
+
+        List<MusicaAlbumDTO> musicas = musicaRepository
+                .buscarCatalogoPorAlbum(idAlbum)
+                .stream()
+                .map(this::converterMusicaAlbum)
+                .toList();
+
+        return new AlbumDetalheDTO(
+                CatalogoProjectionMapper.converterAlbum(album),
+                reunirGeneros(musicas),
+                musicas
+        );
     }
 
     @Transactional(readOnly = true)
@@ -375,4 +404,26 @@ public class AlbumService {
                 artistaResumo
         );
     }
+
+    private MusicaAlbumDTO converterMusicaAlbum(
+            MusicaCatalogoProjection musica
+    ) {
+        return new MusicaAlbumDTO(
+                musica.getIdMusica(),
+                musica.getTitulo(),
+                musica.getDuracaoSegundos(),
+                CatalogoProjectionMapper.separarGeneros(
+                        musica.getGeneros()
+                )
+        );
+    }
+
+    private List<String> reunirGeneros(List<MusicaAlbumDTO> musicas) {
+        return musicas.stream()
+                .flatMap(musica -> musica.generos().stream())
+                .distinct()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
+    }
+
 }
