@@ -1,5 +1,6 @@
 package gerenciador_musica_backend.controller;
 
+import gerenciador_musica_backend.dto.AlbumDetalheDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.service.AlbumService;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,15 @@ public class AlbumController {
     ) {
         return ResponseEntity.ok(
                 albumService.buscarPorId(idAlbum)
+        );
+    }
+
+    @GetMapping("/{idAlbum}/detalhes")
+    public ResponseEntity<AlbumDetalheDTO> buscarDetalhesCatalogo(
+            @PathVariable("idAlbum") Long idAlbum
+    ) {
+        return ResponseEntity.ok(
+                albumService.buscarDetalhesCatalogo(idAlbum)
         );
     }
 }

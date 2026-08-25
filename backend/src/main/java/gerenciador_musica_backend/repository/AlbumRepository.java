@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AlbumRepository extends JpaRepository<Album, Long> {
 
@@ -45,5 +46,22 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
             """, nativeQuery = true)
     List<AlbumCatalogoProjection> buscarCatalogoPorArtista(
             @Param("idArtista") Long idArtista
+    );
+
+    @Query(value = """
+            SELECT
+                id_album AS "idAlbum",
+                id_artista AS "idArtista",
+                nome_artista AS "nomeArtista",
+                titulo,
+                ano_lancamento AS "anoLancamento",
+                capa_url AS "capaUrl",
+                total_musicas AS "totalMusicas",
+                duracao_total_segundos AS "duracaoTotalSegundos"
+            FROM vw_albuns_artista_catalogo
+            WHERE id_album = :idAlbum
+            """, nativeQuery = true)
+    Optional<AlbumCatalogoProjection> buscarCatalogoPorId(
+            @Param("idAlbum") Long idAlbum
     );
 }
