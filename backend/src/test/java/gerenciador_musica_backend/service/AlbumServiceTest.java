@@ -1,6 +1,7 @@
 package gerenciador_musica_backend.service;
 
 import gerenciador_musica_backend.dto.AlbumAtualizacaoRequestDTO;
+import gerenciador_musica_backend.dto.AlbumDetalheDTO;
 import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
 import gerenciador_musica_backend.exception.AlbumDuplicadoException;
@@ -11,6 +12,8 @@ import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
+import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
+import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -254,6 +258,79 @@ class AlbumServiceTest {
 
         assertThat(resultado.idAlbum()).isEqualTo(10L);
         assertThat(resultado.artista().id()).isEqualTo(1L);
+    }
+
+    @Test
+    void deveBuscarDetalhesDoAlbumPelasViews() {
+        AlbumCatalogoProjection album = mock(
+                AlbumCatalogoProjection.class
+        );
+        MusicaCatalogoProjection musica = mock(
+                MusicaCatalogoProjection.class
+        );
+        MusicaCatalogoProjection musicaSemGenero = mock(
+                MusicaCatalogoProjection.class
+        );
+
+        when(album.getIdAlbum()).thenReturn(10L);
+        when(album.getIdArtista()).thenReturn(1L);
+        when(album.getNomeArtista()).thenReturn("Queen");
+        when(album.getTitulo()).thenReturn("A Night at the Opera");
+        when(album.getAnoLancamento()).thenReturn((short) 1975);
+        when(album.getCapaUrl()).thenReturn(null);
+        when(album.getTotalMusicas()).thenReturn(2L);
+        when(album.getDuracaoTotalSegundos()).thenReturn(573L);
+        when(musica.getIdMusica()).thenReturn(20L);
+        when(musica.getTitulo()).thenReturn("Bohemian Rhapsody");
+        when(musica.getDuracaoSegundos()).thenReturn(354);
+        when(musica.getGeneros())
+                .thenReturn("Rock, Progressive Rock");
+        when(musicaSemGenero.getIdMusica()).thenReturn(21L);
+        when(musicaSemGenero.getTitulo()).thenReturn("Love of My Life");
+        when(musicaSemGenero.getDuracaoSegundos()).thenReturn(219);
+        when(musicaSemGenero.getGeneros()).thenReturn("  ");
+        when(albumRepository.buscarCatalogoPorId(10L))
+                .thenReturn(Optional.of(album));
+        when(musicaRepository.buscarCatalogoPorAlbum(10L))
+                .thenReturn(List.of(musica, musicaSemGenero));
+
+        AlbumDetalheDTO resultado =
+                albumService.buscarDetalhesCatalogo(10L);
+
+        assertThat(resultado.album().titulo())
+                .isEqualTo("A Night at the Opera");
+        assertThat(resultado.generos())
+                .containsExactly("Progressive Rock", "Rock");
+        assertThat(resultado.musicas()).hasSize(2);
+        assertThat(resultado.musicas().getFirst().generos())
+                .containsExactly("Rock", "Progressive Rock");
+        assertThat(resultado.musicas().getLast().generos()).isEmpty();
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoDetalhesDoAlbumNaoExistirem() {
+        when(albumRepository.buscarCatalogoPorId(99L))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(
+                () -> albumService.buscarDetalhesCatalogo(99L)
+        )
+                .isInstanceOf(AlbumNaoEncontradoException.class)
+                .hasMessage("Álbum não encontrado com o ID: 99");
+
+        verify(musicaRepository, never()).buscarCatalogoPorAlbum(any());
+    }
+
+    @Test
+    void deveRejeitarIdInvalidoAoBuscarDetalhesDoAlbum() {
+        assertThatThrownBy(
+                () -> albumService.buscarDetalhesCatalogo(0L)
+        )
+                .isInstanceOf(DadosAlbumInvalidosException.class)
+                .hasMessage("O ID do álbum deve ser válido.");
+
+        verify(albumRepository, never()).buscarCatalogoPorId(any());
+        verify(musicaRepository, never()).buscarCatalogoPorAlbum(any());
     }
 
     @Test

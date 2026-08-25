@@ -4,6 +4,7 @@ import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Genero;
 import gerenciador_musica_backend.model.Musica;
+import gerenciador_musica_backend.service.AlbumService;
 import gerenciador_musica_backend.service.ArtistaService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ class ArtistaViewsIntegrationTest {
 
     @Autowired
     private ArtistaService artistaService;
+
+    @Autowired
+    private AlbumService albumService;
 
     @Test
     void deveReunirDadosDasTresViewsNaPaginaDoArtista() {
@@ -96,6 +100,24 @@ class ArtistaViewsIntegrationTest {
                     assertThat(item.titulo()).isEqualTo(musica.getTitulo());
                     assertThat(item.papelArtista()).isEqualTo("PRINCIPAL");
                     assertThat(item.generos()).containsExactly(genero.getNome());
+                });
+
+        var detalhesAlbum = albumService.buscarDetalhesCatalogo(
+                album.getIdAlbum()
+        );
+
+        assertThat(detalhesAlbum.album().titulo())
+                .isEqualTo(album.getTitulo());
+        assertThat(detalhesAlbum.album().totalMusicas()).isEqualTo(1L);
+        assertThat(detalhesAlbum.album().duracaoTotalSegundos())
+                .isEqualTo(210L);
+        assertThat(detalhesAlbum.generos())
+                .containsExactly(genero.getNome());
+        assertThat(detalhesAlbum.musicas())
+                .singleElement()
+                .satisfies(item -> {
+                    assertThat(item.titulo()).isEqualTo(musica.getTitulo());
+                    assertThat(item.duracaoSegundos()).isEqualTo(210);
                 });
 
         var detalhesParticipante = artistaService.buscarDetalhesCatalogo(
