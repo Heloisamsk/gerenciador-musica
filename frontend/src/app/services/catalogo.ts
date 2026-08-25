@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
+import type { AlbumDetalhe } from '../models/AlbumDetalhe';
 import type { AlbumResponse } from '../models/AlbumResponse';
 import type { ArtistaDetalhe } from '../models/ArtistaDetalhe';
 import type { ArtistaResponse } from '../models/ArtistaResponse';
@@ -19,10 +20,9 @@ export class CatalogoService {
   private readonly apiUrl =
     `${environment.apiUrl}/api`;
 
-  // GET /api/musicas agora devolve uma resposta paginada (US06). A home
-  // mostra o catálogo completo (sem filtro), então pedimos o tamanho
-  // máximo de página que o backend aceita (100) — um catálogo maior que
-  // isso precisaria passar a usar a pesquisa do backend de verdade.
+  // Mantém a consulta resumida compatível com a paginação do backend.
+  // A gestão completa de músicas utiliza o serviço administrativo,
+  // que percorre as páginas sem limitar o catálogo aos primeiros itens.
   private readonly TAMANHO_PAGINA_MAXIMO = 100;
 
   constructor(
@@ -46,6 +46,12 @@ export class CatalogoService {
   listarAlbuns(): Observable<AlbumResponse[]> {
     return this.http.get<AlbumResponse[]>(
       `${this.apiUrl}/albuns`
+    );
+  }
+
+  buscarDetalhesAlbum(idAlbum: number): Observable<AlbumDetalhe> {
+    return this.http.get<AlbumDetalhe>(
+      `${this.apiUrl}/albuns/${idAlbum}/detalhes`
     );
   }
 

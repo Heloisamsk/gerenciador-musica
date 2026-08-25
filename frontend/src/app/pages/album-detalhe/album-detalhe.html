@@ -1,0 +1,114 @@
+<main class="pagina-detalhe">
+  <div class="conteudo">
+    <a class="voltar-link" routerLink="/home">
+      ← Voltar para o início
+    </a>
+
+    @if (carregando()) {
+      <output class="mensagem-estado" aria-live="polite">
+        Carregando detalhes do álbum...
+      </output>
+    } @else if (mensagemErro()) {
+      <section class="mensagem-erro" role="alert">
+        <p>{{ mensagemErro() }}</p>
+
+        @if (idAlbum() !== null) {
+          <button
+            type="button"
+            class="botao-secundario"
+            (click)="tentarNovamente()"
+          >
+            Tentar novamente
+          </button>
+        }
+      </section>
+    } @else if (detalhes(); as detalhesAlbum) {
+      <header class="cabecalho-album">
+        <img
+          class="capa-album"
+          [src]="detalhesAlbum.album.capaUrl || '/capa-padrao.png'"
+          [alt]="'Capa do álbum ' + detalhesAlbum.album.titulo"
+          referrerpolicy="no-referrer"
+          (error)="substituirImagem($event, '/capa-padrao.png')"
+        >
+
+        <div class="dados-album">
+          <span class="tipo-conteudo">Álbum</span>
+          <h1>{{ detalhesAlbum.album.titulo }}</h1>
+
+          <a
+            class="artista-link"
+            [routerLink]="['/artistas', detalhesAlbum.album.idArtista]"
+          >
+            {{ detalhesAlbum.album.nomeArtista }}
+          </a>
+
+          <p class="metadados">
+            <span>{{ detalhesAlbum.album.anoLancamento }}</span>
+            <span aria-hidden="true">•</span>
+            <span>
+              {{ detalhesAlbum.album.totalMusicas }}
+              @if (detalhesAlbum.album.totalMusicas === 1) {
+                música
+              } @else {
+                músicas
+              }
+            </span>
+            <span aria-hidden="true">•</span>
+            <span>
+              {{ formatarDuracao(detalhesAlbum.album.duracaoTotalSegundos) }}
+            </span>
+          </p>
+
+          @if (detalhesAlbum.generos.length > 0) {
+            <ul class="generos" aria-label="Gêneros do álbum">
+              @for (genero of detalhesAlbum.generos; track genero) {
+                <li>{{ genero }}</li>
+              }
+            </ul>
+          }
+        </div>
+      </header>
+
+      <section class="secao-faixas" aria-labelledby="titulo-faixas">
+        <div class="cabecalho-secao">
+          <h2 id="titulo-faixas">Faixas</h2>
+          <span>{{ detalhesAlbum.musicas.length }} cadastradas</span>
+        </div>
+
+        @if (detalhesAlbum.musicas.length > 0) {
+          <ul class="lista-faixas" aria-label="Faixas do álbum">
+            @for (musica of detalhesAlbum.musicas; track musica.idMusica) {
+              <li>
+                <a
+                  class="linha-faixa"
+                  [routerLink]="['/musicas', musica.idMusica]"
+                  [attr.aria-label]="'Ver detalhes da música ' + musica.titulo"
+                >
+                  <span class="marcador" aria-hidden="true">♪</span>
+
+                  <span class="dados-faixa">
+                    <strong>{{ musica.titulo }}</strong>
+                    @if (musica.generos.length > 0) {
+                      <span>{{ musica.generos.join(', ') }}</span>
+                    } @else {
+                      <span>Gênero não informado</span>
+                    }
+                  </span>
+
+                  <span class="duracao">
+                    {{ formatarDuracao(musica.duracaoSegundos) }}
+                  </span>
+                </a>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="lista-vazia">
+            Este álbum ainda não possui músicas cadastradas.
+          </p>
+        }
+      </section>
+    }
+  </div>
+</main>

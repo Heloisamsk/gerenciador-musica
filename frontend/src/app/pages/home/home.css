@@ -224,35 +224,42 @@
   white-space: nowrap;
 }
 
-.grade-musicas {
+.grade-albuns {
   display: grid;
   grid-template-columns:
     repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
 }
 
-.musica-card {
+.album-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
   padding: 16px;
+  color: inherit;
   background-color: #181818;
   border: 1px solid transparent;
   border-radius: 10px;
+  text-decoration: none;
   transition:
     background-color 0.2s,
     border-color 0.2s,
     transform 0.2s;
 }
 
-.musica-card:hover {
+.album-card:hover {
   background-color: #282828;
   border-color: #333333;
   transform: translateY(-3px);
 }
 
-.musica-capa {
+.album-card:focus-visible {
+  outline: 2px solid #1db954;
+  outline-offset: 3px;
+}
+
+.album-capa {
   display: block;
   width: 100%;
   aspect-ratio: 1;
@@ -264,7 +271,7 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-.musica-card strong {
+.album-card strong {
   color: #ffffff;
   font-size: 1rem;
   overflow: hidden;
@@ -272,7 +279,7 @@
   white-space: nowrap;
 }
 
-.musica-card span {
+.album-card span {
   color: #b3b3b3;
   font-size: 0.9rem;
   overflow: hidden;
@@ -322,7 +329,7 @@
     padding: 24px 16px 48px;
   }
 
-  .grade-musicas {
+  .grade-albuns {
     grid-template-columns:
       repeat(auto-fill, minmax(150px, 1fr));
     gap: 14px;
@@ -340,12 +347,12 @@
     height: 105px;
   }
 
-  .grade-musicas {
+  .grade-albuns {
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
   }
 
-  .musica-card {
+  .album-card {
     padding: 12px;
   }
 }

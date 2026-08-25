@@ -1,0 +1,71 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  color: #fff;
+  background-color: #101010;
+}
+
+:host * {
+  box-sizing: border-box;
+}
+
+.pagina-detalhe {
+  padding: 32px 24px 72px;
+}
+
+.conteudo {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.voltar-link {
+  display: inline-flex;
+  min-height: 44px;
+  margin-bottom: 28px;
+  color: #c7c7c7;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.voltar-link:focus-visible,
+.botao-secundario:focus-visible {
+  outline: 2px solid #1db954;
+  outline-offset: 3px;
+}
+
+.mensagem-estado,
+.mensagem-erro,
+.lista-vazia {
+  display: block;
+  width: 100%;
+  padding: 24px;
+  color: #c7c7c7;
+  background-color: #181818;
+  border: 1px solid #303030;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.mensagem-erro {
+  color: #ffb4b4;
+  background-color: #2f2020;
+  border-color: #6f3030;
+}
+
+.botao-secundario {
+  min-height: 42px;
+  padding: 10px 18px;
+  color: #fff;
+  background: transparent;
+  border: 1px solid #727272;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+@media (max-width: 560px) {
+  .pagina-detalhe {
+    padding: 20px 14px 48px;
+  }
+}

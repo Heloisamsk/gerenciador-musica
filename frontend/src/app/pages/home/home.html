@@ -108,41 +108,50 @@
     </section>
 
     <section class="secao">
-      <h2>Músicas</h2>
+      <h2>Álbuns</h2>
 
-      @if (carregandoMusicas()) {
+      @if (carregandoAlbuns()) {
       <p class="mensagem-estado">
-        Carregando músicas...
+        Carregando álbuns...
       </p>
-      } @else if (erroMusicas()) {
+      } @else if (erroAlbuns()) {
       <p class="mensagem-erro">
-        {{ erroMusicas() }}
+        {{ erroAlbuns() }}
       </p>
       } @else {
-      <div class="grade-musicas">
+      <div class="grade-albuns">
         @for (
-        musica of musicas();
-        track musica.id
+        album of albuns();
+        track album.idAlbum
         ) {
-        <article class="musica-card">
+        <a
+          class="album-card"
+          [routerLink]="['/albuns', album.idAlbum]"
+          [attr.aria-label]="
+            'Ver detalhes do álbum ' + album.titulo
+            + ' de ' + album.artista.nome
+          "
+        >
           <img
-            class="musica-capa"
-            src="/capa-padrao.png"
-            [alt]="'Capa padrão de ' + musica.titulo"
+            class="album-capa"
+            [src]="album.capaUrl || '/capa-padrao.png'"
+            [alt]="'Capa do álbum ' + album.titulo"
             loading="lazy"
+            referrerpolicy="no-referrer"
+            (error)="substituirImagem($event, '/capa-padrao.png')"
           >
 
           <strong>
-            {{ musica.titulo }}
+            {{ album.titulo }}
           </strong>
 
           <span>
-                {{ musica.artistaPrincipal.nome }}
-              </span>
-        </article>
+            {{ album.anoLancamento }} · {{ album.artista.nome }}
+          </span>
+        </a>
         } @empty {
         <p class="mensagem-estado">
-          Nenhuma música encontrada.
+          Nenhum álbum encontrado.
         </p>
         }
       </div>
