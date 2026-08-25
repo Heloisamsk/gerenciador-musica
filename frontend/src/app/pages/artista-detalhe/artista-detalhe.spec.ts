@@ -40,6 +40,11 @@ describe('ArtistaDetalhePage', () => {
     expect(texto).toContain('A Night at the Opera');
     expect(texto).toContain('Bohemian Rhapsody');
     expect(texto).toContain('Artista principal');
+
+    const linkAlbum = fixture.nativeElement.querySelector(
+      'a.link-album'
+    ) as HTMLAnchorElement;
+    expect(linkAlbum.getAttribute('href')).toBe('/albuns/10');
   });
 
   it('não deve chamar a API quando o id da rota for inválido', async () => {
