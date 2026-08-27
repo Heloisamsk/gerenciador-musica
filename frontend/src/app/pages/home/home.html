@@ -1,16 +1,15 @@
 <div class="home-layout">
   <aside class="sidebar">
-    <div class="perfil">
+    <a class="perfil" routerLink="/perfil" style="text-decoration: none;">
       <img
         class="perfil-foto"
         src="/avatar-padrao.png"
         alt="Foto padrão do usuário"
-      >
-
+      />
       <span class="perfil-nome">
         {{ nomeUsuario() }}
       </span>
-    </div>
+    </a>
 
     <nav class="menu">
       <a
