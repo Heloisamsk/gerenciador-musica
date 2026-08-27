@@ -1,0 +1,33 @@
+<main class="perfil-page">
+  <div class="perfil-card">
+    <a class="voltar-link" routerLink="/home">
+      &larr; Voltar para a Home
+    </a>
+
+    <header class="perfil-header">
+      <img class="foto-perfil" src="/avatar-padrao.png" alt="Foto do usuário">
+      <div class="identidade-perfil">
+        <span class="section-label">Perfil</span>
+        <h1>{{ nome() }}</h1>
+        <p class="email-perfil">{{ email() }}</p>
+
+        <div class="badges">
+          <span class="role-badge" [class.role-admin]="role() === 'ADMIN'" [class.role-user]="role() === 'USER'">
+            {{ role() === 'ADMIN' ? 'Administrador' : 'Usuário' }}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <section class="perfil-acoes">
+      <a class="acao-link" routerLink="/playlists">
+        Ver Minhas Playlists
+      </a>
+      @if (role() === 'ADMIN') {
+        <a class="acao-link admin-link" routerLink="/admin/painel">
+          Acessar Painel Administrativo
+        </a>
+      }
+    </section>
+  </div>
+</main>

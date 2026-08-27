@@ -69,6 +69,17 @@ export class AuthService {
             'role',
             resposta.role
           );
+
+          localStorage.setItem(
+            'nome',
+            resposta.nome
+          );
+
+          localStorage.setItem(
+            'email',
+            resposta.email
+          );
+
         })
       );
   }
@@ -126,5 +137,7 @@ export class AuthService {
 
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    localStorage.removeItem('nome');
+    localStorage.removeItem('email');
   }
 }

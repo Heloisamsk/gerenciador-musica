@@ -41,6 +41,9 @@ export class Home implements OnInit {
   ngOnInit(): void {
     this.carregarArtistas();
     this.carregarAlbuns();
+    if (typeof window !== 'undefined') {
+      this.nomeUsuario.set(localStorage.getItem('nome') || 'Usuário');
+    }
   }
 
   isAdmin(): boolean {

@@ -1,0 +1,157 @@
+:host {
+  display: block;
+  --background: #0f0f0f;
+  --card-background: #181818;
+  --border-color: #343434;
+  --primary: #1ed760;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  min-height: 100vh;
+  color: var(--text-primary);
+  background-color: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.perfil-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: radial-gradient(circle at top, #1c1c1c 0%, var(--background) 45%);
+}
+
+.perfil-card {
+  width: 100%;
+  max-width: 800px;
+  min-height: calc(100vh - 4rem);
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 35%);
+}
+
+.voltar-link {
+  display: inline-block;
+  margin-bottom: 2.5rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 150ms ease;
+}
+
+.voltar-link:hover {
+  color: var(--primary);
+}
+
+.perfil-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.foto-perfil {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 2px solid #333;
+}
+
+.identidade-perfil {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.section-label {
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.identidade-perfil h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.email-perfil {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.role-badge {
+  display: inline-flex;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.role-admin {
+  color: #000;
+  background-color: var(--primary);
+}
+
+.role-user {
+  color: #fff;
+  background-color: #535353;
+}
+
+.perfil-acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.acao-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  color: #fff;
+  background-color: transparent;
+  border: 1px solid #727272;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 150ms ease;
+  max-width: 300px;
+}
+
+.acao-link:hover {
+  background-color: #2a2a2a;
+  border-color: #fff;
+}
+
+.admin-link {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.admin-link:hover {
+  background-color: var(--primary);
+  color: #000;
+}
+
+@media (max-width: 600px) {
+  .perfil-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .acao-link {
+    max-width: 100%;
+  }
+}
