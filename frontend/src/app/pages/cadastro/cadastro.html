@@ -64,8 +64,8 @@
         }
       </div>
 
-      <button class="cadastro-btn" type="submit">
-        Cadastrar
+      <button class="cadastro-btn" type="submit" [disabled]="cadastrando()">
+        {{ cadastrando() ? 'Cadastrando...' : 'Cadastrar' }}
       </button>
     </form>
   </section>
