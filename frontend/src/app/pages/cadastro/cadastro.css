@@ -122,6 +122,12 @@
   transform: scale(0.98);
 }
 
+.cadastro-btn:disabled {
+  background-color: #1a8f42;
+  cursor: not-allowed;
+  transform: none;
+}
+
 @media (max-width: 480px) {
   .cadastro-container {
     padding: 16px;

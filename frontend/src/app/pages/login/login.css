@@ -57,6 +57,12 @@
   transform: scale(1.02);
 }
 
+.login-btn:disabled {
+  background-color: #1a8f42;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .login-card {
   background-color: #282828;
   padding: 40px;

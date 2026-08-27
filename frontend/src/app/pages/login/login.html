@@ -46,8 +46,8 @@
         }
       </div>
 
-      <button class="login-btn" type="submit">
-        Entrar
+      <button class="login-btn" type="submit" [disabled]="entrando()">
+        {{ entrando() ? 'Entrando...' : 'Entrar' }}
       </button>
     </form>
 

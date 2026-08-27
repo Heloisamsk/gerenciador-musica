@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -6,6 +6,7 @@ import {
   Validators
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth';
 
 @Component({
@@ -42,36 +43,41 @@ export class Login {
     return this.loginForm.controls.senha;
   }
 
+  entrando = signal(false);
+
   constructor(
     private readonly authService: AuthService,
     private readonly router: Router
   ) {}
 
   entrar(): void {
-    if (this.loginForm.invalid) {
+    if (this.loginForm.invalid || this.entrando()) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
     const credenciais = this.loginForm.getRawValue();
+    this.entrando.set(true);
 
-    this.authService.login(credenciais).subscribe({
-      next: (resposta) => {
-        console.log(
-          'Login feito com sucesso!',
-          resposta
-        );
+    this.authService.login(credenciais)
+      .pipe(finalize(() => this.entrando.set(false)))
+      .subscribe({
+        next: (resposta) => {
+          console.log(
+            'Login feito com sucesso!',
+            resposta
+          );
 
-        void this.router.navigate(['/home']);
-      },
+          void this.router.navigate(['/home']);
+        },
 
-      error: (erro) => {
-        console.error('Erro no login', erro);
+        error: (erro) => {
+          console.error('Erro no login', erro);
 
-        alert(
-          'E-mail ou senha incorretos. Tente novamente!'
-        );
-      }
-    });
+          alert(
+            'E-mail ou senha incorretos. Tente novamente!'
+          );
+        }
+      });
   }
 }
