@@ -410,7 +410,7 @@ Armazena o histórico de reproduções de músicas pelos usuários.
 | id_usuario | BIGINT | NOT NULL, FK → usuario | Usuário que reproduziu a música. |
 | id_musica | BIGINT | NOT NULL, FK → musica | Música reproduzida. |
 | reproduzida_em | TIMESTAMP WITH TIME ZONE | NOT NULL, DEFAULT `now()` | Data e horário da reprodução. |
-| segundos_ouvidos | INTEGER | NOT NULL, CHECK (>= 0) | Quantos segundos da música foram ouvidos. |
+| segundos_ouvidos | INTEGER | NOT NULL, CHECK (>= 0), validado por trigger | Quantos segundos foram ouvidos, sem poder ultrapassar a duração da música. |
 
 </details>
 
@@ -650,10 +650,26 @@ As rotas autenticadas exigem o envio do token JWT no cabeçalho da requisição:
 | `PUT` | `/api/admin/musicas/{id}` | `ADMIN` | Atualizar uma música e suas associações sem alterar seu ID |
 | `DELETE` | `/api/admin/musicas/{id}` | `ADMIN` | Excluir uma música e limpar suas associações dependentes |
 | `GET` | `/api/admin/banco/usuarios` | `ADMIN` | Listar os usuários cadastrados no banco de dados |
+| `GET` | `/api/admin/relatorios/catalogo` | `ADMIN` | Gerar o resumo e os relatórios de artistas e álbuns a partir das views do catálogo |
+| `GET` | `/api/admin/relatorios/catalogo.csv?tipo=ARTISTAS` | `ADMIN` | Exportar em CSV o relatório de artistas; use `tipo=ALBUNS` para exportar o relatório de álbuns |
 
 > Os endpoints iniciados por `/api/admin` são protegidos e podem ser acessados somente por usuários com a role `ADMIN`. Usuários autenticados com a role `USER` recebem a resposta `403 Forbidden` ao tentar acessar essas rotas.
 
 </details>
+
+</details>
+
+<details>
+<summary><h2><strong>⚙️ » Gatilhos SQL</strong></h2></summary>
+
+| Gatilho | Evento | Regra automatizada |
+|---------|--------|--------------------|
+| `trg_atualizar_data_review` | Antes de atualizar uma avaliação | Atualiza automaticamente `atualizada_em`. |
+| `ct_musica_exige_artista_principal` | Ao concluir alterações em `musica` | Garante que toda música tenha exatamente um artista principal. |
+| `ct_credito_exige_artista_principal` | Ao concluir alterações em `musica_artista` | Impede alterações nos créditos que deixem a música sem um único artista principal. |
+| `trg_validar_duracao_reproducao` | Antes de inserir ou alterar uma reprodução | Impede que `segundos_ouvidos` ultrapasse `musica.duracao_segundos`. |
+
+O gatilho de reproduções é criado pela migration [`V20__validar_duracao_reproducao.sql`](backend/src/main/resources/db/migration/V20__validar_duracao_reproducao.sql). A regra é aplicada no banco mesmo quando a escrita não passa pela API, preservando a integridade dos dados em inserções e atualizações.
 
 </details>
 

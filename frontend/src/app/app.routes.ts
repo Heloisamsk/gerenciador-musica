@@ -38,6 +38,16 @@ export const routes: Routes = [
     }
   },
   {
+    path: 'admin/relatorios',
+    loadComponent: () =>
+      import('./pages/admin-relatorios/admin-relatorios')
+        .then(modulo => modulo.AdminRelatorios),
+    canActivate: [authGuard],
+    data: {
+      expectedRole: 'ADMIN'
+    }
+  },
+  {
     path: 'admin',
     component: Home,
     canActivate: [authGuard],
