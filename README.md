@@ -237,15 +237,12 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 <details>
 <summary><h2><strong>🗄️ » Configuração do Banco de Dados</strong></h2></summary>
 
-O projeto usa **PostgreSQL 18** como SGBD, executado via Docker (serviço `postgres` do `docker-compose.yml`).
+O projeto usa **PostgreSQL 18** como SGBD. O Docker Compose cria automaticamente um banco principal e outro isolado para os testes de integração.
 
-| Configuração | Valor |
-|---|---|
-| Host (fora do container) | `localhost` |
-| Porta | `5432` |
-| Nome do banco | `gerenciador_musica` |
-| Usuário | `gerenciador` |
-| Senha | `gerenciador` |
+| Finalidade | Serviço | Host | Porta | Banco | Usuário | Senha |
+|---|---|---|---|---|---|---|
+| Aplicação | `postgres` | `localhost` | `5432` | `gerenciador_musica` | `gerenciador` | `gerenciador` |
+| Testes | `postgres-test` | `localhost` | `5433` | `gerenciador_musica_test` | `postgres` | `postgres` |
 
 A estrutura do banco é criada e atualizada automaticamente pelo [Flyway](https://flywaydb.org/) a partir das migrations disponíveis em [`backend/src/main/resources/db/migration`](backend/src/main/resources/db/migration), executadas quando o backend é iniciado.
 
@@ -504,7 +501,7 @@ Registra os artistas seguidos pelos usuários.
 <details>
 <summary><h2><strong>🗺️ » Como executar</strong></h2></summary>
 
-**Pré-requisitos:** [Git](https://git-scm.com/) e [Docker Desktop](https://www.docker.com/products/docker-desktop/). Para execução local, também são necessários Java 21, Node.js e npm.
+**Pré-requisitos para executar toda a aplicação:** [Git](https://git-scm.com/) e [Docker Desktop](https://www.docker.com/products/docker-desktop/). Java 21, Node.js e npm só são necessários para executar o código ou os testes diretamente na máquina.
 
 <details>
 <summary><h3><strong>Clonar e iniciar com Docker</strong></h3></summary>
@@ -512,35 +509,40 @@ Registra os artistas seguidos pelos usuários.
 ```bash
 git clone https://github.com/projeto-gerenciador-musica/gerenciador-musica.git
 cd gerenciador-musica
-docker compose up -d --build
+docker compose up
 ```
 
-Serviços disponíveis após a inicialização:
+Esse único comando constrói as imagens quando necessário, cria os dois bancos, executa as migrations, gera uma chave JWT temporária para o ambiente local e inicia os serviços na ordem correta.
+
+Serviços disponíveis após a inicialização completa:
 
 - Frontend: `http://localhost:4200`
 - Backend: `http://localhost:8080`
-- PostgreSQL: `localhost:5432`
+- PostgreSQL da aplicação: `localhost:5432`
+- PostgreSQL de testes: `localhost:5433`
 
 | Ação                       | Comando                                 |
 | -------------------------- | --------------------------------------- |
 | Verificar containers       | `docker compose ps`                     |
 | Visualizar logs            | `docker compose logs -f`                |
+| Iniciar em segundo plano   | `docker compose up -d`                  |
+| Reconstruir tudo           | `docker compose up --build`             |
 | Reconstruir frontend       | `docker compose up -d --build frontend` |
 | Reconstruir backend        | `docker compose up -d --build backend`  |
 | Parar os serviços          | `docker compose stop`                   |
 | Parar e remover containers | `docker compose down`                   |
 
-> `docker compose down` mantém os dados do PostgreSQL. Utilize `docker compose down -v` somente quando desejar apagar também o volume do banco.
+> `docker compose down` mantém os dados dos bancos PostgreSQL. Utilize `docker compose down -v` somente quando desejar apagar também os volumes dos bancos principal e de testes.
 
 </details>
 
 <details>
 <summary><h3><strong>Executar localmente para desenvolvimento</strong></h3></summary>
 
-Inicie apenas o PostgreSQL com Docker:
+Inicie os bancos principal e de testes com Docker:
 
 ```bash
-docker compose up -d postgres
+docker compose up -d postgres postgres-test
 ```
 
 Em outro terminal, inicie o backend:
@@ -569,6 +571,8 @@ npm start
 
 <details>
 <summary><h3><strong>Executar os testes</strong></h3></summary>
+
+O banco `postgres-test` já é criado pelo `docker compose up`; não é necessário criar outro container manualmente. Com os serviços ativos, execute em outro terminal.
 
 Backend:
 
