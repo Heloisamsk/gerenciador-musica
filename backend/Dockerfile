@@ -21,10 +21,8 @@ WORKDIR /app
 RUN groupadd --system app \
     && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app
 
-COPY --from=build --chown=app:app /app/target/*.jar app.jar
-COPY --chown=app:app docker-entrypoint.sh /app/docker-entrypoint.sh
-
-RUN chmod 0555 /app/docker-entrypoint.sh
+COPY --from=build --chown=root:root --chmod=0444 /app/target/*.jar app.jar
+COPY --chown=root:root --chmod=0555 docker-entrypoint.sh /app/docker-entrypoint.sh
 
 EXPOSE 8080
 
