@@ -15,8 +15,7 @@ import type { ArtistaResponse } from '../../models/ArtistaResponse';
   selector: 'app-home',
   standalone: true,
   imports: [RouterLink],
-  templateUrl: './home.html',
-  styleUrl: './home.css'
+  templateUrl: './home.html'
 })
 export class Home implements OnInit {
 
