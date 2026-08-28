@@ -57,6 +57,21 @@ describe('Home', () => {
     expect(fixture.nativeElement.querySelector('.musica-card')).toBeNull();
   });
 
+  it('deve exibir a identidade Crotchet sem subtítulos decorativos', () => {
+    carregarCatalogo([]);
+
+    const marca = fixture.nativeElement.querySelector('.marca');
+    const iconesMenu = fixture.nativeElement.querySelectorAll(
+      '.menu-link .menu-nota'
+    );
+
+    expect(marca.textContent).toContain('Crotchet - Music Hub');
+    expect(marca.querySelector('svg')).not.toBeNull();
+    expect(iconesMenu.length).toBeGreaterThanOrEqual(5);
+    expect(fixture.nativeElement.querySelector('.hero-sobretitulo')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.secao-sobretitulo')).toBeNull();
+  });
+
   it('deve informar quando não for possível carregar os álbuns', () => {
     fixture.detectChanges();
 
