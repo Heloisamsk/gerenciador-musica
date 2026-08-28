@@ -22,9 +22,12 @@ RUN groupadd --system app \
     && useradd --system --gid app --home-dir /app --shell /usr/sbin/nologin app
 
 COPY --from=build --chown=app:app /app/target/*.jar app.jar
+COPY --chown=app:app docker-entrypoint.sh /app/docker-entrypoint.sh
+
+RUN chmod 0555 /app/docker-entrypoint.sh
 
 EXPOSE 8080
 
 USER app
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
