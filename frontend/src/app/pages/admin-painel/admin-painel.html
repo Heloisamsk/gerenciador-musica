@@ -11,7 +11,7 @@
       <p class="secao-label">Área administrativa</p>
       <h1>Painel</h1>
       <p class="painel-descricao">
-        Cadastre novos conteúdos e consulte os registros do sistema.
+        Cadastre conteúdos, consulte registros e gere relatórios do sistema.
       </p>
     </header>
 
@@ -173,6 +173,38 @@
           <span class="acao-conteudo">
             <strong>Listar álbuns</strong>
             <span>Consulte os álbuns e seus artistas responsáveis.</span>
+          </span>
+
+          <span class="acao-seta" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="grupo-acoes" aria-labelledby="titulo-relatorios">
+      <div class="grupo-cabecalho">
+        <h2 id="titulo-relatorios">Relatórios</h2>
+        <p>Visualize dados consolidados do catálogo musical.</p>
+      </div>
+
+      <div class="grade-acoes">
+        <a
+          class="acao-card"
+          routerLink="/admin/relatorios"
+        >
+          <span class="acao-icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M5 20V10" />
+              <path d="M12 20V4" />
+              <path d="M19 20v-7" />
+              <path d="M3 20h18" />
+            </svg>
+          </span>
+
+          <span class="acao-conteudo">
+            <strong>Visualizar relatórios</strong>
+            <span>
+              Consulte indicadores de artistas e álbuns ou exporte em CSV.
+            </span>
           </span>
 
           <span class="acao-seta" aria-hidden="true">→</span>

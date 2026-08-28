@@ -1,0 +1,220 @@
+<main class="relatorios-page">
+  <section class="relatorios-container" aria-labelledby="titulo-relatorios">
+    <a class="voltar-link" routerLink="/admin/painel"> ← Voltar para o painel </a>
+
+    <header class="relatorios-header">
+      <div>
+        <p class="section-label">Painel administrativo</p>
+        <h1 id="titulo-relatorios">Relatórios</h1>
+        <p>Consulte dados consolidados pelas Views do catálogo musical.</p>
+      </div>
+
+      <button
+        class="secondary-button"
+        type="button"
+        [disabled]="carregando()"
+        (click)="carregarRelatorio()"
+      >
+        @if (carregando()) {
+          Atualizando...
+        } @else {
+          Atualizar dados
+        }
+      </button>
+    </header>
+
+    @if (carregando()) {
+      <output class="state-card" aria-live="polite"> Gerando relatórios... </output>
+    } @else if (mensagemErro()) {
+      <div class="state-card error-card" role="alert">
+        <h2>Não foi possível gerar os relatórios</h2>
+        <p>{{ mensagemErro() }}</p>
+        <button class="primary-button" type="button" (click)="carregarRelatorio()">
+          Tentar novamente
+        </button>
+      </div>
+    } @else if (relatorio(); as dados) {
+      <section class="resumo" aria-labelledby="titulo-resumo">
+        <div class="resumo-heading">
+          <h2 id="titulo-resumo">Resumo do catálogo</h2>
+          <p>
+            Gerado em
+            <time [attr.datetime]="dados.geradoEm">
+              {{ dados.geradoEm | date: 'dd/MM/yyyy HH:mm' }}
+            </time>
+          </p>
+        </div>
+
+        <dl class="resumo-grid">
+          <div>
+            <dt>Artistas</dt>
+            <dd>{{ dados.resumo.totalArtistas }}</dd>
+          </div>
+          <div>
+            <dt>Álbuns</dt>
+            <dd>{{ dados.resumo.totalAlbuns }}</dd>
+          </div>
+          <div>
+            <dt>Músicas</dt>
+            <dd>{{ dados.resumo.totalMusicas }}</dd>
+          </div>
+          <div>
+            <dt>Participações</dt>
+            <dd>{{ dados.resumo.totalParticipacoes }}</dd>
+          </div>
+          <div class="duracao-card">
+            <dt>Duração do catálogo</dt>
+            <dd>{{ formatarDuracao(dados.resumo.duracaoTotalSegundos) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="dados-relatorio" aria-labelledby="titulo-dados">
+        <div class="dados-heading">
+          <div>
+            <h2 id="titulo-dados">Dados detalhados</h2>
+            <p>Selecione a visão que deseja consultar ou exportar.</p>
+          </div>
+
+          <div class="abas" role="tablist" aria-label="Tipos de relatório">
+            <button
+              id="aba-artistas"
+              type="button"
+              role="tab"
+              [class.ativa]="abaAtiva() === 'ARTISTAS'"
+              [attr.aria-selected]="abaAtiva() === 'ARTISTAS'"
+              aria-controls="painel-artistas"
+              (click)="selecionarAba('ARTISTAS')"
+            >
+              Artistas
+            </button>
+            <button
+              id="aba-albuns"
+              type="button"
+              role="tab"
+              [class.ativa]="abaAtiva() === 'ALBUNS'"
+              [attr.aria-selected]="abaAtiva() === 'ALBUNS'"
+              aria-controls="painel-albuns"
+              (click)="selecionarAba('ALBUNS')"
+            >
+              Álbuns
+            </button>
+          </div>
+        </div>
+
+        <div class="ferramentas">
+          <label for="busca-relatorio">
+            Buscar no relatório
+            <input
+              id="busca-relatorio"
+              type="search"
+              [placeholder]="
+                abaAtiva() === 'ARTISTAS' ? 'Nome do artista' : 'Álbum, artista ou ano'
+              "
+              [value]="termoBusca()"
+              (input)="atualizarBusca($event)"
+            />
+          </label>
+
+          <button
+            class="primary-button"
+            type="button"
+            [disabled]="exportando() !== null"
+            [attr.aria-busy]="exportando() === abaAtiva()"
+            (click)="exportarCsv(abaAtiva())"
+          >
+            @if (exportando() === abaAtiva()) {
+              Exportando...
+            } @else {
+              Exportar CSV
+            }
+          </button>
+        </div>
+
+        @if (mensagemErroExportacao()) {
+          <div class="export-error" role="alert">
+            {{ mensagemErroExportacao() }}
+          </div>
+        }
+
+        @if (abaAtiva() === 'ARTISTAS') {
+          <div
+            id="painel-artistas"
+            class="table-container"
+            role="tabpanel"
+            aria-labelledby="aba-artistas"
+          >
+            <table>
+              <caption>
+                Relatório consolidado por artista
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Artista</th>
+                  <th scope="col">Álbuns</th>
+                  <th scope="col">Músicas</th>
+                  <th scope="col">Participações</th>
+                  <th scope="col">Duração</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (artista of artistasFiltrados(); track artista.idArtista) {
+                  <tr>
+                    <th scope="row" data-label="Artista">{{ artista.nome }}</th>
+                    <td data-label="Álbuns">{{ artista.totalAlbuns }}</td>
+                    <td data-label="Músicas">{{ artista.totalMusicasPrincipais }}</td>
+                    <td data-label="Participações">{{ artista.totalParticipacoes }}</td>
+                    <td data-label="Duração">
+                      {{ formatarDuracao(artista.duracaoTotalSegundos) }}
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="5" class="empty-row">Nenhum artista encontrado.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div
+            id="painel-albuns"
+            class="table-container"
+            role="tabpanel"
+            aria-labelledby="aba-albuns"
+          >
+            <table>
+              <caption>
+                Relatório consolidado por álbum
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Álbum</th>
+                  <th scope="col">Artista</th>
+                  <th scope="col">Ano</th>
+                  <th scope="col">Músicas</th>
+                  <th scope="col">Duração</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (album of albunsFiltrados(); track album.idAlbum) {
+                  <tr>
+                    <th scope="row" data-label="Álbum">{{ album.titulo }}</th>
+                    <td data-label="Artista">{{ album.nomeArtista }}</td>
+                    <td data-label="Ano">{{ album.anoLancamento }}</td>
+                    <td data-label="Músicas">{{ album.totalMusicas }}</td>
+                    <td data-label="Duração">{{ formatarDuracao(album.duracaoTotalSegundos) }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="5" class="empty-row">Nenhum álbum encontrado.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+  </section>
+</main>

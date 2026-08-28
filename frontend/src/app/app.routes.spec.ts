@@ -58,6 +58,19 @@ describe('rotas administrativas de músicas', () => {
   }
 });
 
+describe('rota administrativa de relatórios', () => {
+  it('deve carregar a página e exigir perfil ADMIN', () => {
+    const rota = routes.find(
+      item => item.path === 'admin/relatorios'
+    );
+
+    expect(rota).toBeDefined();
+    expect(rota?.loadComponent).toBeDefined();
+    expect(rota?.canActivate).toContain(authGuard);
+    expect(rota?.data?.['expectedRole']).toBe('ADMIN');
+  });
+});
+
 describe('rota de detalhes do artista', () => {
   it('deve carregar a página e exigir autenticação', () => {
     const rota = routes.find(
