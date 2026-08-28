@@ -14,6 +14,7 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,8 +24,8 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /*
- * Teste de INTEGRAÇÃO: usa o Postgres real do docker-compose (o mesmo banco de
- * desenvolvimento, com dados reais já cadastrados), não um banco em memória isolado.
+ * Teste de INTEGRAÇÃO: usa o Postgres de testes do docker-compose, não um banco
+ * em memória nem o banco principal de desenvolvimento.
  * Por isso cada consulta é restrita aos IDs criados neste teste (ver porIdsCriados),
  * senão os asserts de contagem quebrariam com os dados que já existem no banco.
  * Cada teste roda dentro de uma transação revertida ao final (padrão do @DataJpaTest),
@@ -32,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 class MusicaRepositorySpecificationTest {
 
     @Autowired
