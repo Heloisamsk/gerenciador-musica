@@ -1,33 +1,222 @@
 <main class="perfil-page">
-  <div class="perfil-card">
+  <nav class="perfil-nav" aria-label="Navegação do perfil">
     <a class="voltar-link" routerLink="/home">
-      &larr; Voltar para a Home
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+      Voltar para a Home
     </a>
+    <a class="marca" routerLink="/home" aria-label="Crotchet - Music Hub">
+      <img src="/crotchet.svg" alt="">
+      <span>Crotchet <small>Music Hub</small></span>
+    </a>
+  </nav>
 
-    <header class="perfil-header">
-      <img class="foto-perfil" src="/avatar-padrao.png" alt="Foto do usuário">
-      <div class="identidade-perfil">
-        <span class="section-label">Perfil</span>
-        <h1>{{ nome() }}</h1>
-        <p class="email-perfil">{{ email() }}</p>
-
-        <div class="badges">
-          <span class="role-badge" [class.role-admin]="role() === 'ADMIN'" [class.role-user]="role() === 'USER'">
-            {{ role() === 'ADMIN' ? 'Administrador' : 'Usuário' }}
-          </span>
+  @if (carregando()) {
+    <section class="estado estado--carregando" aria-live="polite">
+      <span></span><p>Preparando seu perfil musical...</p>
+    </section>
+  } @else if (!perfil()) {
+    <section class="estado estado--erro" role="alert">
+      <h1>Não foi possível abrir o perfil</h1>
+      <p>{{ mensagemErro() }}</p>
+      <a routerLink="/home">Voltar para a Home</a>
+    </section>
+  } @else {
+    <article class="perfil-shell">
+      <header class="perfil-cabecalho">
+        <div class="banner" [class.banner--vazio]="!perfil()!.bannerUrl">
+          @if (perfil()!.bannerUrl) {
+            <img [src]="perfil()!.bannerUrl" alt="Banner escolhido para o perfil"
+              (error)="corrigirImagem($event, '/capa-padrao.png')">
+          }
+          <span class="banner-nota" aria-hidden="true">♪</span>
         </div>
-      </div>
-    </header>
 
-    <section class="perfil-acoes">
-      <a class="acao-link" routerLink="/playlists">
-        Ver Minhas Playlists
-      </a>
-      @if (role() === 'ADMIN') {
-        <a class="acao-link admin-link" routerLink="/admin/painel">
-          Acessar Painel Administrativo
-        </a>
+        <div class="identidade">
+          <img class="foto-perfil" [src]="perfil()!.fotoUrl || '/avatar-padrao.png'"
+            [alt]="'Foto de perfil de ' + perfil()!.nome"
+            (error)="corrigirImagem($event, '/avatar-padrao.png')">
+          <div class="identidade-texto">
+            <span class="tipo-perfil">Perfil musical</span>
+            <h1>{{ perfil()!.nome }}</h1>
+            @if (perfil()!.username) { <p class="username">&#64;{{ perfil()!.username }}</p> }
+            @if (perfil()!.fraseDestaque) { <p class="frase">{{ perfil()!.fraseDestaque }}</p> }
+          </div>
+          <button class="botao botao--editar" type="button" (click)="abrirEdicao()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+            </svg>
+            Editar perfil
+          </button>
+        </div>
+      </header>
+
+      @if (mensagemSucesso()) {
+        <p class="feedback feedback--sucesso" role="status">{{ mensagemSucesso() }}</p>
       }
+
+      <div class="perfil-conteudo">
+        <section class="destaque-area" aria-labelledby="titulo-destaque">
+          <div class="secao-cabecalho"><div><span>Escolha da semana</span><h2 id="titulo-destaque">Em destaque</h2></div></div>
+          @if (destaquePrincipal(); as destaque) {
+            <a class="destaque-card" [routerLink]="rotaItem(destaque)">
+              <div class="destaque-imagem">
+                <img [src]="destaque.imagemUrl || imagemAlternativa(destaque.tipo)"
+                  [alt]="'Capa de ' + destaque.titulo"
+                  (error)="corrigirImagem($event, imagemAlternativa(destaque.tipo))">
+                <span class="nota-card" aria-hidden="true">♪</span>
+              </div>
+              <span class="item-tipo">{{ rotuloTipo(destaque.tipo) }}</span>
+              <strong>{{ destaque.titulo }}</strong>
+              <small>{{ destaque.subtitulo }}</small>
+              <span class="abrir-item">Abrir no catálogo
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              </span>
+            </a>
+          } @else {
+            <button class="destaque-vazio" type="button" (click)="abrirEdicao()">
+              <span class="nota-vazia" aria-hidden="true">♪</span>
+              <strong>Escolha seu primeiro destaque</strong>
+              <small>Adicione um artista, uma música ou um álbum ao perfil.</small>
+            </button>
+          }
+        </section>
+
+        <section class="curadoria-area" aria-labelledby="titulo-curadoria">
+          <div class="secao-cabecalho secao-cabecalho--curadoria">
+            <div><span>Seleção pessoal</span><h2 id="titulo-curadoria">Favoritos no perfil</h2></div>
+            <span class="contador">{{ favoritos().length }}/3</span>
+          </div>
+          <div class="favoritos-lista">
+            @for (item of favoritosSecundarios(); track item.tipo) {
+              <a class="favorito-card" [routerLink]="rotaItem(item)">
+                <img [src]="item.imagemUrl || imagemAlternativa(item.tipo)" [alt]="'Capa de ' + item.titulo"
+                  (error)="corrigirImagem($event, imagemAlternativa(item.tipo))">
+                <span class="favorito-texto">
+                  <small>{{ rotuloTipo(item.tipo) }}</small><strong>{{ item.titulo }}</strong><span>{{ item.subtitulo }}</span>
+                </span>
+                <svg class="seta" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              </a>
+            }
+            @if (favoritosSecundarios().length === 0) {
+              <button class="favorito-vazio" type="button" (click)="abrirEdicao()">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                <span><strong>Complete sua seleção</strong><small>Mostre mais do que define seu gosto musical.</small></span>
+              </button>
+            }
+          </div>
+          <div class="sobre">
+            <h3>Sobre</h3>
+            <p>{{ perfil()!.biografia || 'Este perfil ainda não adicionou uma biografia.' }}</p>
+          </div>
+          <nav class="atalhos" aria-label="Atalhos do perfil">
+            <a routerLink="/playlists">Minhas playlists</a>
+            @if (perfil()!.role === 'ADMIN') { <a routerLink="/admin/painel">Painel administrativo</a> }
+          </nav>
+        </section>
+      </div>
+    </article>
+  }
+</main>
+
+@if (editando()) {
+  <div class="editor-fundo" (click)="fecharEdicao()">
+    <section class="editor" role="dialog" aria-modal="true" aria-labelledby="titulo-editor"
+      (click)="$event.stopPropagation()">
+      <header class="editor-cabecalho">
+        <div><span>Curadoria do perfil</span><h2 id="titulo-editor">Editar perfil</h2></div>
+        <button type="button" aria-label="Fechar edição" (click)="fecharEdicao()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+        </button>
+      </header>
+
+      <form [formGroup]="formulario" (ngSubmit)="salvar()">
+        <fieldset>
+          <legend>Identidade</legend>
+          <div class="campos-duplos">
+            <label>Nome público
+              <input formControlName="nome" autocomplete="name">
+              @if (formulario.controls.nome.touched && formulario.controls.nome.invalid) {
+                <small class="campo-erro">Informe um nome público.</small>
+              }
+            </label>
+            <label>Username
+              <span class="campo-prefixo"><span>&#64;</span><input formControlName="username" autocomplete="username" placeholder="seu.nome"></span>
+              @if (formulario.controls.username.touched && formulario.controls.username.invalid) {
+                <small class="campo-erro">Use de 3 a 30 letras, números, ponto ou underline.</small>
+              }
+            </label>
+          </div>
+          <label>Frase de destaque
+            <input formControlName="fraseDestaque" maxlength="160" placeholder="Uma frase que combine com seu momento musical">
+          </label>
+          <label>Biografia
+            <textarea formControlName="biografia" rows="3" maxlength="800" placeholder="Conte um pouco sobre o seu gosto musical"></textarea>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Imagens por link</legend>
+          <label>Link da foto de perfil
+            <input formControlName="fotoUrl" type="url" inputmode="url" placeholder="https://exemplo.com/minha-foto.jpg">
+            @if (formulario.controls.fotoUrl.touched && formulario.controls.fotoUrl.invalid) {
+              <small class="campo-erro">Informe um link iniciado por http:// ou https://.</small>
+            }
+          </label>
+          <label>Link do banner
+            <input formControlName="bannerUrl" type="url" inputmode="url" placeholder="https://exemplo.com/meu-banner.jpg">
+            @if (formulario.controls.bannerUrl.touched && formulario.controls.bannerUrl.invalid) {
+              <small class="campo-erro">Informe um link iniciado por http:// ou https://.</small>
+            }
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Favoritos exibidos</legend>
+          <p class="ajuda-formulario">Escolha até um item de cada categoria. O principal aparece em tamanho maior.</p>
+          @if (catalogoCarregando()) {
+            <p class="catalogo-carregando" aria-live="polite">Carregando catálogo...</p>
+          } @else {
+            <div class="campos-duplos campos-duplos--favoritos">
+              <label>Artista
+                <select formControlName="idArtistaDestaque">
+                  <option [ngValue]="null">Nenhum artista</option>
+                  @for (artista of artistas(); track artista.idArtista) { <option [ngValue]="artista.idArtista">{{ artista.nome }}</option> }
+                </select>
+              </label>
+              <label>Música
+                <select formControlName="idMusicaDestaque">
+                  <option [ngValue]="null">Nenhuma música</option>
+                  @for (musica of musicas(); track musica.id) {
+                    <option [ngValue]="musica.id">{{ musica.titulo }} — {{ musica.artistaPrincipal.nome }}</option>
+                  }
+                </select>
+              </label>
+              <label>Álbum
+                <select formControlName="idAlbumDestaque">
+                  <option [ngValue]="null">Nenhum álbum</option>
+                  @for (album of albuns(); track album.idAlbum) {
+                    <option [ngValue]="album.idAlbum">{{ album.titulo }} — {{ album.artista.nome }}</option>
+                  }
+                </select>
+              </label>
+              <label>Destaque principal
+                <select formControlName="tipoDestaquePrincipal">
+                  <option [ngValue]="null">Escolher automaticamente</option>
+                  <option value="ARTISTA">Artista</option><option value="MUSICA">Música</option><option value="ALBUM">Álbum</option>
+                </select>
+              </label>
+            </div>
+          }
+        </fieldset>
+
+        @if (mensagemErro()) { <p class="feedback feedback--erro" role="alert">{{ mensagemErro() }}</p> }
+        <footer class="editor-acoes">
+          <button class="botao botao--secundario" type="button" (click)="fecharEdicao()">Cancelar</button>
+          <button class="botao botao--salvar" type="submit" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando...' : 'Salvar perfil' }}
+          </button>
+        </footer>
+      </form>
     </section>
   </div>
-</main>
+}
