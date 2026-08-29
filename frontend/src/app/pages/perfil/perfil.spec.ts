@@ -111,6 +111,19 @@ describe('Perfil', () => {
       .toBe('https://exemplo.com/foto.jpg');
   });
 
+  it('deve fechar o editor pela tecla Escape', () => {
+    component.abrirEdicao();
+    fixture.detectChanges();
+
+    const editor = fixture.nativeElement.querySelector('.editor');
+    editor.dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'Escape',
+      bubbles: true
+    }));
+
+    expect(component.editando()).toBe(false);
+  });
+
   it('deve impedir link de imagem sem protocolo http', () => {
     component.formulario.controls.fotoUrl.setValue('exemplo.com/foto.jpg');
     expect(component.formulario.controls.fotoUrl.hasError('urlHttp')).toBe(true);

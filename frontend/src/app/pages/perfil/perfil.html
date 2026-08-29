@@ -119,9 +119,9 @@
 </main>
 
 @if (editando()) {
-  <div class="editor-fundo" (click)="fecharEdicao()">
+  <div class="editor-fundo">
     <section class="editor" role="dialog" aria-modal="true" aria-labelledby="titulo-editor"
-      (click)="$event.stopPropagation()">
+      (keydown.escape)="fecharEdicao()">
       <header class="editor-cabecalho">
         <div><span>Curadoria do perfil</span><h2 id="titulo-editor">Editar perfil</h2></div>
         <button type="button" aria-label="Fechar edição" (click)="fecharEdicao()">
