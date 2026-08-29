@@ -70,15 +70,6 @@
       <a routerLink="/playlists/nova">Começar agora</a>
     </div>
 
-    <div class="sidebar-rodape">
-      <a class="perfil-resumo" routerLink="/perfil">
-        <img class="perfil-foto" src="/avatar-padrao.png" alt="Foto do perfil">
-        <span><small>Minha conta</small><strong>{{ nomeUsuario() }}</strong></span>
-      </a>
-      <button type="button" class="botao-sair" aria-label="Sair da conta" title="Sair" (click)="logout()">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10"></path></svg>
-      </button>
-    </div>
   </aside>
 
   <main class="conteudo">
@@ -88,9 +79,17 @@
         <input class="campo-busca" type="search" name="termoBusca" placeholder="Busque por uma música" aria-label="Buscar músicas" autocomplete="off" (input)="atualizarBusca($event)">
         <button type="submit" class="busca-botao">Buscar</button>
       </form>
-      <a class="topo-perfil" routerLink="/perfil" aria-label="Abrir meu perfil">
-        <img src="/avatar-padrao.png" alt=""><span>{{ nomeUsuario() }}</span>
-      </a>
+      <div class="topo-conta">
+        <a class="topo-perfil" routerLink="/perfil" aria-label="Abrir meu perfil">
+          <img [src]="fotoPerfil()" alt="" referrerpolicy="no-referrer"
+            (error)="substituirImagem($event, '/avatar-padrao.png')">
+          <span>{{ nomeUsuario() }}</span>
+        </a>
+        <button type="button" class="topo-sair" aria-label="Sair da conta"
+          title="Sair" (click)="logout()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10"></path></svg>
+        </button>
+      </div>
     </header>
 
     <section class="hero" aria-labelledby="titulo-home">
@@ -105,7 +104,7 @@
 
       <div class="hero-visual" aria-hidden="true">
         <div class="hero-sol"></div><div class="hero-disco"></div>
-        @if (albuns()[0]; as albumDestaque) {
+        @if (albumDestaque(); as albumDestaque) {
           <a class="hero-album" [routerLink]="['/albuns', albumDestaque.idAlbum]" tabindex="-1">
             <img [src]="albumDestaque.capaUrl || '/capa-padrao.png'" [alt]="'Capa do álbum ' + albumDestaque.titulo" referrerpolicy="no-referrer" (error)="substituirImagem($event, '/capa-padrao.png')">
             <span class="hero-play"><svg viewBox="0 0 24 24"><path d="m9 7 8 5-8 5z"></path></svg></span>
