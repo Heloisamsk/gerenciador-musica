@@ -81,7 +81,7 @@
 }
 .foto-perfil { width: 178px; height: 178px; margin-top: -66px; object-fit: cover; background: var(--panel-raised); border: 6px solid var(--panel); border-radius: 50%; box-shadow: 0 16px 35px #0009; }
 .identidade-texto { min-width: 0; padding-top: 18px; }
-.tipo-perfil, .secao-cabecalho > div > span, .editor-cabecalho span, .item-tipo {
+.secao-cabecalho > div > span, .editor-cabecalho span, .item-tipo {
   color: var(--golden-sand);
   font-family: Consolas, monospace;
   font-size: .65rem;
@@ -177,6 +177,9 @@
 .campo-erro { color: var(--apricot-cream); font-weight: 500; }
 .ajuda-formulario { margin: -5px 0 0; color: var(--muted); font-size: .75rem; line-height: 1.5; }
 .catalogo-carregando { margin: 0; padding: 18px; color: var(--cool-steel); background: var(--panel); text-align: center; }
+.seletor-musica { display: grid; gap: 8px; }
+.busca-musica { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.resultado-musicas { display: flex; gap: 12px; }
 .editor-acoes { display: flex; justify-content: flex-end; gap: 10px; padding-top: 22px; }
 .botao--secundario { color: var(--text); background: transparent; border-color: #9cafb76a; }
 .botao--salvar { color: var(--black); background: var(--apricot-cream); }

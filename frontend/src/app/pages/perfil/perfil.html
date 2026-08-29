@@ -5,7 +5,7 @@
       Voltar para a Home
     </a>
     <a class="marca" routerLink="/home" aria-label="Crotchet - Music Hub">
-      <img src="/crotchet.svg" alt="">
+      <img src="/favicon.svg" alt="">
       <span>Crotchet <small>Music Hub</small></span>
     </a>
   </nav>
@@ -27,8 +27,9 @@
           @if (perfil()!.bannerUrl) {
             <img [src]="perfil()!.bannerUrl" alt="Banner escolhido para o perfil"
               (error)="corrigirImagem($event, '/capa-padrao.png')">
+          } @else {
+            <span class="banner-nota" aria-hidden="true">♪</span>
           }
-          <span class="banner-nota" aria-hidden="true">♪</span>
         </div>
 
         <div class="identidade">
@@ -36,7 +37,6 @@
             [alt]="'Foto de perfil de ' + perfil()!.nome"
             (error)="corrigirImagem($event, '/avatar-padrao.png')">
           <div class="identidade-texto">
-            <span class="tipo-perfil">Perfil musical</span>
             <h1>{{ perfil()!.nome }}</h1>
             @if (perfil()!.username) { <p class="username">&#64;{{ perfil()!.username }}</p> }
             @if (perfil()!.fraseDestaque) { <p class="frase">{{ perfil()!.fraseDestaque }}</p> }
@@ -183,14 +183,6 @@
                   @for (artista of artistas(); track artista.idArtista) { <option [ngValue]="artista.idArtista">{{ artista.nome }}</option> }
                 </select>
               </label>
-              <label>Música
-                <select formControlName="idMusicaDestaque">
-                  <option [ngValue]="null">Nenhuma música</option>
-                  @for (musica of musicas(); track musica.id) {
-                    <option [ngValue]="musica.id">{{ musica.titulo }} — {{ musica.artistaPrincipal.nome }}</option>
-                  }
-                </select>
-              </label>
               <label>Álbum
                 <select formControlName="idAlbumDestaque">
                   <option [ngValue]="null">Nenhum álbum</option>
@@ -207,6 +199,42 @@
               </label>
             </div>
           }
+
+          <div class="seletor-musica">
+            <label for="busca-musica">Música</label>
+            <div class="busca-musica">
+              <input id="busca-musica" type="search" autocomplete="off"
+                placeholder="Busque pelo título da música"
+                [value]="buscaMusica()"
+                (input)="atualizarBuscaMusica($event)"
+                (keydown.enter)="$event.preventDefault(); pesquisarMusicas()">
+              <button class="botao botao--salvar" type="button" (click)="pesquisarMusicas()"
+                [disabled]="musicasCarregando()">Pesquisar</button>
+            </div>
+
+            <select formControlName="idMusicaDestaque" aria-label="Música favorita"
+              [attr.aria-busy]="musicasCarregando()">
+              <option [ngValue]="null">Nenhuma música</option>
+              @for (musica of musicas(); track musica.id) {
+                <option [ngValue]="musica.id">{{ musica.titulo }} — {{ musica.artistaPrincipal.nome }}</option>
+              }
+            </select>
+
+            <div class="resultado-musicas" aria-live="polite">
+              @if (musicasCarregando()) {
+                <small>Carregando músicas...</small>
+              } @else if (mensagemErroMusicas()) {
+                <small class="campo-erro">{{ mensagemErroMusicas() }}</small>
+              } @else {
+                <small>{{ totalMusicas() }} música(s) encontrada(s)</small>
+              }
+
+              @if (podeCarregarMaisMusicas()) {
+                <button class="botao botao--secundario" type="button" (click)="carregarMaisMusicas()"
+                  [disabled]="musicasCarregando()">Carregar mais</button>
+              }
+            </div>
+          </div>
         </fieldset>
 
         @if (mensagemErro()) { <p class="feedback feedback--erro" role="alert">{{ mensagemErro() }}</p> }

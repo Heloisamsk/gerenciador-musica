@@ -3,8 +3,11 @@ import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
 
+import type { MusicaListagem } from '../../models/MusicaListagem';
+import type { PaginaResponse } from '../../models/PaginaResponse';
 import type { PerfilResponse } from '../../models/Perfil';
 import { CatalogoService } from '../../services/catalogo';
+import { MusicaService } from '../../services/musica';
 import { PerfilService } from '../../services/perfil';
 import { Perfil } from './perfil';
 
@@ -14,6 +17,10 @@ describe('Perfil', () => {
   let perfilServiceMock: {
     obter: ReturnType<typeof vi.fn>;
     atualizar: ReturnType<typeof vi.fn>;
+  };
+  let musicaServiceMock: {
+    pesquisar: ReturnType<typeof vi.fn>;
+    buscarPorId: ReturnType<typeof vi.fn>;
   };
 
   const perfil: PerfilResponse = {
@@ -43,10 +50,13 @@ describe('Perfil', () => {
       obter: vi.fn().mockReturnValue(of(perfil)),
       atualizar: vi.fn().mockReturnValue(of({ ...perfil, nome: 'Ana' }))
     };
+    musicaServiceMock = {
+      pesquisar: vi.fn().mockReturnValue(of(paginaMusicas([]))),
+      buscarPorId: vi.fn().mockReturnValue(of(musicaFavorita()))
+    };
 
     const catalogoServiceMock = {
       listarArtistas: vi.fn().mockReturnValue(of([])),
-      listarMusicas: vi.fn().mockReturnValue(of([])),
       listarAlbuns: vi.fn().mockReturnValue(of([]))
     };
 
@@ -55,7 +65,8 @@ describe('Perfil', () => {
       providers: [
         provideRouter([]),
         { provide: PerfilService, useValue: perfilServiceMock },
-        { provide: CatalogoService, useValue: catalogoServiceMock }
+        { provide: CatalogoService, useValue: catalogoServiceMock },
+        { provide: MusicaService, useValue: musicaServiceMock }
       ]
     }).compileComponents();
 
@@ -69,6 +80,21 @@ describe('Perfil', () => {
   it('deve exibir o nome sem revelar o email', () => {
     expect(fixture.nativeElement.textContent).toContain('Ana Liz Novaes');
     expect(fixture.nativeElement.textContent).not.toContain('@example');
+  });
+
+  it('deve usar o ícone existente e ocultar rótulo e nota quando há banner', () => {
+    const marca = fixture.nativeElement.querySelector('.marca img');
+
+    expect(marca.getAttribute('src')).toBe('/favicon.svg');
+    expect(fixture.nativeElement.querySelector('.tipo-perfil')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.banner-nota')).toBeNull();
+  });
+
+  it('deve mostrar a nota do banner somente quando não há imagem escolhida', () => {
+    component.perfil.set({ ...perfil, bannerUrl: null });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.banner-nota')).not.toBeNull();
   });
 
   it('deve colocar a escolha principal no cartão de destaque', () => {
@@ -88,6 +114,42 @@ describe('Perfil', () => {
   it('deve impedir link de imagem sem protocolo http', () => {
     component.formulario.controls.fotoUrl.setValue('exemplo.com/foto.jpg');
     expect(component.formulario.controls.fotoUrl.hasError('urlHttp')).toBe(true);
+  });
+
+  it('deve pesquisar músicas no backend e carregar as próximas páginas', () => {
+    const primeira = musicaFavorita();
+    const segunda = { ...musicaFavorita(), id: 11, titulo: 'Love of My Life' };
+
+    musicaServiceMock.pesquisar
+      .mockReturnValueOnce(of(paginaMusicas([primeira], 0, 2, 2)))
+      .mockReturnValueOnce(of(paginaMusicas([segunda], 0, 2, 2)))
+      .mockReturnValueOnce(of(paginaMusicas([
+        { ...musicaFavorita(), id: 12, titulo: 'Somebody to Love' }
+      ], 1, 2, 2)));
+
+    component.abrirEdicao();
+    component.atualizarBuscaMusica({
+      currentTarget: { value: 'Love' }
+    } as unknown as Event);
+    component.pesquisarMusicas();
+    component.carregarMaisMusicas();
+
+    expect(musicaServiceMock.pesquisar).toHaveBeenNthCalledWith(
+      2,
+      { titulo: 'Love' },
+      0,
+      25,
+      'titulo,asc'
+    );
+    expect(musicaServiceMock.pesquisar).toHaveBeenNthCalledWith(
+      3,
+      { titulo: 'Love' },
+      1,
+      25,
+      'titulo,asc'
+    );
+    expect(component.musicas().map(musica => musica.id))
+      .toEqual([10, 11, 12]);
   });
 
   it('deve salvar o perfil sem enviar strings opcionais vazias', () => {
@@ -115,4 +177,32 @@ describe('Perfil', () => {
     );
     expect(component.editando()).toBe(false);
   });
+
+  function musicaFavorita(): MusicaListagem {
+    return {
+      id: 10,
+      titulo: 'Por Supuesto',
+      duracaoSegundos: 180,
+      anoLancamento: 2021,
+      artistaPrincipal: { id: 5, nome: 'Marina Sena' },
+      album: null,
+      artistasParticipantes: [],
+      generos: []
+    };
+  }
+
+  function paginaMusicas(
+    itens: MusicaListagem[],
+    paginaAtual = 0,
+    totalPaginas = 1,
+    totalItens = itens.length
+  ): PaginaResponse<MusicaListagem> {
+    return {
+      itens,
+      paginaAtual,
+      tamanhoPagina: 25,
+      totalItens,
+      totalPaginas
+    };
+  }
 });
