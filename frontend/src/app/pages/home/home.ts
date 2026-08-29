@@ -161,7 +161,9 @@ export class Home implements OnInit {
   ): AlbumResponse | null {
     if (albuns.length === 0) return null;
 
-    const indice = Math.floor(Math.random() * albuns.length);
+    const valorAleatorio = new Uint32Array(1);
+    globalThis.crypto.getRandomValues(valorAleatorio);
+    const indice = valorAleatorio[0] % albuns.length;
     return albuns[indice];
   }
 

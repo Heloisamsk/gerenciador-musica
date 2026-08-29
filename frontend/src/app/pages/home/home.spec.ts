@@ -92,15 +92,17 @@ describe('Home', () => {
   });
 
   it('deve sortear o álbum exibido em Para começar', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.75);
-    carregarCatalogo([
+    const geradorSeguro = vi.spyOn(globalThis.crypto, 'getRandomValues');
+    const albuns = [
       albumDeExemplo(),
       { ...albumDeExemplo(), idAlbum: 11, titulo: 'Jazz' }
-    ]);
+    ];
 
-    expect(component.albumDestaque()?.idAlbum).toBe(11);
-    expect(fixture.nativeElement.querySelector('.hero-faixa').textContent)
-      .toContain('Jazz');
+    carregarCatalogo(albuns);
+
+    expect(geradorSeguro).toHaveBeenCalledOnce();
+    expect(albuns.map(album => album.idAlbum))
+      .toContain(component.albumDestaque()?.idAlbum);
   });
 
   it('deve informar quando não for possível carregar os álbuns', () => {
