@@ -31,6 +31,22 @@ public class Perfil {
     @Column(name = "frase_destaque", length = 500)
     private String fraseDestaque;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_artista_destaque")
+    private Artista artistaDestaque;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_musica_destaque")
+    private Musica musicaDestaque;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_album_destaque")
+    private Album albumDestaque;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_destaque_principal", length = 20)
+    private TipoDestaquePerfil tipoDestaquePrincipal;
+
     protected Perfil() {
     }
 
@@ -84,5 +100,39 @@ public class Perfil {
 
     public void setFraseDestaque(String fraseDestaque) {
         this.fraseDestaque = fraseDestaque;
+    }
+
+    public Artista getArtistaDestaque() {
+        return artistaDestaque;
+    }
+
+    public void setArtistaDestaque(Artista artistaDestaque) {
+        this.artistaDestaque = artistaDestaque;
+    }
+
+    public Musica getMusicaDestaque() {
+        return musicaDestaque;
+    }
+
+    public void setMusicaDestaque(Musica musicaDestaque) {
+        this.musicaDestaque = musicaDestaque;
+    }
+
+    public Album getAlbumDestaque() {
+        return albumDestaque;
+    }
+
+    public void setAlbumDestaque(Album albumDestaque) {
+        this.albumDestaque = albumDestaque;
+    }
+
+    public TipoDestaquePerfil getTipoDestaquePrincipal() {
+        return tipoDestaquePrincipal;
+    }
+
+    public void setTipoDestaquePrincipal(
+            TipoDestaquePerfil tipoDestaquePrincipal
+    ) {
+        this.tipoDestaquePrincipal = tipoDestaquePrincipal;
     }
 }

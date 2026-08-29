@@ -203,6 +203,7 @@ CREATE TABLE perfil (
     id_artista_destaque BIGINT,
     id_album_destaque BIGINT,
     id_musica_destaque BIGINT,
+    tipo_destaque_principal VARCHAR(20),
 
     CONSTRAINT pk_perfil
         PRIMARY KEY (id_perfil),
@@ -228,7 +229,13 @@ CREATE TABLE perfil (
     CONSTRAINT fk_perfil_musica_destaque
         FOREIGN KEY (id_musica_destaque)
         REFERENCES musica (id_musica)
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+
+    CONSTRAINT ck_perfil_tipo_destaque_principal
+        CHECK (
+            tipo_destaque_principal IS NULL
+            OR tipo_destaque_principal IN ('ARTISTA', 'MUSICA', 'ALBUM')
+        )
 );
 
 CREATE INDEX idx_perfil_artista_destaque

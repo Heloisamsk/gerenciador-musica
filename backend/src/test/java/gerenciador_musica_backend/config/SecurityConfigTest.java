@@ -3,6 +3,7 @@ package gerenciador_musica_backend.config;
 import gerenciador_musica_backend.controller.AcessoController;
 import gerenciador_musica_backend.repository.UsuarioRepository;
 import gerenciador_musica_backend.service.JwtService;
+import gerenciador_musica_backend.service.PerfilService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -35,6 +36,9 @@ class SecurityConfigTest {
 
     @MockitoBean
     private UsuarioRepository usuarioRepository;
+
+    @MockitoBean
+    private PerfilService perfilService;
 
     @Test
     void deveRetornar401SemAutenticacaoNaRotaAdmin()
