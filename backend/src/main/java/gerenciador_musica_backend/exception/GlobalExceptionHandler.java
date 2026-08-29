@@ -25,6 +25,19 @@ public class GlobalExceptionHandler {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(DadosPerfilInvalidosException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarDadosPerfilInvalidos(
+            DadosPerfilInvalidosException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
     /*
      * 400 - Dados da música inválidos segundo
      * as regras de negócio do MusicaService.
