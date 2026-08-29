@@ -8,6 +8,7 @@ import { finalize } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
 import { CatalogoService } from '../../services/catalogo';
+import { PerfilService } from '../../services/perfil';
 import type { AlbumResponse } from '../../models/AlbumResponse';
 import type { ArtistaResponse } from '../../models/ArtistaResponse';
 
@@ -20,10 +21,12 @@ import type { ArtistaResponse } from '../../models/ArtistaResponse';
 export class Home implements OnInit {
 
   nomeUsuario = signal('Usuário');
+  fotoPerfil = signal('/avatar-padrao.png');
   termoBusca = signal('');
 
   artistas = signal<ArtistaResponse[]>([]);
   albuns = signal<AlbumResponse[]>([]);
+  albumDestaque = signal<AlbumResponse | null>(null);
 
   carregandoArtistas = signal(false);
   carregandoAlbuns = signal(false);
@@ -34,15 +37,18 @@ export class Home implements OnInit {
   constructor(
     private readonly authService: AuthService,
     private readonly catalogoService: CatalogoService,
+    private readonly perfilService: PerfilService,
     private readonly router: Router
   ) {}
 
   ngOnInit(): void {
-    this.carregarArtistas();
-    this.carregarAlbuns();
     if (typeof window !== 'undefined') {
       this.nomeUsuario.set(localStorage.getItem('nome') || 'Usuário');
     }
+
+    this.carregarPerfil();
+    this.carregarArtistas();
+    this.carregarAlbuns();
   }
 
   isAdmin(): boolean {
@@ -114,6 +120,16 @@ export class Home implements OnInit {
       });
   }
 
+  private carregarPerfil(): void {
+    this.perfilService.obter().subscribe({
+      next: perfil => {
+        this.nomeUsuario.set(perfil.nome || 'Usuário');
+        this.fotoPerfil.set(perfil.fotoUrl || '/avatar-padrao.png');
+      },
+      error: () => this.fotoPerfil.set('/avatar-padrao.png')
+    });
+  }
+
   private carregarAlbuns(): void {
     this.carregandoAlbuns.set(true);
     this.erroAlbuns.set('');
@@ -128,14 +144,25 @@ export class Home implements OnInit {
       .subscribe({
         next: albuns => {
           this.albuns.set(albuns);
+          this.albumDestaque.set(this.escolherAlbumAleatorio(albuns));
         },
         error: () => {
           this.albuns.set([]);
+          this.albumDestaque.set(null);
           this.erroAlbuns.set(
             'Não foi possível carregar os álbuns.'
           );
         }
       });
+  }
+
+  private escolherAlbumAleatorio(
+    albuns: AlbumResponse[]
+  ): AlbumResponse | null {
+    if (albuns.length === 0) return null;
+
+    const indice = Math.floor(Math.random() * albuns.length);
+    return albuns[indice];
   }
 
   substituirFotoArtista(evento: Event): void {

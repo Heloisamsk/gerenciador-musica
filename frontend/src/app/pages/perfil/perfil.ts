@@ -9,7 +9,7 @@ import {
   Validators
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 
 import type { AlbumResponse } from '../../models/AlbumResponse';
 import type { ArtistaResponse } from '../../models/ArtistaResponse';
@@ -21,6 +21,7 @@ import type {
   TipoDestaquePerfil
 } from '../../models/Perfil';
 import { CatalogoService } from '../../services/catalogo';
+import { MusicaService } from '../../services/musica';
 import { PerfilService } from '../../services/perfil';
 
 @Component({
@@ -37,12 +38,22 @@ export class Perfil implements OnInit {
   readonly salvando = signal(false);
   readonly editando = signal(false);
   readonly catalogoCarregando = signal(false);
+  readonly musicasCarregando = signal(false);
   readonly mensagemErro = signal('');
   readonly mensagemSucesso = signal('');
+  readonly mensagemErroMusicas = signal('');
 
   readonly artistas = signal<ArtistaResponse[]>([]);
   readonly musicas = signal<MusicaListagem[]>([]);
   readonly albuns = signal<AlbumResponse[]>([]);
+  readonly buscaMusica = signal('');
+  readonly paginaMusicas = signal(0);
+  readonly totalPaginasMusicas = signal(0);
+  readonly totalMusicas = signal(0);
+
+  readonly podeCarregarMaisMusicas = computed(
+    () => this.paginaMusicas() + 1 < this.totalPaginasMusicas()
+  );
 
   readonly favoritos = computed<PerfilItem[]>(() => {
     const perfil = this.perfil();
@@ -104,7 +115,8 @@ export class Perfil implements OnInit {
 
   constructor(
     private readonly perfilService: PerfilService,
-    private readonly catalogoService: CatalogoService
+    private readonly catalogoService: CatalogoService,
+    private readonly musicaService: MusicaService
   ) {}
 
   ngOnInit(): void {
@@ -120,8 +132,12 @@ export class Perfil implements OnInit {
     this.mensagemErro.set('');
     this.mensagemSucesso.set('');
 
-    if (this.artistas().length === 0) {
+    if (this.artistas().length === 0 || this.albuns().length === 0) {
       this.carregarCatalogo();
+    }
+
+    if (this.musicas().length === 0) {
+      this.carregarPaginaMusicas(false, 0);
     }
   }
 
@@ -194,6 +210,21 @@ export class Perfil implements OnInit {
     }
   }
 
+  atualizarBuscaMusica(evento: Event): void {
+    const campo = evento.currentTarget as HTMLInputElement;
+    this.buscaMusica.set(campo.value);
+  }
+
+  pesquisarMusicas(): void {
+    this.carregarPaginaMusicas(false, 0);
+  }
+
+  carregarMaisMusicas(): void {
+    if (this.musicasCarregando() || !this.podeCarregarMaisMusicas()) return;
+
+    this.carregarPaginaMusicas(true, this.paginaMusicas() + 1);
+  }
+
   private carregarPerfil(): void {
     this.perfilService.obter().subscribe({
       next: perfil => {
@@ -212,12 +243,10 @@ export class Perfil implements OnInit {
 
     forkJoin({
       artistas: this.catalogoService.listarArtistas(),
-      musicas: this.catalogoService.listarMusicas(),
       albuns: this.catalogoService.listarAlbuns()
     }).subscribe({
       next: catalogo => {
         this.artistas.set(catalogo.artistas);
-        this.musicas.set(catalogo.musicas);
         this.albuns.set(catalogo.albuns);
         this.catalogoCarregando.set(false);
       },
@@ -228,6 +257,67 @@ export class Perfil implements OnInit {
         );
       }
     });
+  }
+
+  private carregarPaginaMusicas(
+    acumular: boolean,
+    paginaSolicitada: number
+  ): void {
+    if (this.musicasCarregando()) return;
+
+    const termo = this.buscaMusica().trim();
+    const idSelecionado = this.formulario.controls.idMusicaDestaque.value;
+    const selecionadaCarregada = this.musicas().find(
+      musica => musica.id === idSelecionado
+    ) ?? null;
+    const musicaSelecionada$ = selecionadaCarregada || idSelecionado === null
+      ? of(selecionadaCarregada)
+      : this.musicaService.buscarPorId(idSelecionado).pipe(
+          catchError(() => of(null))
+        );
+
+    this.musicasCarregando.set(true);
+    this.mensagemErroMusicas.set('');
+
+    forkJoin({
+      pagina: this.musicaService.pesquisar(
+        termo ? { titulo: termo } : {},
+        paginaSolicitada,
+        25,
+        'titulo,asc'
+      ),
+      selecionada: musicaSelecionada$
+    }).pipe(
+      finalize(() => this.musicasCarregando.set(false))
+    ).subscribe({
+      next: ({ pagina, selecionada }) => {
+        const itens = acumular
+          ? [...this.musicas(), ...pagina.itens]
+          : pagina.itens;
+
+        this.musicas.set(this.removerMusicasDuplicadas(selecionada, itens));
+        this.paginaMusicas.set(pagina.paginaAtual);
+        this.totalPaginasMusicas.set(pagina.totalPaginas);
+        this.totalMusicas.set(pagina.totalItens);
+      },
+      error: () => {
+        this.mensagemErroMusicas.set(
+          'Não foi possível pesquisar as músicas. Tente novamente.'
+        );
+      }
+    });
+  }
+
+  private removerMusicasDuplicadas(
+    selecionada: MusicaListagem | null,
+    musicas: MusicaListagem[]
+  ): MusicaListagem[] {
+    const unicas = new Map<number, MusicaListagem>();
+
+    if (selecionada) unicas.set(selecionada.id, selecionada);
+    musicas.forEach(musica => unicas.set(musica.id, musica));
+
+    return [...unicas.values()];
   }
 
   private preencherFormulario(perfil: PerfilResponse): void {

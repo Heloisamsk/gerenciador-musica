@@ -5,8 +5,10 @@ import {
 } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { vi } from 'vitest';
 
 import type { AlbumResponse } from '../../models/AlbumResponse';
+import type { PerfilResponse } from '../../models/Perfil';
 import { Home } from './home';
 
 describe('Home', () => {
@@ -15,6 +17,7 @@ describe('Home', () => {
   let httpMock: HttpTestingController;
 
   const apiUrl = 'http://localhost:8080/api';
+  const perfilUrl = `${apiUrl}/user/perfil`;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -33,6 +36,7 @@ describe('Home', () => {
 
   afterEach(() => {
     httpMock.verify();
+    vi.restoreAllMocks();
   });
 
   it('deve criar e carregar artistas e álbuns', () => {
@@ -72,9 +76,37 @@ describe('Home', () => {
     expect(fixture.nativeElement.querySelector('.secao-sobretitulo')).toBeNull();
   });
 
+  it('deve usar no cabeçalho a foto escolhida no perfil', () => {
+    carregarCatalogo([], {
+      ...perfilDeExemplo(),
+      fotoUrl: 'https://exemplo.com/minha-foto.jpg'
+    });
+
+    const foto = fixture.nativeElement.querySelector(
+      '.topo-perfil img'
+    ) as HTMLImageElement;
+
+    expect(foto.src).toBe('https://exemplo.com/minha-foto.jpg');
+    expect(fixture.nativeElement.querySelector('.sidebar-rodape')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.topo-sair')).not.toBeNull();
+  });
+
+  it('deve sortear o álbum exibido em Para começar', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.75);
+    carregarCatalogo([
+      albumDeExemplo(),
+      { ...albumDeExemplo(), idAlbum: 11, titulo: 'Jazz' }
+    ]);
+
+    expect(component.albumDestaque()?.idAlbum).toBe(11);
+    expect(fixture.nativeElement.querySelector('.hero-faixa').textContent)
+      .toContain('Jazz');
+  });
+
   it('deve informar quando não for possível carregar os álbuns', () => {
     fixture.detectChanges();
 
+    httpMock.expectOne(perfilUrl).flush(perfilDeExemplo());
     httpMock.expectOne(`${apiUrl}/artistas`).flush([]);
     httpMock.expectOne(`${apiUrl}/albuns`).flush(
       {},
@@ -91,9 +123,13 @@ describe('Home', () => {
     );
   });
 
-  function carregarCatalogo(albuns: AlbumResponse[]): void {
+  function carregarCatalogo(
+    albuns: AlbumResponse[],
+    perfil: PerfilResponse = perfilDeExemplo()
+  ): void {
     fixture.detectChanges();
 
+    httpMock.expectOne(perfilUrl).flush(perfil);
     httpMock.expectOne(`${apiUrl}/artistas`).flush([]);
     httpMock.expectOne(`${apiUrl}/albuns`).flush(albuns);
     fixture.detectChanges();
@@ -112,6 +148,24 @@ describe('Home', () => {
         descricao: 'Banda britânica de rock.',
         fotoPerfilUrl: null
       }
+    };
+  }
+
+  function perfilDeExemplo(): PerfilResponse {
+    return {
+      idUsuario: 1,
+      username: 'alvaro',
+      nome: 'Álvaro',
+      dataCadastro: '2026-01-01T12:00:00Z',
+      role: 'USER',
+      fotoUrl: null,
+      bannerUrl: null,
+      biografia: null,
+      fraseDestaque: null,
+      tipoDestaquePrincipal: null,
+      artistaDestaque: null,
+      musicaDestaque: null,
+      albumDestaque: null
     };
   }
 });
