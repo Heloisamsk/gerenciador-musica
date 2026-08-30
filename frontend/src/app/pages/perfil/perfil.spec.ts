@@ -34,15 +34,18 @@ describe('Perfil', () => {
     biografia: 'Entre pop brasileiro e descobertas independentes.',
     fraseDestaque: 'Uma trilha para cada fase.',
     tipoDestaquePrincipal: 'MUSICA',
-    artistaDestaque: {
-      tipo: 'ARTISTA', id: 5, titulo: 'Marina Sena',
-      subtitulo: 'Artista', imagemUrl: null
-    },
+    artistaDestaque: null,
     musicaDestaque: {
       tipo: 'MUSICA', id: 10, titulo: 'Por Supuesto',
       subtitulo: 'Marina Sena', imagemUrl: null
     },
-    albumDestaque: null
+    albumDestaque: null,
+    artistasFavoritos: [{
+      tipo: 'ARTISTA', id: 5, titulo: 'Marina Sena',
+      subtitulo: 'Artista', imagemUrl: null
+    }],
+    albunsFavoritos: [],
+    musicasFavoritas: []
   };
 
   beforeEach(async () => {
@@ -99,7 +102,9 @@ describe('Perfil', () => {
 
   it('deve colocar a escolha principal no cartão de destaque', () => {
     expect(component.destaquePrincipal()?.titulo).toBe('Por Supuesto');
-    expect(component.favoritosSecundarios()[0].titulo).toBe('Marina Sena');
+    expect(component.gruposFavoritos()[0].itens[0].titulo)
+      .toBe('Marina Sena');
+    expect(fixture.nativeElement.querySelector('.contador')).toBeNull();
   });
 
   it('deve abrir o editor preenchido com os dados atuais', () => {
@@ -127,6 +132,20 @@ describe('Perfil', () => {
   it('deve impedir link de imagem sem protocolo http', () => {
     component.formulario.controls.fotoUrl.setValue('exemplo.com/foto.jpg');
     expect(component.formulario.controls.fotoUrl.hasError('urlHttp')).toBe(true);
+  });
+
+  it('deve manter o destaque principal fora da lista de favoritos', () => {
+    component.abrirEdicao();
+    component.formulario.patchValue({
+      tipoDestaquePrincipal: 'ARTISTA',
+      idArtistaDestaque: 5,
+      idsArtistasFavoritos: [5]
+    });
+
+    component.aoAlterarDestaque();
+
+    expect(component.formulario.controls.idsArtistasFavoritos.value)
+      .toEqual([]);
   });
 
   it('deve pesquisar músicas no backend e carregar as próximas páginas', () => {
@@ -185,7 +204,10 @@ describe('Perfil', () => {
         fotoUrl: null,
         bannerUrl: null,
         idMusicaDestaque: 10,
-        tipoDestaquePrincipal: 'MUSICA'
+        tipoDestaquePrincipal: 'MUSICA',
+        idsArtistasFavoritos: [5],
+        idsAlbunsFavoritos: [],
+        idsMusicasFavoritas: []
       })
     );
     expect(component.editando()).toBe(false);

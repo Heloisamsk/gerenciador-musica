@@ -24,6 +24,9 @@ export interface PerfilResponse {
   artistaDestaque: PerfilItem | null;
   musicaDestaque: PerfilItem | null;
   albumDestaque: PerfilItem | null;
+  artistasFavoritos: PerfilItem[];
+  albunsFavoritos: PerfilItem[];
+  musicasFavoritas: PerfilItem[];
 }
 
 export interface AtualizarPerfilRequest {
@@ -37,4 +40,7 @@ export interface AtualizarPerfilRequest {
   idMusicaDestaque: number | null;
   idAlbumDestaque: number | null;
   tipoDestaquePrincipal: TipoDestaquePerfil | null;
+  idsArtistasFavoritos: number[];
+  idsAlbunsFavoritos: number[];
+  idsMusicasFavoritas: number[];
 }
