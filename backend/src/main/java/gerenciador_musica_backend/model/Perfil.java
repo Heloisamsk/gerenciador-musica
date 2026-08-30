@@ -2,6 +2,9 @@ package gerenciador_musica_backend.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "perfil")
 public class Perfil {
@@ -46,6 +49,33 @@ public class Perfil {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_destaque_principal", length = 20)
     private TipoDestaquePerfil tipoDestaquePrincipal;
+
+    @ManyToMany
+    @JoinTable(
+            name = "perfil_artista_favorito",
+            joinColumns = @JoinColumn(name = "id_perfil"),
+            inverseJoinColumns = @JoinColumn(name = "id_artista")
+    )
+    @OrderColumn(name = "ordem")
+    private List<Artista> artistasFavoritos = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "perfil_album_favorito",
+            joinColumns = @JoinColumn(name = "id_perfil"),
+            inverseJoinColumns = @JoinColumn(name = "id_album")
+    )
+    @OrderColumn(name = "ordem")
+    private List<Album> albunsFavoritos = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "perfil_musica_favorita",
+            joinColumns = @JoinColumn(name = "id_perfil"),
+            inverseJoinColumns = @JoinColumn(name = "id_musica")
+    )
+    @OrderColumn(name = "ordem")
+    private List<Musica> musicasFavoritas = new ArrayList<>();
 
     protected Perfil() {
     }
@@ -134,5 +164,32 @@ public class Perfil {
             TipoDestaquePerfil tipoDestaquePrincipal
     ) {
         this.tipoDestaquePrincipal = tipoDestaquePrincipal;
+    }
+
+    public List<Artista> getArtistasFavoritos() {
+        return artistasFavoritos;
+    }
+
+    public void setArtistasFavoritos(List<Artista> artistasFavoritos) {
+        this.artistasFavoritos.clear();
+        this.artistasFavoritos.addAll(artistasFavoritos);
+    }
+
+    public List<Album> getAlbunsFavoritos() {
+        return albunsFavoritos;
+    }
+
+    public void setAlbunsFavoritos(List<Album> albunsFavoritos) {
+        this.albunsFavoritos.clear();
+        this.albunsFavoritos.addAll(albunsFavoritos);
+    }
+
+    public List<Musica> getMusicasFavoritas() {
+        return musicasFavoritas;
+    }
+
+    public void setMusicasFavoritas(List<Musica> musicasFavoritas) {
+        this.musicasFavoritas.clear();
+        this.musicasFavoritas.addAll(musicasFavoritas);
     }
 }

@@ -21,6 +21,10 @@ import gerenciador_musica_backend.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+
 @Service
 public class PerfilService {
 
@@ -65,13 +69,45 @@ public class PerfilService {
         perfil.setBiografia(normalizarOpcional(request.biografia()));
         perfil.setFraseDestaque(normalizarOpcional(request.fraseDestaque()));
 
-        perfil.setArtistaDestaque(buscarArtista(request.idArtistaDestaque()));
-        perfil.setMusicaDestaque(buscarMusica(request.idMusicaDestaque()));
-        perfil.setAlbumDestaque(buscarAlbum(request.idAlbumDestaque()));
-        perfil.setTipoDestaquePrincipal(validarTipoPrincipal(
+        Artista artistaDestaque = buscarArtista(request.idArtistaDestaque());
+        Musica musicaDestaque = buscarMusica(request.idMusicaDestaque());
+        Album albumDestaque = buscarAlbum(request.idAlbumDestaque());
+        TipoDestaquePerfil tipoPrincipal = validarTipoPrincipal(
                 request.tipoDestaquePrincipal(),
-                perfil
-        ));
+                artistaDestaque,
+                musicaDestaque,
+                albumDestaque
+        );
+
+        List<Long> idsArtistas = validarIdsFavoritos(
+                request.idsArtistasFavoritos(), "artistas"
+        );
+        List<Long> idsAlbuns = validarIdsFavoritos(
+                request.idsAlbunsFavoritos(), "álbuns"
+        );
+        List<Long> idsMusicas = validarIdsFavoritos(
+                request.idsMusicasFavoritas(), "músicas"
+        );
+
+        validarDestaqueNaoRepetido(
+                tipoPrincipal,
+                artistaDestaque,
+                musicaDestaque,
+                albumDestaque,
+                idsArtistas,
+                idsAlbuns,
+                idsMusicas
+        );
+        definirDestaquePrincipal(
+                perfil,
+                tipoPrincipal,
+                artistaDestaque,
+                musicaDestaque,
+                albumDestaque
+        );
+        perfil.setArtistasFavoritos(buscarArtistas(idsArtistas));
+        perfil.setAlbunsFavoritos(buscarAlbuns(idsAlbuns));
+        perfil.setMusicasFavoritas(buscarMusicas(idsMusicas));
 
         perfilRepository.save(perfil);
         return converterResposta(perfil);
@@ -138,15 +174,17 @@ public class PerfilService {
 
     private TipoDestaquePerfil validarTipoPrincipal(
             TipoDestaquePerfil tipo,
-            Perfil perfil
+            Artista artista,
+            Musica musica,
+            Album album
     ) {
         if (tipo == null) {
-            return primeiroTipoDisponivel(perfil);
+            return primeiroTipoDisponivel(artista, musica, album);
         }
 
-        if (!tipoEstaSelecionado(tipo, perfil)) {
+        if (!tipoEstaSelecionado(tipo, artista, musica, album)) {
             throw new DadosPerfilInvalidosException(
-                    "O destaque principal deve ser um favorito selecionado."
+                    "Escolha um item válido para o destaque principal."
             );
         }
 
@@ -154,16 +192,106 @@ public class PerfilService {
     }
 
     private TipoDestaquePerfil primeiroTipoDisponivel(Perfil perfil) {
-        if (perfil.getArtistaDestaque() != null) {
+        return primeiroTipoDisponivel(
+                perfil.getArtistaDestaque(),
+                perfil.getMusicaDestaque(),
+                perfil.getAlbumDestaque()
+        );
+    }
+
+    private TipoDestaquePerfil primeiroTipoDisponivel(
+            Artista artista,
+            Musica musica,
+            Album album
+    ) {
+        if (artista != null) {
             return TipoDestaquePerfil.ARTISTA;
         }
-        if (perfil.getMusicaDestaque() != null) {
+        if (musica != null) {
             return TipoDestaquePerfil.MUSICA;
         }
-        if (perfil.getAlbumDestaque() != null) {
+        if (album != null) {
             return TipoDestaquePerfil.ALBUM;
         }
         return null;
+    }
+
+    private void definirDestaquePrincipal(
+            Perfil perfil,
+            TipoDestaquePerfil tipo,
+            Artista artista,
+            Musica musica,
+            Album album
+    ) {
+        perfil.setTipoDestaquePrincipal(tipo);
+        perfil.setArtistaDestaque(
+                tipo == TipoDestaquePerfil.ARTISTA ? artista : null
+        );
+        perfil.setMusicaDestaque(
+                tipo == TipoDestaquePerfil.MUSICA ? musica : null
+        );
+        perfil.setAlbumDestaque(
+                tipo == TipoDestaquePerfil.ALBUM ? album : null
+        );
+    }
+
+    private List<Long> validarIdsFavoritos(
+            List<Long> ids,
+            String categoria
+    ) {
+        if (ids == null) {
+            return List.of();
+        }
+        if (ids.size() > 3) {
+            throw new DadosPerfilInvalidosException(
+                    "Selecione no máximo três " + categoria + " favoritos."
+            );
+        }
+        if (ids.stream().anyMatch(Objects::isNull)
+                || new HashSet<>(ids).size() != ids.size()) {
+            throw new DadosPerfilInvalidosException(
+                    "A seleção de " + categoria + " favoritos é inválida."
+            );
+        }
+        return List.copyOf(ids);
+    }
+
+    private void validarDestaqueNaoRepetido(
+            TipoDestaquePerfil tipo,
+            Artista artista,
+            Musica musica,
+            Album album,
+            List<Long> idsArtistas,
+            List<Long> idsAlbuns,
+            List<Long> idsMusicas
+    ) {
+        if (tipo == null) {
+            return;
+        }
+
+        boolean repetido = switch (tipo) {
+            case ARTISTA -> idsArtistas.contains(artista.getIdArtista());
+            case MUSICA -> idsMusicas.contains(musica.getIdMusica());
+            case ALBUM -> idsAlbuns.contains(album.getIdAlbum());
+        };
+
+        if (repetido) {
+            throw new DadosPerfilInvalidosException(
+                    "O destaque principal não pode ser repetido nos favoritos."
+            );
+        }
+    }
+
+    private List<Artista> buscarArtistas(List<Long> ids) {
+        return ids.stream().map(this::buscarArtista).toList();
+    }
+
+    private List<Album> buscarAlbuns(List<Long> ids) {
+        return ids.stream().map(this::buscarAlbum).toList();
+    }
+
+    private List<Musica> buscarMusicas(List<Long> ids) {
+        return ids.stream().map(this::buscarMusica).toList();
     }
 
     private PerfilResponseDTO converterResposta(Perfil perfil) {
@@ -187,7 +315,16 @@ public class PerfilService {
                 tipoPrincipal,
                 converterArtista(perfil.getArtistaDestaque()),
                 converterMusica(perfil.getMusicaDestaque()),
-                converterAlbum(perfil.getAlbumDestaque())
+                converterAlbum(perfil.getAlbumDestaque()),
+                perfil.getArtistasFavoritos().stream()
+                        .map(this::converterArtista)
+                        .toList(),
+                perfil.getAlbunsFavoritos().stream()
+                        .map(this::converterAlbum)
+                        .toList(),
+                perfil.getMusicasFavoritas().stream()
+                        .map(this::converterMusica)
+                        .toList()
         );
     }
 
@@ -248,14 +385,28 @@ public class PerfilService {
             TipoDestaquePerfil tipo,
             Perfil perfil
     ) {
+        return tipoEstaSelecionado(
+                tipo,
+                perfil.getArtistaDestaque(),
+                perfil.getMusicaDestaque(),
+                perfil.getAlbumDestaque()
+        );
+    }
+
+    private boolean tipoEstaSelecionado(
+            TipoDestaquePerfil tipo,
+            Artista artista,
+            Musica musica,
+            Album album
+    ) {
         if (tipo == null) {
             return false;
         }
 
         return switch (tipo) {
-            case ARTISTA -> perfil.getArtistaDestaque() != null;
-            case MUSICA -> perfil.getMusicaDestaque() != null;
-            case ALBUM -> perfil.getAlbumDestaque() != null;
+            case ARTISTA -> artista != null;
+            case MUSICA -> musica != null;
+            case ALBUM -> album != null;
         };
     }
 }

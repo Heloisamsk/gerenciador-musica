@@ -1,10 +1,12 @@
 package gerenciador_musica_backend.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import gerenciador_musica_backend.model.TipoDestaquePerfil;
+
+import java.util.List;
 
 public record AtualizarPerfilRequestDTO(
 
@@ -67,6 +69,27 @@ public record AtualizarPerfilRequestDTO(
         @Positive(message = "O álbum selecionado é inválido.")
         Long idAlbumDestaque,
 
-        TipoDestaquePerfil tipoDestaquePrincipal
+        TipoDestaquePerfil tipoDestaquePrincipal,
+
+        @Size(
+                max = 3,
+                message = "Selecione no máximo três artistas favoritos."
+        )
+        List<@Positive(message = "O artista favorito é inválido.") Long>
+                idsArtistasFavoritos,
+
+        @Size(
+                max = 3,
+                message = "Selecione no máximo três álbuns favoritos."
+        )
+        List<@Positive(message = "O álbum favorito é inválido.") Long>
+                idsAlbunsFavoritos,
+
+        @Size(
+                max = 3,
+                message = "Selecione no máximo três músicas favoritas."
+        )
+        List<@Positive(message = "A música favorita é inválida.") Long>
+                idsMusicasFavoritas
 ) {
 }

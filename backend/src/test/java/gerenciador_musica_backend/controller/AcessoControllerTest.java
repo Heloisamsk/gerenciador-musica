@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,7 +49,10 @@ class AcessoControllerTest {
                 null,
                 null,
                 null,
-                null
+                null,
+                List.of(),
+                List.of(),
+                List.of()
         ));
 
         mockMvc.perform(get("/api/user/perfil"))
