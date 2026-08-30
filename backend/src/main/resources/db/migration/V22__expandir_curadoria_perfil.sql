@@ -1,7 +1,7 @@
 CREATE TABLE perfil_artista_favorito (
     id_perfil BIGINT NOT NULL,
     id_artista BIGINT NOT NULL,
-    ordem SMALLINT NOT NULL,
+    ordem INTEGER NOT NULL,
 
     CONSTRAINT pk_perfil_artista_favorito
         PRIMARY KEY (id_perfil, id_artista),
@@ -20,7 +20,7 @@ CREATE TABLE perfil_artista_favorito (
 CREATE TABLE perfil_album_favorito (
     id_perfil BIGINT NOT NULL,
     id_album BIGINT NOT NULL,
-    ordem SMALLINT NOT NULL,
+    ordem INTEGER NOT NULL,
 
     CONSTRAINT pk_perfil_album_favorito
         PRIMARY KEY (id_perfil, id_album),
@@ -39,7 +39,7 @@ CREATE TABLE perfil_album_favorito (
 CREATE TABLE perfil_musica_favorita (
     id_perfil BIGINT NOT NULL,
     id_musica BIGINT NOT NULL,
-    ordem SMALLINT NOT NULL,
+    ordem INTEGER NOT NULL,
 
     CONSTRAINT pk_perfil_musica_favorita
         PRIMARY KEY (id_perfil, id_musica),
