@@ -167,7 +167,10 @@ describe('Home', () => {
       tipoDestaquePrincipal: null,
       artistaDestaque: null,
       musicaDestaque: null,
-      albumDestaque: null
+      albumDestaque: null,
+      artistasFavoritos: [],
+      albunsFavoritos: [],
+      musicasFavoritas: []
     };
   }
 });

@@ -84,24 +84,33 @@
         <section class="curadoria-area" aria-labelledby="titulo-curadoria">
           <div class="secao-cabecalho secao-cabecalho--curadoria">
             <div><span>Seleção pessoal</span><h2 id="titulo-curadoria">Favoritos no perfil</h2></div>
-            <span class="contador">{{ favoritos().length }}/3</span>
           </div>
-          <div class="favoritos-lista">
-            @for (item of favoritosSecundarios(); track item.tipo) {
-              <a class="favorito-card" [routerLink]="rotaItem(item)">
-                <img [src]="item.imagemUrl || imagemAlternativa(item.tipo)" [alt]="'Capa de ' + item.titulo"
-                  (error)="corrigirImagem($event, imagemAlternativa(item.tipo))">
-                <span class="favorito-texto">
-                  <small>{{ rotuloTipo(item.tipo) }}</small><strong>{{ item.titulo }}</strong><span>{{ item.subtitulo }}</span>
-                </span>
-                <svg class="seta" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
-              </a>
-            }
-            @if (favoritosSecundarios().length === 0) {
-              <button class="favorito-vazio" type="button" (click)="abrirEdicao()">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
-                <span><strong>Complete sua seleção</strong><small>Mostre mais do que define seu gosto musical.</small></span>
-              </button>
+          <div class="favoritos-grupos">
+            @for (grupo of gruposFavoritos(); track grupo.tipo) {
+              <section class="favoritos-grupo" [attr.aria-labelledby]="'grupo-' + grupo.tipo">
+                <header>
+                  <span aria-hidden="true">♪</span>
+                  <h3 [id]="'grupo-' + grupo.tipo">{{ grupo.titulo }}</h3>
+                </header>
+                <div class="favoritos-lista">
+                  @for (item of grupo.itens; track item.id) {
+                    <a class="favorito-card" [routerLink]="rotaItem(item)">
+                      <img [src]="item.imagemUrl || imagemAlternativa(item.tipo)" [alt]="'Capa de ' + item.titulo"
+                        (error)="corrigirImagem($event, imagemAlternativa(item.tipo))">
+                      <span class="favorito-texto">
+                        <strong>{{ item.titulo }}</strong><span>{{ item.subtitulo }}</span>
+                      </span>
+                      <svg class="seta" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+                    </a>
+                  }
+                  @if (grupo.itens.length === 0) {
+                    <button class="favorito-vazio" type="button" (click)="abrirEdicao()">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                      <span><strong>Adicione {{ grupo.titulo.toLowerCase() }}</strong><small>Escolha até três itens para esta estante.</small></span>
+                    </button>
+                  }
+                </div>
+              </section>
             }
           </div>
           <div class="sobre">
@@ -171,37 +180,93 @@
         </fieldset>
 
         <fieldset>
-          <legend>Favoritos exibidos</legend>
-          <p class="ajuda-formulario">Escolha até um item de cada categoria. O principal aparece em tamanho maior.</p>
+          <legend>Destaque principal</legend>
+          <p class="ajuda-formulario">Escolha um único artista, álbum ou música para ocupar o cartão maior.</p>
+          <label>Categoria do destaque
+            <select formControlName="tipoDestaquePrincipal" (change)="aoAlterarDestaque()">
+              <option [ngValue]="null">Sem destaque principal</option>
+              <option value="ARTISTA">Artista</option>
+              <option value="ALBUM">Álbum</option>
+              <option value="MUSICA">Música</option>
+            </select>
+          </label>
           @if (catalogoCarregando()) {
             <p class="catalogo-carregando" aria-live="polite">Carregando catálogo...</p>
           } @else {
-            <div class="campos-duplos campos-duplos--favoritos">
-              <label>Artista
-                <select formControlName="idArtistaDestaque">
-                  <option [ngValue]="null">Nenhum artista</option>
-                  @for (artista of artistas(); track artista.idArtista) { <option [ngValue]="artista.idArtista">{{ artista.nome }}</option> }
+            @if (formulario.controls.tipoDestaquePrincipal.value === 'ARTISTA') {
+              <label>Artista em destaque
+                <select formControlName="idArtistaDestaque" (change)="aoAlterarDestaque()">
+                  <option [ngValue]="null">Escolha um artista</option>
+                  @for (artista of artistas(); track artista.idArtista) {
+                    <option [ngValue]="artista.idArtista">{{ artista.nome }}</option>
+                  }
                 </select>
               </label>
-              <label>Álbum
-                <select formControlName="idAlbumDestaque">
-                  <option [ngValue]="null">Nenhum álbum</option>
+            }
+            @if (formulario.controls.tipoDestaquePrincipal.value === 'ALBUM') {
+              <label>Álbum em destaque
+                <select formControlName="idAlbumDestaque" (change)="aoAlterarDestaque()">
+                  <option [ngValue]="null">Escolha um álbum</option>
                   @for (album of albuns(); track album.idAlbum) {
                     <option [ngValue]="album.idAlbum">{{ album.titulo }} — {{ album.artista.nome }}</option>
                   }
                 </select>
               </label>
-              <label>Destaque principal
-                <select formControlName="tipoDestaquePrincipal">
-                  <option [ngValue]="null">Escolher automaticamente</option>
-                  <option value="ARTISTA">Artista</option><option value="MUSICA">Música</option><option value="ALBUM">Álbum</option>
-                </select>
-              </label>
-            </div>
+            }
+          }
+          @if (formulario.controls.tipoDestaquePrincipal.value === 'MUSICA') {
+            <label>Música em destaque
+              <select formControlName="idMusicaDestaque" (change)="aoAlterarDestaque()"
+                [attr.aria-busy]="musicasCarregando()">
+                <option [ngValue]="null">Escolha uma música</option>
+                @for (musica of musicas(); track musica.id) {
+                  <option [ngValue]="musica.id">{{ musica.titulo }} — {{ musica.artistaPrincipal.nome }}</option>
+                }
+              </select>
+            </label>
+          }
+        </fieldset>
+
+        <fieldset>
+          <legend>Favoritos por categoria</legend>
+          <p class="ajuda-formulario">Monte três estantes com até três escolhas cada. O destaque principal fica fora delas.</p>
+          @if (catalogoCarregando()) {
+            <p class="catalogo-carregando" aria-live="polite">Carregando catálogo...</p>
+          } @else {
+            <section class="selecao-categoria" aria-labelledby="favoritos-artistas">
+              <h3 id="favoritos-artistas">Artistas</h3>
+              <div class="opcoes-favoritos">
+                @for (artista of artistas(); track artista.idArtista) {
+                  <label class="opcao-favorito" [class.opcao-favorito--destaque]="itemEhDestaque('ARTISTA', artista.idArtista)">
+                    <input type="checkbox"
+                      [checked]="estaSelecionado('idsArtistasFavoritos', artista.idArtista)"
+                      [disabled]="itemEhDestaque('ARTISTA', artista.idArtista) || limiteAtingido('idsArtistasFavoritos', artista.idArtista)"
+                      (change)="alternarFavorito('idsArtistasFavoritos', 'ARTISTA', artista.idArtista, $event)">
+                    <span>{{ artista.nome }}</span>
+                  </label>
+                }
+              </div>
+            </section>
+
+            <section class="selecao-categoria" aria-labelledby="favoritos-albuns">
+              <h3 id="favoritos-albuns">Álbuns</h3>
+              <div class="opcoes-favoritos">
+                @for (album of albuns(); track album.idAlbum) {
+                  <label class="opcao-favorito" [class.opcao-favorito--destaque]="itemEhDestaque('ALBUM', album.idAlbum)">
+                    <input type="checkbox"
+                      [checked]="estaSelecionado('idsAlbunsFavoritos', album.idAlbum)"
+                      [disabled]="itemEhDestaque('ALBUM', album.idAlbum) || limiteAtingido('idsAlbunsFavoritos', album.idAlbum)"
+                      (change)="alternarFavorito('idsAlbunsFavoritos', 'ALBUM', album.idAlbum, $event)">
+                    <span>{{ album.titulo }} <small>{{ album.artista.nome }}</small></span>
+                  </label>
+                }
+              </div>
+            </section>
           }
 
+          <section class="selecao-categoria" aria-labelledby="favoritos-musicas">
+            <h3 id="favoritos-musicas">Músicas</h3>
           <div class="seletor-musica">
-            <label for="busca-musica">Música</label>
             <div class="busca-musica">
               <input id="busca-musica" type="search" autocomplete="off"
                 placeholder="Busque pelo título da música"
@@ -212,13 +277,17 @@
                 [disabled]="musicasCarregando()">Pesquisar</button>
             </div>
 
-            <select formControlName="idMusicaDestaque" aria-label="Música favorita"
-              [attr.aria-busy]="musicasCarregando()">
-              <option [ngValue]="null">Nenhuma música</option>
+            <div class="opcoes-favoritos opcoes-favoritos--musicas" [attr.aria-busy]="musicasCarregando()">
               @for (musica of musicas(); track musica.id) {
-                <option [ngValue]="musica.id">{{ musica.titulo }} — {{ musica.artistaPrincipal.nome }}</option>
+                <label class="opcao-favorito" [class.opcao-favorito--destaque]="itemEhDestaque('MUSICA', musica.id)">
+                  <input type="checkbox"
+                    [checked]="estaSelecionado('idsMusicasFavoritas', musica.id)"
+                    [disabled]="itemEhDestaque('MUSICA', musica.id) || limiteAtingido('idsMusicasFavoritas', musica.id)"
+                    (change)="alternarFavorito('idsMusicasFavoritas', 'MUSICA', musica.id, $event)">
+                  <span>{{ musica.titulo }} <small>{{ musica.artistaPrincipal.nome }}</small></span>
+                </label>
               }
-            </select>
+            </div>
 
             <div class="resultado-musicas" aria-live="polite">
               @if (musicasCarregando()) {
@@ -235,6 +304,7 @@
               }
             </div>
           </div>
+          </section>
         </fieldset>
 
         @if (mensagemErro()) { <p class="feedback feedback--erro" role="alert">{{ mensagemErro() }}</p> }

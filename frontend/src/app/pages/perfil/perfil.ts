@@ -9,7 +9,7 @@ import {
   Validators
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, map, of } from 'rxjs';
 
 import type { AlbumResponse } from '../../models/AlbumResponse';
 import type { ArtistaResponse } from '../../models/ArtistaResponse';
@@ -23,6 +23,11 @@ import type {
 import { CatalogoService } from '../../services/catalogo';
 import { MusicaService } from '../../services/musica';
 import { PerfilService } from '../../services/perfil';
+
+type CampoFavoritos =
+  | 'idsArtistasFavoritos'
+  | 'idsAlbunsFavoritos'
+  | 'idsMusicasFavoritas';
 
 @Component({
   selector: 'app-perfil',
@@ -55,27 +60,36 @@ export class Perfil implements OnInit {
     () => this.paginaMusicas() + 1 < this.totalPaginasMusicas()
   );
 
-  readonly favoritos = computed<PerfilItem[]>(() => {
-    const perfil = this.perfil();
-    if (!perfil) return [];
-
-    return [
-      perfil.artistaDestaque,
-      perfil.musicaDestaque,
-      perfil.albumDestaque
-    ].filter((item): item is PerfilItem => item !== null);
-  });
-
   readonly destaquePrincipal = computed<PerfilItem | null>(() => {
-    const tipo = this.perfil()?.tipoDestaquePrincipal;
-    return this.favoritos().find(item => item.tipo === tipo)
-      ?? this.favoritos()[0]
-      ?? null;
+    const perfil = this.perfil();
+    if (!perfil) return null;
+
+    return {
+      ARTISTA: perfil.artistaDestaque,
+      MUSICA: perfil.musicaDestaque,
+      ALBUM: perfil.albumDestaque
+    }[perfil.tipoDestaquePrincipal ?? 'ARTISTA'] ?? null;
   });
 
-  readonly favoritosSecundarios = computed(() => {
-    const principal = this.destaquePrincipal();
-    return this.favoritos().filter(item => item !== principal);
+  readonly gruposFavoritos = computed(() => {
+    const perfil = this.perfil();
+    return [
+      {
+        tipo: 'ARTISTA' as const,
+        titulo: 'Artistas',
+        itens: perfil?.artistasFavoritos ?? []
+      },
+      {
+        tipo: 'ALBUM' as const,
+        titulo: 'Álbuns',
+        itens: perfil?.albunsFavoritos ?? []
+      },
+      {
+        tipo: 'MUSICA' as const,
+        titulo: 'Músicas',
+        itens: perfil?.musicasFavoritas ?? []
+      }
+    ];
   });
 
   readonly formulario = new FormGroup({
@@ -110,7 +124,10 @@ export class Perfil implements OnInit {
     idArtistaDestaque: new FormControl<number | null>(null),
     idMusicaDestaque: new FormControl<number | null>(null),
     idAlbumDestaque: new FormControl<number | null>(null),
-    tipoDestaquePrincipal: new FormControl<TipoDestaquePerfil | null>(null)
+    tipoDestaquePrincipal: new FormControl<TipoDestaquePerfil | null>(null),
+    idsArtistasFavoritos: new FormControl<number[]>([], { nonNullable: true }),
+    idsAlbunsFavoritos: new FormControl<number[]>([], { nonNullable: true }),
+    idsMusicasFavoritas: new FormControl<number[]>([], { nonNullable: true })
   });
 
   constructor(
@@ -155,7 +172,7 @@ export class Perfil implements OnInit {
     const dados = this.montarRequest();
     if (!this.destaquePrincipalValido(dados)) {
       this.mensagemErro.set(
-        'Escolha como principal um item que esteja nos favoritos do perfil.'
+        'Escolha um item válido para o destaque principal.'
       );
       return;
     }
@@ -193,9 +210,9 @@ export class Perfil implements OnInit {
 
   rotuloTipo(tipo: TipoDestaquePerfil): string {
     return {
-      ARTISTA: 'Artista favorito',
-      MUSICA: 'Música favorita',
-      ALBUM: 'Álbum favorito'
+      ARTISTA: 'Artista em destaque',
+      MUSICA: 'Música em destaque',
+      ALBUM: 'Álbum em destaque'
     }[tipo];
   }
 
@@ -223,6 +240,67 @@ export class Perfil implements OnInit {
     if (this.musicasCarregando() || !this.podeCarregarMaisMusicas()) return;
 
     this.carregarPaginaMusicas(true, this.paginaMusicas() + 1);
+  }
+
+  aoAlterarDestaque(): void {
+    const tipo = this.formulario.controls.tipoDestaquePrincipal.value;
+    const configuracao = tipo ? this.configuracaoCategoria(tipo) : null;
+    if (!configuracao) return;
+
+    const id = this.formulario.controls[configuracao.campoDestaque].value;
+    if (id !== null) {
+      this.removerFavorito(configuracao.campoFavoritos, id);
+    }
+  }
+
+  estaSelecionado(campo: CampoFavoritos, id: number): boolean {
+    return this.formulario.controls[campo].value.includes(id);
+  }
+
+  itemEhDestaque(tipo: TipoDestaquePerfil, id: number): boolean {
+    if (this.formulario.controls.tipoDestaquePrincipal.value !== tipo) {
+      return false;
+    }
+
+    const configuracao = this.configuracaoCategoria(tipo);
+    return this.formulario.controls[configuracao.campoDestaque].value === id;
+  }
+
+  limiteAtingido(campo: CampoFavoritos, id: number): boolean {
+    const selecionados = this.formulario.controls[campo].value;
+    return selecionados.length >= 3 && !selecionados.includes(id);
+  }
+
+  alternarFavorito(
+    campo: CampoFavoritos,
+    tipo: TipoDestaquePerfil,
+    id: number,
+    evento: Event
+  ): void {
+    const marcado = (evento.currentTarget as HTMLInputElement).checked;
+    const selecionados = this.formulario.controls[campo].value;
+
+    if (!marcado) {
+      this.formulario.controls[campo].setValue(
+        selecionados.filter(itemId => itemId !== id)
+      );
+      return;
+    }
+
+    if (this.itemEhDestaque(tipo, id)) {
+      this.mensagemErro.set(
+        'O destaque principal não pode ser repetido nos favoritos.'
+      );
+      return;
+    }
+
+    if (selecionados.length >= 3) {
+      this.mensagemErro.set('Escolha no máximo três itens por categoria.');
+      return;
+    }
+
+    this.mensagemErro.set('');
+    this.formulario.controls[campo].setValue([...selecionados, id]);
   }
 
   private carregarPerfil(): void {
@@ -266,14 +344,18 @@ export class Perfil implements OnInit {
     if (this.musicasCarregando()) return;
 
     const termo = this.buscaMusica().trim();
-    const idSelecionado = this.formulario.controls.idMusicaDestaque.value;
-    const selecionadaCarregada = this.musicas().find(
-      musica => musica.id === idSelecionado
-    ) ?? null;
-    const musicaSelecionada$ = selecionadaCarregada || idSelecionado === null
-      ? of(selecionadaCarregada)
-      : this.musicaService.buscarPorId(idSelecionado).pipe(
+    const idsSelecionados = new Set([
+      this.formulario.controls.idMusicaDestaque.value,
+      ...this.formulario.controls.idsMusicasFavoritas.value
+    ].filter((id): id is number => id !== null));
+    const idsCarregados = new Set(this.musicas().map(musica => musica.id));
+    const idsAusentes = [...idsSelecionados].filter(id => !idsCarregados.has(id));
+    const musicasSelecionadas$ = idsAusentes.length === 0
+      ? of([] as MusicaListagem[])
+      : forkJoin(idsAusentes.map(id => this.musicaService.buscarPorId(id).pipe(
           catchError(() => of(null))
+        ))).pipe(
+          map(itens => itens.filter(item => item !== null))
         );
 
     this.musicasCarregando.set(true);
@@ -286,16 +368,16 @@ export class Perfil implements OnInit {
         25,
         'titulo,asc'
       ),
-      selecionada: musicaSelecionada$
+      selecionadas: musicasSelecionadas$
     }).pipe(
       finalize(() => this.musicasCarregando.set(false))
     ).subscribe({
-      next: ({ pagina, selecionada }) => {
+      next: ({ pagina, selecionadas }) => {
         const itens = acumular
           ? [...this.musicas(), ...pagina.itens]
           : pagina.itens;
 
-        this.musicas.set(this.removerMusicasDuplicadas(selecionada, itens));
+        this.musicas.set(this.removerMusicasDuplicadas(selecionadas, itens));
         this.paginaMusicas.set(pagina.paginaAtual);
         this.totalPaginasMusicas.set(pagina.totalPaginas);
         this.totalMusicas.set(pagina.totalItens);
@@ -309,12 +391,12 @@ export class Perfil implements OnInit {
   }
 
   private removerMusicasDuplicadas(
-    selecionada: MusicaListagem | null,
+    selecionadas: MusicaListagem[],
     musicas: MusicaListagem[]
   ): MusicaListagem[] {
     const unicas = new Map<number, MusicaListagem>();
 
-    if (selecionada) unicas.set(selecionada.id, selecionada);
+    selecionadas.forEach(musica => unicas.set(musica.id, musica));
     musicas.forEach(musica => unicas.set(musica.id, musica));
 
     return [...unicas.values()];
@@ -331,7 +413,10 @@ export class Perfil implements OnInit {
       idArtistaDestaque: perfil.artistaDestaque?.id ?? null,
       idMusicaDestaque: perfil.musicaDestaque?.id ?? null,
       idAlbumDestaque: perfil.albumDestaque?.id ?? null,
-      tipoDestaquePrincipal: perfil.tipoDestaquePrincipal
+      tipoDestaquePrincipal: perfil.tipoDestaquePrincipal,
+      idsArtistasFavoritos: perfil.artistasFavoritos.map(item => item.id),
+      idsAlbunsFavoritos: perfil.albunsFavoritos.map(item => item.id),
+      idsMusicasFavoritas: perfil.musicasFavoritas.map(item => item.id)
     });
   }
 
@@ -344,10 +429,16 @@ export class Perfil implements OnInit {
       bannerUrl: this.normalizarOpcional(valor.bannerUrl),
       biografia: this.normalizarOpcional(valor.biografia),
       fraseDestaque: this.normalizarOpcional(valor.fraseDestaque),
-      idArtistaDestaque: valor.idArtistaDestaque,
-      idMusicaDestaque: valor.idMusicaDestaque,
-      idAlbumDestaque: valor.idAlbumDestaque,
-      tipoDestaquePrincipal: valor.tipoDestaquePrincipal
+      idArtistaDestaque: valor.tipoDestaquePrincipal === 'ARTISTA'
+        ? valor.idArtistaDestaque : null,
+      idMusicaDestaque: valor.tipoDestaquePrincipal === 'MUSICA'
+        ? valor.idMusicaDestaque : null,
+      idAlbumDestaque: valor.tipoDestaquePrincipal === 'ALBUM'
+        ? valor.idAlbumDestaque : null,
+      tipoDestaquePrincipal: valor.tipoDestaquePrincipal,
+      idsArtistasFavoritos: valor.idsArtistasFavoritos,
+      idsAlbunsFavoritos: valor.idsAlbunsFavoritos,
+      idsMusicasFavoritas: valor.idsMusicasFavoritas
     };
   }
 
@@ -364,6 +455,44 @@ export class Perfil implements OnInit {
   private normalizarOpcional(valor: string): string | null {
     const normalizado = valor.trim();
     return normalizado.length > 0 ? normalizado : null;
+  }
+
+  private removerFavorito(campo: CampoFavoritos, id: number): void {
+    const selecionados = this.formulario.controls[campo].value;
+    this.formulario.controls[campo].setValue(
+      selecionados.filter(itemId => itemId !== id)
+    );
+  }
+
+  private configuracaoCategoria(tipo: TipoDestaquePerfil): {
+    campoDestaque:
+      | 'idArtistaDestaque'
+      | 'idAlbumDestaque'
+      | 'idMusicaDestaque';
+    campoFavoritos: CampoFavoritos;
+  } {
+    const configuracoes: Record<TipoDestaquePerfil, {
+      campoDestaque:
+        | 'idArtistaDestaque'
+        | 'idAlbumDestaque'
+        | 'idMusicaDestaque';
+      campoFavoritos: CampoFavoritos;
+    }> = {
+      ARTISTA: {
+        campoDestaque: 'idArtistaDestaque',
+        campoFavoritos: 'idsArtistasFavoritos'
+      },
+      ALBUM: {
+        campoDestaque: 'idAlbumDestaque',
+        campoFavoritos: 'idsAlbunsFavoritos'
+      },
+      MUSICA: {
+        campoDestaque: 'idMusicaDestaque',
+        campoFavoritos: 'idsMusicasFavoritas'
+      }
+    };
+
+    return configuracoes[tipo];
   }
 
   private validarUrlHttp(control: AbstractControl): ValidationErrors | null {

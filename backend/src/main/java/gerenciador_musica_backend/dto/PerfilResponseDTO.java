@@ -1,6 +1,7 @@
 package gerenciador_musica_backend.dto;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 import gerenciador_musica_backend.model.Role;
 import gerenciador_musica_backend.model.TipoDestaquePerfil;
@@ -18,6 +19,9 @@ public record PerfilResponseDTO(
         TipoDestaquePerfil tipoDestaquePrincipal,
         PerfilItemResponseDTO artistaDestaque,
         PerfilItemResponseDTO musicaDestaque,
-        PerfilItemResponseDTO albumDestaque
+        PerfilItemResponseDTO albumDestaque,
+        List<PerfilItemResponseDTO> artistasFavoritos,
+        List<PerfilItemResponseDTO> albunsFavoritos,
+        List<PerfilItemResponseDTO> musicasFavoritas
 ) {
 }

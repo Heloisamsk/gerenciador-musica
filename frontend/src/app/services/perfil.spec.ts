@@ -51,7 +51,10 @@ describe('PerfilService', () => {
       idArtistaDestaque: 5,
       idMusicaDestaque: null,
       idAlbumDestaque: null,
-      tipoDestaquePrincipal: 'ARTISTA'
+      tipoDestaquePrincipal: 'ARTISTA',
+      idsArtistasFavoritos: [8],
+      idsAlbunsFavoritos: [],
+      idsMusicasFavoritas: []
     };
 
     service.atualizar(dados).subscribe();
@@ -82,7 +85,10 @@ describe('PerfilService', () => {
         imagemUrl: null
       },
       musicaDestaque: null,
-      albumDestaque: null
+      albumDestaque: null,
+      artistasFavoritos: [],
+      albunsFavoritos: [],
+      musicasFavoritas: []
     };
   }
 });

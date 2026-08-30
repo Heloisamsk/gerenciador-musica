@@ -1,8 +1,15 @@
 <main class="pagina-detalhe">
   <div class="conteudo">
-    <a class="voltar-link" routerLink="/home">
-      ← Voltar para o início
-    </a>
+    <nav class="catalogo-nav" aria-label="Navegação do catálogo">
+      <a class="voltar-link" routerLink="/home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+        Voltar para o início
+      </a>
+      <a class="catalogo-marca" routerLink="/home" aria-label="Crotchet - Music Hub">
+        <img src="/favicon.svg" alt="">
+        <span>Crotchet <small>Music Hub</small></span>
+      </a>
+    </nav>
 
     @if (carregando()) {
       <output class="mensagem-estado" aria-live="polite">

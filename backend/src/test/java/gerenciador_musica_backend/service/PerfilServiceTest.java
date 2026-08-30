@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,14 +67,24 @@ class PerfilServiceTest {
 
     @Test
     void deveAtualizarImagensIdentidadeECuradoria() {
-        Artista artista = new Artista(
+        Artista artistaDestaque = new Artista(
                 "Marina Sena",
                 "Marina de Oliveira Sena",
                 "Cantora brasileira.",
                 "https://exemplo.com/artista.jpg"
         );
-        ReflectionTestUtils.setField(artista, "idArtista", 5L);
-        when(artistaRepository.findById(5L)).thenReturn(Optional.of(artista));
+        ReflectionTestUtils.setField(artistaDestaque, "idArtista", 5L);
+        Artista artistaFavorita = new Artista(
+                "Luedji Luna",
+                "Luedji Gomes Santa Rita",
+                "Cantora e compositora brasileira.",
+                "https://exemplo.com/luedji.jpg"
+        );
+        ReflectionTestUtils.setField(artistaFavorita, "idArtista", 6L);
+        when(artistaRepository.findById(5L))
+                .thenReturn(Optional.of(artistaDestaque));
+        when(artistaRepository.findById(6L))
+                .thenReturn(Optional.of(artistaFavorita));
 
         AtualizarPerfilRequestDTO request = new AtualizarPerfilRequestDTO(
                 "  Ana  ",
@@ -85,7 +96,10 @@ class PerfilServiceTest {
                 5L,
                 null,
                 null,
-                TipoDestaquePerfil.ARTISTA
+                TipoDestaquePerfil.ARTISTA,
+                List.of(6L),
+                List.of(),
+                List.of()
         );
 
         PerfilResponseDTO resposta = perfilService.atualizarPerfil(
@@ -101,11 +115,14 @@ class PerfilServiceTest {
                 .isEqualTo(TipoDestaquePerfil.ARTISTA);
         assertThat(resposta.artistaDestaque().titulo())
                 .isEqualTo("Marina Sena");
+        assertThat(resposta.artistasFavoritos())
+                .extracting(item -> item.titulo())
+                .containsExactly("Luedji Luna");
         verify(perfilRepository).save(perfil);
     }
 
     @Test
-    void deveRecusarDestaquePrincipalSemFavoritoCorrespondente() {
+    void deveRecusarDestaquePrincipalSemItemCorrespondente() {
         AtualizarPerfilRequestDTO request = new AtualizarPerfilRequestDTO(
                 "Ana",
                 null,
@@ -116,12 +133,47 @@ class PerfilServiceTest {
                 null,
                 null,
                 null,
-                TipoDestaquePerfil.ALBUM
+                TipoDestaquePerfil.ALBUM,
+                List.of(),
+                List.of(),
+                List.of()
         );
 
         assertThatThrownBy(() -> perfilService.atualizarPerfil(usuario, request))
                 .isInstanceOf(DadosPerfilInvalidosException.class)
-                .hasMessageContaining("favorito selecionado");
+                .hasMessageContaining("destaque principal");
+    }
+
+    @Test
+    void deveRecusarDestaqueRepetidoNosFavoritos() {
+        Artista artista = new Artista(
+                "Marina Sena",
+                "Marina de Oliveira Sena",
+                "Cantora brasileira.",
+                null
+        );
+        ReflectionTestUtils.setField(artista, "idArtista", 5L);
+        when(artistaRepository.findById(5L)).thenReturn(Optional.of(artista));
+
+        AtualizarPerfilRequestDTO request = new AtualizarPerfilRequestDTO(
+                "Ana",
+                null,
+                null,
+                null,
+                null,
+                null,
+                5L,
+                null,
+                null,
+                TipoDestaquePerfil.ARTISTA,
+                List.of(5L),
+                List.of(),
+                List.of()
+        );
+
+        assertThatThrownBy(() -> perfilService.atualizarPerfil(usuario, request))
+                .isInstanceOf(DadosPerfilInvalidosException.class)
+                .hasMessageContaining("não pode ser repetido");
     }
 
     @Test
