@@ -1,0 +1,38 @@
+:host { display: block; min-height: 100%; }
+
+.tema-toggle {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  color: var(--app-button-text);
+  background: var(--app-accent);
+  border: 1px solid var(--app-ink);
+  border-radius: 0;
+  box-shadow: 6px 6px 0 var(--app-ink);
+  cursor: pointer;
+  font: 700 .76rem "Segoe UI Variable", "Segoe UI", sans-serif;
+}
+
+.tema-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.tema-toggle:hover { background: var(--app-accent-alt); }
+.tema-toggle:focus-visible { outline: 3px solid var(--app-focus); outline-offset: 4px; }
+
+@media (max-width: 760px) {
+  .tema-toggle { right: 14px; bottom: 88px; width: 42px; padding: 0; justify-content: center; box-shadow: 4px 4px 0 var(--app-ink); }
+  .tema-toggle span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}

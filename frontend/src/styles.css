@@ -1,8 +1,75 @@
 @import './app/pages/home/home.css';
 
+:root {
+  --app-cool-steel: #9cafb7;
+  --app-dry-sage: #adb993;
+  --app-golden-sand: #d0d38f;
+  --app-apricot-cream: #f6ca83;
+  --app-palm-leaf: #949d6a;
+  --app-background: #12150f;
+  --app-surface: #0e110f;
+  --app-panel: #20261d;
+  --app-panel-raised: #293126;
+  --app-sidebar: #080a08;
+  --app-text: #f7f5ec;
+  --app-muted: #c8cdb9;
+  --app-ink: #080a08;
+  --app-button-text: #080a08;
+  --app-line: #adb99333;
+  --app-shadow: #0008;
+  --app-focus: #f6ca83;
+  --app-accent: #f6ca83;
+  --app-accent-alt: #d0d38f;
+  --app-grid: #949d6a0d;
+}
+
+:root[data-tema='claro'] {
+  --app-background: #f4f6ee;
+  --app-surface: #fffef8;
+  --app-panel: #e5eadc;
+  --app-panel-raised: #d8dfcb;
+  --app-sidebar: #d5ddca;
+  --app-text: #1b241d;
+  --app-muted: #536055;
+  --app-ink: #111611;
+  --app-line: #63705a4d;
+  --app-shadow: #52604a35;
+  --app-grid: #949d6a1d;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: #121212;
+  color: var(--app-text);
+  background: var(--app-background);
+  transition: color .2s ease, background .2s ease;
+}
+
+button, input, textarea, select { font: inherit; }
+
+app-perfil .selecao-categoria { display: grid; gap: 10px; }
+app-perfil .favoritos-grupos { display: grid; gap: 22px; }
+app-perfil .favoritos-grupo { padding: 14px; background: #9cafb70b; border: 1px solid var(--app-line); }
+app-perfil .favoritos-grupo > header { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+app-perfil .favoritos-grupo > header span { color: var(--app-apricot-cream); font-family: Georgia, serif; font-size: 1.3rem; }
+app-perfil .favoritos-grupo h3 { margin: 0; font-family: "Trebuchet MS", sans-serif; font-size: .95rem; }
+app-perfil .favoritos-grupo:nth-child(2) .favorito-card { border-color: var(--app-golden-sand); }
+app-perfil .favoritos-grupo:nth-child(3) .favorito-card { border-color: var(--app-palm-leaf); }
+app-perfil .selecao-categoria + .selecao-categoria { margin-top: 8px; }
+app-perfil .selecao-categoria h3 { margin: 0; color: var(--app-dry-sage); font-family: "Trebuchet MS", sans-serif; font-size: .84rem; }
+app-perfil .opcoes-favoritos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; max-height: 190px; overflow-y: auto; padding: 2px; }
+app-perfil .opcao-favorito { display: flex; align-items: center; gap: 9px; min-height: 42px; padding: 8px 10px; color: var(--app-text); background: var(--app-panel); border: 1px solid var(--app-line); cursor: pointer; }
+app-perfil .opcao-favorito input { width: 16px; min-height: 16px; margin: 0; accent-color: var(--app-apricot-cream); }
+app-perfil .opcao-favorito > span { display: grid; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+app-perfil .opcao-favorito small { color: var(--app-muted); font-weight: 500; }
+app-perfil .opcao-favorito--destaque { opacity: .58; border-style: dashed; }
+app-perfil .opcoes-favoritos--musicas { max-height: 230px; }
+
+@media (max-width: 560px) {
+  app-perfil .opcoes-favoritos { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html, body { transition: none; }
 }
