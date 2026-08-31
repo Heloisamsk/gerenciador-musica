@@ -1,5 +1,13 @@
 <form class="review-form" (submit)="salvar($event)">
-  @if (!estaEditando()) {
+  @if (alvoFixo(); as alvo) {
+    <div class="review-form__alvo-fixo">
+      <span class="review-form__rotulo">Avaliando</span>
+      <strong>{{ alvo.titulo }}</strong>
+      @if (alvo.artista) {
+        <span>{{ alvo.artista }}</span>
+      }
+    </div>
+  } @else if (!estaEditando()) {
     <div class="review-form__tipo" role="radiogroup" aria-label="Tipo de avaliação">
       <button
         type="button"

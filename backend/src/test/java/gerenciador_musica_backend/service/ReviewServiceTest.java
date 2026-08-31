@@ -212,6 +212,31 @@ class ReviewServiceTest {
     }
 
     @Test
+    void deveBuscarReviewDeOutroUsuarioSomenteParaVisualizacao() {
+        Usuario outroUsuario = new Usuario("João", "joao@email.com", "hash", Role.USER);
+        ReflectionTestUtils.setField(outroUsuario, "id", 2L);
+
+        Review review = new Review(outroUsuario, musica, null, (short) 4, "Muito bom");
+        ReflectionTestUtils.setField(review, "idReview", 70L);
+
+        when(reviewRepository.findById(70L)).thenReturn(Optional.of(review));
+
+        ReviewResponseDTO resposta = reviewService.buscarPorId(70L);
+
+        assertThat(resposta.idReview()).isEqualTo(70L);
+        assertThat(resposta.autor().nome()).isEqualTo("João");
+        assertThat(resposta.minhaReview()).isFalse();
+    }
+
+    @Test
+    void deveLancarExcecaoAoBuscarReviewInexistente() {
+        when(reviewRepository.findById(404L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> reviewService.buscarPorId(404L))
+                .isInstanceOf(ReviewNaoEncontradaException.class);
+    }
+
+    @Test
     void deveAtualizarReviewDoProprioUsuario() {
         Review review = new Review(usuarioLogado, musica, null, (short) 3, "Ok");
         ReflectionTestUtils.setField(review, "idReview", 50L);

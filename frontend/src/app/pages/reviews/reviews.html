@@ -1,54 +1,35 @@
-<div class="reviews-container">
-  <a class="voltar-link" routerLink="/home">
-    ← Voltar para a home
-  </a>
+<div class="reviews-shell">
+  <a class="voltar-link" routerLink="/home">← Voltar para a home</a>
 
   <div class="reviews-cabecalho">
     <div>
-      <h1 class="page-title">Reviews</h1>
+      <h1>Reviews</h1>
       <p class="reviews-subtitulo">
         Avalie músicas e álbuns de 1 a 5 estrelas, inspirado no Letterboxd.
       </p>
     </div>
 
-    @if (!criandoReview() && !reviewEmEdicao()) {
-      <button type="button" class="reviews-nova" (click)="abrirNovaReview()">
-        + Nova review
-      </button>
-    }
+    <a class="acao acao--principal" routerLink="/reviews/nova">
+      + Nova review
+    </a>
   </div>
 
-  @if (criandoReview()) {
-    <app-review-form
-      (salvo)="aoSalvarFormulario()"
-      (cancelado)="fecharFormularios()"
-    />
-  }
-
-  @if (reviewEmEdicao(); as review) {
-    <app-review-form
-      [reviewParaEditar]="review"
-      (salvo)="aoSalvarFormulario()"
-      (cancelado)="fecharFormularios()"
-    />
-  }
-
-  <div class="reviews-abas" role="tablist">
+  <div class="reviews-escopo" role="tablist">
     <button
       type="button"
       role="tab"
-      class="reviews-aba"
-      [class.reviews-aba--ativa]="abaAtiva() === 'FEED'"
-      (click)="trocarAba('FEED')"
+      class="reviews-escopo-botao"
+      [class.reviews-escopo-botao--ativo]="escopo() === 'TODAS'"
+      (click)="trocarEscopo('TODAS')"
     >
-      Atividade recente
+      Todas
     </button>
     <button
       type="button"
       role="tab"
-      class="reviews-aba"
-      [class.reviews-aba--ativa]="abaAtiva() === 'MINHAS'"
-      (click)="trocarAba('MINHAS')"
+      class="reviews-escopo-botao"
+      [class.reviews-escopo-botao--ativo]="escopo() === 'MINHAS'"
+      (click)="trocarEscopo('MINHAS')"
     >
       Minhas reviews
     </button>
@@ -60,51 +41,51 @@
     </div>
   }
 
-  <div class="reviews-lista" aria-live="polite">
-    @if (carregando()) {
-      <p class="mensagem-estado">Carregando reviews...</p>
-    } @else if (pagina() && pagina()!.itens.length === 0) {
-      <p class="mensagem-estado">
-        @if (abaAtiva() === 'MINHAS') {
-          Você ainda não avaliou nenhuma música ou álbum.
-        } @else {
-          Ainda não há reviews por aqui.
-        }
-      </p>
-    } @else {
-      @for (review of pagina()?.itens; track review.idReview) {
-        <app-review-card
-          [review]="review"
-          (editar)="editarReview($event)"
-          (excluir)="excluirReview($event)"
-        />
+  @if (carregando()) {
+    <p class="mensagem-estado">Carregando reviews...</p>
+  } @else {
+    <section class="secao" aria-labelledby="titulo-albuns-review">
+      <div class="secao-cabecalho">
+        <h2 id="titulo-albuns-review">Álbuns</h2>
+      </div>
+
+      @if (reviewsAlbuns().length > 0) {
+        <div class="grade-reviews">
+          @for (review of reviewsAlbuns(); track review.idReview) {
+            <app-review-card [review]="review" />
+          }
+        </div>
+      } @else {
+        <p class="mensagem-estado">
+          @if (escopo() === 'MINHAS') {
+            Você ainda não avaliou nenhum álbum.
+          } @else {
+            Ainda não há reviews de álbuns.
+          }
+        </p>
       }
-    }
-  </div>
+    </section>
 
-  @if (pagina() && pagina()!.totalPaginas > 1) {
-    <div class="paginacao">
-      <button
-        class="botao-pagina"
-        type="button"
-        [disabled]="carregando() || pagina()!.paginaAtual <= 0"
-        (click)="paginaAnterior()"
-      >
-        ← Anterior
-      </button>
+    <section class="secao" aria-labelledby="titulo-musicas-review">
+      <div class="secao-cabecalho">
+        <h2 id="titulo-musicas-review">Músicas</h2>
+      </div>
 
-      <span class="pagina-info">
-        Página {{ pagina()!.paginaAtual + 1 }} de {{ pagina()!.totalPaginas }}
-      </span>
-
-      <button
-        class="botao-pagina"
-        type="button"
-        [disabled]="carregando() || pagina()!.paginaAtual + 1 >= pagina()!.totalPaginas"
-        (click)="proximaPagina()"
-      >
-        Próxima →
-      </button>
-    </div>
+      @if (reviewsMusicas().length > 0) {
+        <div class="grade-reviews">
+          @for (review of reviewsMusicas(); track review.idReview) {
+            <app-review-card [review]="review" />
+          }
+        </div>
+      } @else {
+        <p class="mensagem-estado">
+          @if (escopo() === 'MINHAS') {
+            Você ainda não avaliou nenhuma música.
+          } @else {
+            Ainda não há reviews de músicas.
+          }
+        </p>
+      }
+    </section>
   }
 </div>

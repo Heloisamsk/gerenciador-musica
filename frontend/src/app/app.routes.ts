@@ -229,6 +229,22 @@ export const routes: Routes = [
 },
 
 {
+  // Precisa vir antes de 'reviews/:id', senão "nova" seria
+  // interpretado como o :id de uma review.
+  path: 'reviews/nova',
+  loadComponent: () =>
+    import('./pages/review-nova/review-nova').then(modulo => modulo.ReviewNova),
+  canActivate: [authGuard]
+},
+
+{
+  path: 'reviews/:id',
+  loadComponent: () =>
+    import('./pages/review-detalhe/review-detalhe').then(modulo => modulo.ReviewDetalhe),
+  canActivate: [authGuard]
+},
+
+{
   path: '**',
   redirectTo: 'login'
 }

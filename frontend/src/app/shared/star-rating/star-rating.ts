@@ -2,6 +2,8 @@ import { Component, computed, input, output, signal } from '@angular/core';
 
 const ESTRELAS = [1, 2, 3, 4, 5] as const;
 
+let proximoId = 0;
+
 @Component({
   selector: 'app-star-rating',
   templateUrl: './star-rating.html',
@@ -9,17 +11,19 @@ const ESTRELAS = [1, 2, 3, 4, 5] as const;
 })
 export class StarRating {
 
-  nota = input<number>(0);
-  interativo = input(false);
-  rotulo = input('Nota');
+  protected readonly grupoNome = `star-rating-${proximoId++}`;
 
-  notaEscolhida = output<number>();
+  readonly nota = input<number>(0);
+  readonly interativo = input(false);
+  readonly rotulo = input('Nota');
+
+  readonly notaEscolhida = output<number>();
 
   protected readonly estrelas = ESTRELAS;
 
-  private notaEmHover = signal<number | null>(null);
+  private readonly notaEmHover = signal<number | null>(null);
 
-  protected notaExibida = computed(
+  protected readonly notaExibida = computed(
     () => this.notaEmHover() ?? this.nota()
   );
 

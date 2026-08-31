@@ -19,6 +19,13 @@ describe('AlbumDetalhePage', () => {
   let httpMock: HttpTestingController;
 
   const apiUrl = 'http://localhost:8080/api/albuns/10/detalhes';
+  const reviewsUrl = 'http://localhost:8080/api/reviews/albuns/10?page=0';
+
+  function flushReviewsVazio(): void {
+    httpMock.expectOne(reviewsUrl).flush({
+      itens: [], paginaAtual: 0, tamanhoPagina: 20, totalItens: 0, totalPaginas: 0
+    });
+  }
 
   afterEach(() => {
     httpMock?.verify();
@@ -31,6 +38,7 @@ describe('AlbumDetalhePage', () => {
     const requisicao = httpMock.expectOne(apiUrl);
     expect(requisicao.request.method).toBe('GET');
     requisicao.flush(detalhesDeExemplo());
+    flushReviewsVazio();
     fixture.detectChanges();
 
     const texto = fixture.nativeElement.textContent;
@@ -80,6 +88,7 @@ describe('AlbumDetalhePage', () => {
         {},
         { status, statusText: 'Erro' }
       );
+      flushReviewsVazio();
 
       expect(component.mensagemErro()).toBe(mensagem);
       expect(component.carregando()).toBe(false);
@@ -91,6 +100,7 @@ describe('AlbumDetalhePage', () => {
     fixture.detectChanges();
 
     httpMock.expectOne(apiUrl).error(new ProgressEvent('network'));
+    flushReviewsVazio();
 
     expect(component.mensagemErro()).toBe(
       'Não foi possível conectar ao servidor. Tente novamente.'
@@ -105,6 +115,7 @@ describe('AlbumDetalhePage', () => {
       {},
       { status: 500, statusText: 'Internal Server Error' }
     );
+    flushReviewsVazio();
 
     component.tentarNovamente();
     httpMock.expectOne(apiUrl).flush(detalhesDeExemplo());
@@ -124,11 +135,55 @@ describe('AlbumDetalhePage', () => {
     detalhes.musicas = [];
 
     httpMock.expectOne(apiUrl).flush(detalhes);
+    flushReviewsVazio();
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain(
       'Este álbum ainda não possui músicas cadastradas.'
     );
+  });
+
+  it('deve mostrar "Avaliar" quando o usuário ainda não tem review deste álbum', async () => {
+    await configurarComId('10');
+    fixture.detectChanges();
+
+    httpMock.expectOne(apiUrl).flush(detalhesDeExemplo());
+    flushReviewsVazio();
+    fixture.detectChanges();
+
+    const link = fixture.nativeElement.querySelector('.acao-avaliar');
+    expect(link.textContent).toContain('Avaliar');
+    expect(link.getAttribute('href')).toBe(
+      '/reviews/nova?tipo=ALBUM&id=10&titulo=A%20Night%20at%20the%20Opera&artista=Queen'
+    );
+  });
+
+  it('deve linkar para a review existente quando o álbum já foi avaliado', async () => {
+    await configurarComId('10');
+    fixture.detectChanges();
+
+    httpMock.expectOne(apiUrl).flush(detalhesDeExemplo());
+    httpMock.expectOne(reviewsUrl).flush({
+      itens: [{
+        idReview: 9,
+        autor: { id: 1, nome: 'Você' },
+        alvo: { tipo: 'ALBUM', id: 10, titulo: 'A Night at the Opera', artista: 'Queen', capaUrl: null },
+        nota: 5,
+        texto: null,
+        criadaEm: '2026-01-01T00:00:00Z',
+        atualizadaEm: '2026-01-01T00:00:00Z',
+        minhaReview: true
+      }],
+      paginaAtual: 0,
+      tamanhoPagina: 20,
+      totalItens: 1,
+      totalPaginas: 1
+    });
+    fixture.detectChanges();
+
+    const link = fixture.nativeElement.querySelector('.acao-avaliar');
+    expect(link.textContent).toContain('Ver minha review');
+    expect(link.getAttribute('href')).toBe('/reviews/9');
   });
 
   it('deve substituir uma capa inválida pela imagem padrão', async () => {

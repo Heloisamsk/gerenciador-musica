@@ -25,6 +25,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -82,6 +83,25 @@ class ReviewControllerTest {
     }
 
     @Test
+    void deveBuscarReviewPorId() throws Exception {
+        when(reviewService.buscarPorId(1L)).thenReturn(montarResposta());
+
+        mockMvc.perform(get("/api/reviews/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idReview").value(1))
+                .andExpect(jsonPath("$.alvo.titulo").value("Bohemian Rhapsody"));
+    }
+
+    @Test
+    void deveRetornar404AoBuscarReviewInexistente() throws Exception {
+        when(reviewService.buscarPorId(99L))
+                .thenThrow(new ReviewNaoEncontradaException(99L));
+
+        mockMvc.perform(get("/api/reviews/99"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void deveAtualizarReview() throws Exception {
         when(reviewService.atualizarReview(eq(1L), any()))
                 .thenReturn(montarResposta());
@@ -95,8 +115,8 @@ class ReviewControllerTest {
                 .andExpect(jsonPath("$.nota").value(5));
 
         verify(reviewService).atualizarReview(
-                eq(1L),
-                eq(new ReviewAtualizacaoRequestDTO((short) 5, "Obra-prima"))
+                1L,
+                new ReviewAtualizacaoRequestDTO((short) 5, "Obra-prima")
         );
     }
 
@@ -125,7 +145,7 @@ class ReviewControllerTest {
 
     @Test
     void deveRetornar404AoExcluirReviewInexistente() throws Exception {
-        org.mockito.Mockito.doThrow(new ReviewNaoEncontradaException(99L))
+        doThrow(new ReviewNaoEncontradaException(99L))
                 .when(reviewService).excluirReview(99L);
 
         mockMvc.perform(delete("/api/reviews/99"))

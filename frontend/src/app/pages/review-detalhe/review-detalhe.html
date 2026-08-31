@@ -1,0 +1,71 @@
+<div class="review-detalhe-container">
+  <a class="voltar-link" routerLink="/reviews">← Voltar para reviews</a>
+
+  @if (carregando()) {
+    <p class="mensagem-estado">Carregando review...</p>
+  } @else if (mensagemErro()) {
+    <div class="status-message error-message" role="alert">
+      <p>{{ mensagemErro() }}</p>
+    </div>
+  } @else if (review(); as review) {
+    @if (editando()) {
+      <app-review-form
+        [reviewParaEditar]="review"
+        (salvo)="aoSalvarEdicao($event)"
+        (cancelado)="cancelarEdicao()"
+      />
+    } @else {
+      <article class="review-detalhe">
+        <a class="review-detalhe__capa" [routerLink]="rotaAlvo(review)">
+          <img
+            [src]="review.alvo.capaUrl || '/capa-padrao.png'"
+            [alt]="'Capa de ' + review.alvo.titulo"
+            (error)="aoFalharCapa($event)"
+          />
+        </a>
+
+        <div class="review-detalhe__conteudo">
+          <span class="review-detalhe__tipo">
+            {{ review.alvo.tipo === 'ALBUM' ? 'Álbum' : 'Música' }}
+          </span>
+
+          <h1>
+            <a [routerLink]="rotaAlvo(review)">{{ review.alvo.titulo }}</a>
+          </h1>
+
+          @if (review.alvo.artista) {
+            <p class="review-detalhe__artista">{{ review.alvo.artista }}</p>
+          }
+
+          <div class="review-detalhe__avaliacao">
+            <app-star-rating [nota]="review.nota" rotulo="Nota" />
+
+            <span class="review-detalhe__autor">
+              @if (review.minhaReview) {
+                Avaliado por <strong>você</strong>
+              } @else {
+                Avaliado por <strong>{{ review.autor.nome }}</strong>
+              }
+              em {{ formatarData(review.criadaEm) }}
+            </span>
+          </div>
+
+          @if (review.texto) {
+            <p class="review-detalhe__texto">{{ review.texto }}</p>
+          }
+
+          @if (review.minhaReview) {
+            <div class="review-detalhe__acoes">
+              <button type="button" class="botao-secundario" (click)="abrirEdicao()">
+                Editar
+              </button>
+              <button type="button" class="botao-perigo" (click)="excluir()">
+                Excluir
+              </button>
+            </div>
+          }
+        </div>
+      </article>
+    }
+  }
+</div>

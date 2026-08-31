@@ -1,0 +1,33 @@
+.review-nova-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(20px, 4vw, 48px);
+  color: var(--app-text);
+  background: var(--app-background);
+}
+
+.voltar-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--app-muted);
+  text-decoration: none;
+  font-size: 0.86rem;
+  transition: color 0.2s ease;
+}
+
+.voltar-link:hover {
+  color: var(--app-accent);
+}
+
+.page-title {
+  max-width: 560px;
+  margin: 0 auto 20px;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 1.9rem;
+}
+
+app-review-form {
+  display: block;
+  max-width: 560px;
+  margin: 0 auto;
+}

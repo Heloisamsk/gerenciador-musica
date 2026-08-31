@@ -36,7 +36,7 @@ describe('StarRating', () => {
     const botoes = fixture.nativeElement.querySelectorAll(
       '.star-rating__botao'
     );
-    (botoes[3] as HTMLButtonElement).click();
+    (botoes[3] as HTMLLabelElement).click();
 
     expect(notaEmitida).toBe(4);
   });

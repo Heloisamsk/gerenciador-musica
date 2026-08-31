@@ -5,9 +5,7 @@ import {
 } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { vi } from 'vitest';
 
-import type { PaginaResponse } from '../../models/PaginaResponse';
 import type { Review } from '../../models/Review';
 import { Reviews } from './reviews';
 
@@ -17,30 +15,41 @@ describe('Reviews', () => {
 
   const apiUrl = 'http://localhost:8080/api/reviews';
 
-  const reviewDeExemplo: Review = {
-    idReview: 1,
-    autor: { id: 1, nome: 'Maria' },
-    alvo: {
-      tipo: 'MUSICA',
-      id: 20,
-      titulo: 'Bohemian Rhapsody',
-      artista: 'Queen',
-      capaUrl: null
-    },
-    nota: 5,
-    texto: 'Obra-prima',
-    criadaEm: '2026-01-10T12:00:00Z',
-    atualizadaEm: '2026-01-10T12:00:00Z',
-    minhaReview: true
-  };
-
-  function paginaDeExemplo(): PaginaResponse<Review> {
+  function reviewMusica(): Review {
     return {
-      itens: [reviewDeExemplo],
-      paginaAtual: 0,
-      tamanhoPagina: 20,
-      totalItens: 1,
-      totalPaginas: 1
+      idReview: 1,
+      autor: { id: 1, nome: 'Maria' },
+      alvo: {
+        tipo: 'MUSICA',
+        id: 20,
+        titulo: 'Bohemian Rhapsody',
+        artista: 'Queen',
+        capaUrl: null
+      },
+      nota: 5,
+      texto: 'Obra-prima',
+      criadaEm: '2026-01-10T12:00:00Z',
+      atualizadaEm: '2026-01-10T12:00:00Z',
+      minhaReview: true
+    };
+  }
+
+  function reviewAlbum(): Review {
+    return {
+      idReview: 2,
+      autor: { id: 1, nome: 'Maria' },
+      alvo: {
+        tipo: 'ALBUM',
+        id: 10,
+        titulo: 'A Night at the Opera',
+        artista: 'Queen',
+        capaUrl: null
+      },
+      nota: 4,
+      texto: null,
+      criadaEm: '2026-01-09T12:00:00Z',
+      atualizadaEm: '2026-01-09T12:00:00Z',
+      minhaReview: false
     };
   }
 
@@ -62,46 +71,51 @@ describe('Reviews', () => {
     httpMock.verify();
   });
 
-  it('deve carregar o feed ao iniciar', () => {
+  it('deve separar as reviews carregadas em álbuns e músicas', () => {
     fixture.detectChanges();
 
-    httpMock.expectOne(`${apiUrl}?page=0`).flush(paginaDeExemplo());
-    fixture.detectChanges();
-
-    expect(fixture.nativeElement.textContent).toContain('Bohemian Rhapsody');
-  });
-
-  it('deve recarregar como "minhas reviews" ao trocar de aba', () => {
-    fixture.detectChanges();
-    httpMock.expectOne(`${apiUrl}?page=0`).flush(paginaDeExemplo());
-    fixture.detectChanges();
-
-    fixture.componentInstance['trocarAba']('MINHAS');
-
-    httpMock.expectOne(`${apiUrl}/minhas?page=0`).flush(paginaDeExemplo());
-  });
-
-  it('deve excluir uma review após confirmação e recarregar a lista', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-
-    fixture.detectChanges();
-    httpMock.expectOne(`${apiUrl}?page=0`).flush(paginaDeExemplo());
-    fixture.detectChanges();
-
-    fixture.componentInstance['excluirReview'](reviewDeExemplo);
-
-    httpMock.expectOne(`${apiUrl}/1`).flush(null);
-    httpMock.expectOne(`${apiUrl}?page=0`).flush({
-      itens: [], paginaAtual: 0, tamanhoPagina: 20, totalItens: 0, totalPaginas: 0
+    httpMock.expectOne(`${apiUrl}?page=0&size=60`).flush({
+      itens: [reviewMusica(), reviewAlbum()],
+      paginaAtual: 0,
+      tamanhoPagina: 60,
+      totalItens: 2,
+      totalPaginas: 1
     });
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance['reviewsMusicas']()).toHaveLength(1);
+    expect(fixture.componentInstance['reviewsAlbuns']()).toHaveLength(1);
+
+    const cards = fixture.nativeElement.querySelectorAll('app-review-card');
+    expect(cards.length).toBe(2);
   });
 
-  it('não deve excluir quando o usuário cancela a confirmação', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
-
+  it('deve recarregar como "minhas reviews" ao trocar de escopo', () => {
     fixture.detectChanges();
-    httpMock.expectOne(`${apiUrl}?page=0`).flush(paginaDeExemplo());
+    httpMock.expectOne(`${apiUrl}?page=0&size=60`).flush({
+      itens: [], paginaAtual: 0, tamanhoPagina: 60, totalItens: 0, totalPaginas: 0
+    });
+    fixture.detectChanges();
 
-    fixture.componentInstance['excluirReview'](reviewDeExemplo);
+    fixture.componentInstance['trocarEscopo']('MINHAS');
+
+    httpMock.expectOne(`${apiUrl}/minhas?page=0&size=60`).flush({
+      itens: [], paginaAtual: 0, tamanhoPagina: 60, totalItens: 0, totalPaginas: 0
+    });
+
+    expect(fixture.componentInstance['escopo']()).toBe('MINHAS');
+  });
+
+  it('deve exibir mensagem de estado vazio por seção', () => {
+    fixture.detectChanges();
+
+    httpMock.expectOne(`${apiUrl}?page=0&size=60`).flush({
+      itens: [], paginaAtual: 0, tamanhoPagina: 60, totalItens: 0, totalPaginas: 0
+    });
+    fixture.detectChanges();
+
+    const texto = fixture.nativeElement.textContent;
+    expect(texto).toContain('Ainda não há reviews de álbuns.');
+    expect(texto).toContain('Ainda não há reviews de músicas.');
   });
 });

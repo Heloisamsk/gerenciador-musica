@@ -12,6 +12,13 @@ interface OpcaoAlvo {
   rotulo: string;
 }
 
+export interface AlvoFixo {
+  tipo: TipoAlvoReview;
+  id: number;
+  titulo: string;
+  artista: string | null;
+}
+
 @Component({
   selector: 'app-review-form',
   imports: [StarRating],
@@ -20,22 +27,29 @@ interface OpcaoAlvo {
 })
 export class ReviewForm implements OnInit {
 
-  reviewParaEditar = input<Review | null>(null);
+  readonly reviewParaEditar = input<Review | null>(null);
 
-  salvo = output<void>();
-  cancelado = output<void>();
+  /*
+   * Quando a review é criada a partir da página de uma música/álbum
+   * específica, o alvo já é conhecido — pula o seletor e mostra só
+   * nota + comentário.
+   */
+  readonly alvoFixo = input<AlvoFixo | null>(null);
 
-  protected tipoAlvo = signal<TipoAlvoReview>('MUSICA');
-  protected idAlvoSelecionado = signal<number | null>(null);
-  protected nota = signal(0);
-  protected texto = signal('');
-  protected enviando = signal(false);
-  protected erro = signal<string | null>(null);
+  readonly salvo = output<Review>();
+  readonly cancelado = output<void>();
 
-  private musicas = signal<MusicaListagem[]>([]);
-  private albuns = signal<AlbumResponse[]>([]);
+  protected readonly tipoAlvo = signal<TipoAlvoReview>('MUSICA');
+  protected readonly idAlvoSelecionado = signal<number | null>(null);
+  protected readonly nota = signal(0);
+  protected readonly texto = signal('');
+  protected readonly enviando = signal(false);
+  protected readonly erro = signal<string | null>(null);
 
-  protected opcoesAlvo = computed<OpcaoAlvo[]>(() =>
+  private readonly musicas = signal<MusicaListagem[]>([]);
+  private readonly albuns = signal<AlbumResponse[]>([]);
+
+  protected readonly opcoesAlvo = computed<OpcaoAlvo[]>(() =>
     this.tipoAlvo() === 'MUSICA'
       ? this.musicas().map(musica => ({
           id: musica.id,
@@ -47,14 +61,18 @@ export class ReviewForm implements OnInit {
         }))
   );
 
-  protected estaEditando = computed(() => this.reviewParaEditar() !== null);
+  protected readonly estaEditando = computed(() => this.reviewParaEditar() !== null);
 
-  protected podeSalvar = computed(() => {
+  protected readonly temAlvoPreDefinido = computed(
+    () => this.estaEditando() || this.alvoFixo() !== null
+  );
+
+  protected readonly podeSalvar = computed(() => {
     if (this.nota() < 1 || this.nota() > 5) {
       return false;
     }
 
-    return this.estaEditando() || this.idAlvoSelecionado() !== null;
+    return this.temAlvoPreDefinido() || this.idAlvoSelecionado() !== null;
   });
 
   constructor(
@@ -68,6 +86,14 @@ export class ReviewForm implements OnInit {
     if (review) {
       this.nota.set(review.nota);
       this.texto.set(review.texto ?? '');
+      return;
+    }
+
+    const alvo = this.alvoFixo();
+
+    if (alvo) {
+      this.tipoAlvo.set(alvo.tipo);
+      this.idAlvoSelecionado.set(alvo.id);
       return;
     }
 
@@ -122,9 +148,9 @@ export class ReviewForm implements OnInit {
         });
 
     operacao.subscribe({
-      next: () => {
+      next: (reviewSalva) => {
         this.enviando.set(false);
-        this.salvo.emit();
+        this.salvo.emit(reviewSalva);
       },
       error: (erro: Error) => {
         this.enviando.set(false);

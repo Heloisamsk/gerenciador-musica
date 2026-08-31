@@ -12,6 +12,26 @@
   border-radius: 17px;
 }
 
+.review-form__alvo-fixo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--app-panel-raised);
+  border-radius: 10px;
+}
+
+.review-form__alvo-fixo strong {
+  color: var(--app-text);
+  font-size: 0.94rem;
+}
+
+.review-form__alvo-fixo span {
+  color: var(--app-muted);
+  font-size: 0.84rem;
+}
+
 .review-form__tipo {
   display: inline-flex;
   gap: 6px;

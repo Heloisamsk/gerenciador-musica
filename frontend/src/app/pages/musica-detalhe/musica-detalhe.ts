@@ -1,12 +1,14 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Params, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { finalize } from 'rxjs';
+import { catchError, finalize, of } from 'rxjs';
 
 import { MusicaService } from '../../services/musica';
 import { MusicaResponse } from '../../models/MusicaResponse';
 import { formatarDuracao } from '../../shared/formatar-duracao';
 import { YoutubePlayer } from '../../shared/youtube-player/youtube-player';
+import type { Review } from '../../models/Review';
+import { ReviewService } from '../../services/review';
 
 @Component({
   selector: 'app-musica-detalhe',
@@ -22,6 +24,10 @@ export class MusicaDetalhe implements OnInit {
   carregando = signal(false);
   mensagemErro = signal('');
 
+  // Minha review desta música, se existir — usada para trocar o botão
+  // "Avaliar" por "Ver minha review" e evitar tentar criar duplicada.
+  minhaReview = signal<Review | null>(null);
+
   // Filtros/página da pesquisa que trouxe o usuário até aqui, recebidos via
   // router state (não vão pra URL). Se a página for aberta direto (sem vir
   // da pesquisa), fica vazio e o link de volta cai numa pesquisa em branco.
@@ -29,6 +35,7 @@ export class MusicaDetalhe implements OnInit {
 
   constructor(
     private readonly musicaService: MusicaService,
+    private readonly reviewService: ReviewService,
     private readonly route: ActivatedRoute
   ) {}
 
@@ -36,6 +43,7 @@ export class MusicaDetalhe implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.voltarQueryParams.set(window.history.state?.queryParams ?? {});
     this.carregarMusica(id);
+    this.carregarMinhaReview(id);
   }
 
   private carregarMusica(id: number): void {
@@ -51,6 +59,15 @@ export class MusicaDetalhe implements OnInit {
           console.error(erro);
           this.mensagemErro.set(this.mensagemDeErroPara(erro));
         }
+      });
+  }
+
+  private carregarMinhaReview(id: number): void {
+    this.reviewService.listarPorMusica(id)
+      .pipe(catchError(() => of(null)))
+      .subscribe(pagina => {
+        const minha = pagina?.itens.find(review => review.minhaReview);
+        this.minhaReview.set(minha ?? null);
       });
   }
 

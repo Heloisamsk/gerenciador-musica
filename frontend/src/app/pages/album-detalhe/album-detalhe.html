@@ -74,6 +74,25 @@
               }
             </ul>
           }
+
+          @if (minhaReview(); as review) {
+            <a class="botao-secundario acao-avaliar" [routerLink]="['/reviews', review.idReview]">
+              ★ Ver minha review
+            </a>
+          } @else {
+            <a
+              class="botao-secundario acao-avaliar"
+              routerLink="/reviews/nova"
+              [queryParams]="{
+                tipo: 'ALBUM',
+                id: detalhesAlbum.album.idAlbum,
+                titulo: detalhesAlbum.album.titulo,
+                artista: detalhesAlbum.album.nomeArtista
+              }"
+            >
+              ★ Avaliar
+            </a>
+          }
         </div>
       </header>
 

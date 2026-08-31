@@ -14,6 +14,7 @@ describe('MusicaDetalhe', () => {
   let httpMock: HttpTestingController;
 
   const musicaUrl = 'http://localhost:8080/api/musicas/1';
+  const reviewsUrl = 'http://localhost:8080/api/reviews/musicas/1?page=0';
 
   function configurarTestBed() {
     TestBed.configureTestingModule({
@@ -36,6 +37,10 @@ describe('MusicaDetalhe', () => {
     httpMock = TestBed.inject(HttpTestingController);
   }
 
+  function paginaVazia() {
+    return { itens: [], paginaAtual: 0, tamanhoPagina: 20, totalItens: 0, totalPaginas: 0 };
+  }
+
   afterEach(() => {
     httpMock.verify();
   });
@@ -45,6 +50,7 @@ describe('MusicaDetalhe', () => {
     fixture.detectChanges();
 
     httpMock.expectOne(musicaUrl).flush(musicaDeExemplo());
+    httpMock.expectOne(reviewsUrl).flush(paginaVazia());
 
     expect(component).toBeTruthy();
   });
@@ -54,6 +60,7 @@ describe('MusicaDetalhe', () => {
     fixture.detectChanges();
 
     httpMock.expectOne(musicaUrl).flush(musicaDeExemplo());
+    httpMock.expectOne(reviewsUrl).flush(paginaVazia());
 
     expect(component.musica()?.titulo).toBe('Bohemian Rhapsody');
     expect(component.musica()?.letra).toBe('Is this the real life?');
@@ -67,6 +74,7 @@ describe('MusicaDetalhe', () => {
     httpMock
       .expectOne(musicaUrl)
       .flush({ message: 'erro' }, { status: 404, statusText: 'Not Found' });
+    httpMock.expectOne(reviewsUrl).flush(paginaVazia());
 
     expect(component.mensagemErro()).toBe('Música não encontrada.');
   });
@@ -79,6 +87,7 @@ describe('MusicaDetalhe', () => {
       ...musicaDeExemplo(),
       youtubeVideoId: 'dQw4w9WgXcQ'
     });
+    httpMock.expectOne(reviewsUrl).flush(paginaVazia());
     fixture.detectChanges();
 
     const iframe = fixture.nativeElement
@@ -95,9 +104,53 @@ describe('MusicaDetalhe', () => {
     fixture.detectChanges();
 
     httpMock.expectOne(musicaUrl).flush(musicaDeExemplo());
+    httpMock.expectOne(reviewsUrl).flush(paginaVazia());
     fixture.detectChanges();
 
     expect(fixture.nativeElement.querySelector('iframe')).toBeNull();
+  });
+
+  it('deve mostrar "Avaliar" quando o usuário ainda não tem review', () => {
+    configurarTestBed();
+    fixture.detectChanges();
+
+    httpMock.expectOne(musicaUrl).flush(musicaDeExemplo());
+    httpMock.expectOne(reviewsUrl).flush(paginaVazia());
+    fixture.detectChanges();
+
+    const link = fixture.nativeElement.querySelector('.acao-avaliar');
+    expect(link.textContent).toContain('Avaliar');
+    expect(link.getAttribute('href')).toBe(
+      '/reviews/nova?tipo=MUSICA&id=1&titulo=Bohemian%20Rhapsody&artista=Queen'
+    );
+  });
+
+  it('deve linkar para a review existente quando o usuário já avaliou', () => {
+    configurarTestBed();
+    fixture.detectChanges();
+
+    httpMock.expectOne(musicaUrl).flush(musicaDeExemplo());
+    httpMock.expectOne(reviewsUrl).flush({
+      itens: [{
+        idReview: 7,
+        autor: { id: 1, nome: 'Você' },
+        alvo: { tipo: 'MUSICA', id: 1, titulo: 'Bohemian Rhapsody', artista: 'Queen', capaUrl: null },
+        nota: 5,
+        texto: null,
+        criadaEm: '2026-01-01T00:00:00Z',
+        atualizadaEm: '2026-01-01T00:00:00Z',
+        minhaReview: true
+      }],
+      paginaAtual: 0,
+      tamanhoPagina: 20,
+      totalItens: 1,
+      totalPaginas: 1
+    });
+    fixture.detectChanges();
+
+    const link = fixture.nativeElement.querySelector('.acao-avaliar');
+    expect(link.textContent).toContain('Ver minha review');
+    expect(link.getAttribute('href')).toBe('/reviews/7');
   });
 
   function musicaDeExemplo() {

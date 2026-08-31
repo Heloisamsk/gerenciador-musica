@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import type { Review } from '../../models/Review';
@@ -14,35 +14,10 @@ const CAPA_PADRAO = '/capa-padrao.png';
 })
 export class ReviewCard {
 
-  review = input.required<Review>();
-
-  editar = output<Review>();
-  excluir = output<Review>();
-
-  protected rotaAlvo(review: Review): string[] {
-    return review.alvo.tipo === 'ALBUM'
-      ? ['/albuns', String(review.alvo.id)]
-      : ['/musicas', String(review.alvo.id)];
-  }
-
-  protected formatarData(data: string): string {
-    return new Date(data).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
-  }
+  readonly review = input.required<Review>();
 
   protected aoFalharCapa(evento: Event): void {
     const imagem = evento.target as HTMLImageElement;
     imagem.src = CAPA_PADRAO;
-  }
-
-  protected aoClicarEditar(): void {
-    this.editar.emit(this.review());
-  }
-
-  protected aoClicarExcluir(): void {
-    this.excluir.emit(this.review());
   }
 }
