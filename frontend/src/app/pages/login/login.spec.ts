@@ -47,6 +47,15 @@ describe('Login (integração com AuthService)', () => {
     router = TestBed.inject(Router);
 
     await fixture.whenStable();
+
+    /*
+     * O template também renderiza o app-album-backdrop, que busca
+     * as capas públicas no ngOnInit. Sem isso, httpMock.verify()
+     * encontraria essa requisição em aberto em todo teste.
+     */
+    httpMock
+      .expectOne('http://localhost:8080/api/public/albuns/capas')
+      .flush([]);
   });
 
   afterEach(() => {

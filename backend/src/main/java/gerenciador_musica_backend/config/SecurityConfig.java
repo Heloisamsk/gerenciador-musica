@@ -90,6 +90,11 @@ public class SecurityConfig {
                         )
                         .permitAll()
 
+                        // Dados públicos de leitura para telas sem login
+                        // (ex.: fundo decorativo de login/cadastro)
+                        .requestMatchers(HttpMethod.GET, "/api/public/**")
+                        .permitAll()
+
                         // Somente ADMIN
                         .requestMatchers("/api/admin/**")
                         .hasRole("ADMIN")

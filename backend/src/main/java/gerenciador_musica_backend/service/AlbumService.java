@@ -1,6 +1,7 @@
 package gerenciador_musica_backend.service;
 
 import gerenciador_musica_backend.dto.AlbumAtualizacaoRequestDTO;
+import gerenciador_musica_backend.dto.AlbumCapaPublicaDTO;
 import gerenciador_musica_backend.dto.AlbumDetalheDTO;
 import gerenciador_musica_backend.dto.AlbumRequestDTO;
 import gerenciador_musica_backend.dto.AlbumResponseDTO;
@@ -141,6 +142,24 @@ public class AlbumService {
                 )
                 .stream()
                 .map(this::converterParaResponse)
+                .toList();
+    }
+
+    /*
+     * Usado pela tela pública de login/cadastro para exibir um
+     * fundo decorativo com capas reais do catálogo, sem exigir
+     * autenticação. Retorna apenas dados não sensíveis.
+     */
+    @Transactional(readOnly = true)
+    public List<AlbumCapaPublicaDTO> listarCapasPublicas() {
+        return albumRepository
+                .findByCapaUrlIsNotNull()
+                .stream()
+                .map(album -> new AlbumCapaPublicaDTO(
+                        album.getIdAlbum(),
+                        album.getTitulo(),
+                        album.getCapaUrl()
+                ))
                 .toList();
     }
 

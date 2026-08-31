@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { environment } from '../../environments/environment';
+import type { AlbumCapaPublica } from '../models/AlbumCapaPublica';
 import type { AlbumDetalhe } from '../models/AlbumDetalhe';
 import type { AlbumResponse } from '../models/AlbumResponse';
 import type { ArtistaDetalhe } from '../models/ArtistaDetalhe';
@@ -46,6 +47,13 @@ export class CatalogoService {
   listarAlbuns(): Observable<AlbumResponse[]> {
     return this.http.get<AlbumResponse[]>(
       `${this.apiUrl}/albuns`
+    );
+  }
+
+  // Não exige autenticação: usado no fundo decorativo de login/cadastro.
+  listarCapasPublicas(): Observable<AlbumCapaPublica[]> {
+    return this.http.get<AlbumCapaPublica[]>(
+      `${this.apiUrl}/public/albuns/capas`
     );
   }
 

@@ -5,6 +5,7 @@ import {
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import type { AlbumCapaPublica } from '../models/AlbumCapaPublica';
 import type { AlbumDetalhe } from '../models/AlbumDetalhe';
 import type { AlbumResponse } from '../models/AlbumResponse';
 import type { ArtistaDetalhe } from '../models/ArtistaDetalhe';
@@ -80,6 +81,24 @@ describe('CatalogoService', () => {
     expect(resultado[0].nome).toBe('Queen');
   });
 
+  it('deve listar as capas públicas sem autenticação', () => {
+    let resultado: AlbumCapaPublica[] = [];
+
+    service.listarCapasPublicas().subscribe(
+      capas => resultado = capas
+    );
+
+    const requisicao = httpMock.expectOne(
+      `${apiUrl}/public/albuns/capas`
+    );
+
+    expect(requisicao.request.method).toBe('GET');
+    requisicao.flush([capaPublicaDeExemplo()]);
+
+    expect(resultado).toHaveLength(1);
+    expect(resultado[0].titulo).toBe('A Night at the Opera');
+  });
+
   it('deve buscar os detalhes agregados do álbum pelo id', () => {
     let resultado: AlbumDetalhe | undefined;
 
@@ -112,6 +131,14 @@ describe('CatalogoService', () => {
         descricao: 'Banda britânica de rock.',
         fotoPerfilUrl: null
       }
+    };
+  }
+
+  function capaPublicaDeExemplo(): AlbumCapaPublica {
+    return {
+      id: 10,
+      titulo: 'A Night at the Opera',
+      capaUrl: 'https://exemplo.com/capas/10.jpg'
     };
   }
 
