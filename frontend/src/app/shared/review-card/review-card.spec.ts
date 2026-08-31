@@ -35,18 +35,20 @@ describe('ReviewCard', () => {
     fixture.detectChanges();
   });
 
-  it('deve exibir o alvo, a nota e o texto da review', () => {
+  it('deve exibir o alvo, a nota e linkar para a página da review', () => {
     const texto = fixture.nativeElement.textContent;
+    const link = fixture.nativeElement.querySelector('a.review-card');
 
     expect(texto).toContain('Bohemian Rhapsody');
     expect(texto).toContain('Queen');
-    expect(texto).toContain('Obra-prima');
+    expect(link.getAttribute('href')).toBe('/reviews/1');
   });
 
-  it('deve mostrar ações de editar/excluir somente quando é a própria review', () => {
+  it('deve marcar com um selo quando é a própria review', () => {
     expect(
-      fixture.nativeElement.querySelector('.review-card__acoes')
+      fixture.nativeElement.querySelector('.review-card__selo')
     ).not.toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Você');
 
     fixture.componentRef.setInput('review', {
       ...reviewDeExemplo,
@@ -55,21 +57,18 @@ describe('ReviewCard', () => {
     fixture.detectChanges();
 
     expect(
-      fixture.nativeElement.querySelector('.review-card__acoes')
+      fixture.nativeElement.querySelector('.review-card__selo')
     ).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Maria');
   });
 
-  it('deve emitir o evento excluir com a review atual', () => {
-    let reviewExcluida: Review | undefined;
-    fixture.componentInstance.excluir.subscribe(
-      (review: Review) => (reviewExcluida = review)
-    );
+  it('deve trocar para a capa padrão quando a imagem falhar', () => {
+    const imagem = fixture.nativeElement.querySelector(
+      '.review-card__capa img'
+    ) as HTMLImageElement;
 
-    const botaoExcluir = fixture.nativeElement.querySelector(
-      '.review-card__acao--excluir'
-    ) as HTMLButtonElement;
-    botaoExcluir.click();
+    imagem.dispatchEvent(new Event('error'));
 
-    expect(reviewExcluida?.idReview).toBe(1);
+    expect(imagem.src).toContain('/capa-padrao.png');
   });
 });
