@@ -1,224 +1,182 @@
 :host {
   display: block;
-
-  --background: #0f0f0f;
-  --card-background: #181818;
-  --field-background: #202020;
-  --border-color: #343434;
-  --primary: #1ed760;
-  --primary-hover: #1fdf64;
-  --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
-  --error: #ff6b6b;
-
   min-height: 100vh;
-  color: var(--text-primary);
-  background-color: var(--background);
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+  min-height: 100dvh;
+  color: var(--app-text);
+  background: var(--app-background);
+  font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
 }
 
-* {
+:host * {
   box-sizing: border-box;
 }
 
-.playlist-nova-page {
-  min-height: 100vh;
-  padding: 2rem;
-
-  background:
-    radial-gradient(
-      circle at top,
-      #1c1c1c 0%,
-      var(--background) 45%
-    );
-}
-
-.playlist-nova-card {
-  width: 100%;
-  max-width: 640px;
-
+.playlist-nova-shell {
+  max-width: 560px;
   margin: 0 auto;
-  padding: 2rem;
-
-  background-color: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 1.25rem;
-
-  box-shadow:
-    0 1.5rem 4rem
-    rgb(0 0 0 / 35%);
+  padding: clamp(22px, 3.5vw, 56px);
 }
 
 .voltar-link {
   display: inline-block;
-
-  margin-bottom: 1.5rem;
-
-  color: var(--text-secondary);
+  margin-bottom: 20px;
+  color: var(--app-muted);
   text-decoration: none;
-
-  font-size: 0.9rem;
-
-  transition: color 150ms ease;
+  font-size: 0.86rem;
+  transition: color 0.2s ease;
 }
 
 .voltar-link:hover {
-  color: var(--primary);
+  color: var(--app-apricot-cream);
 }
 
-.playlist-nova-header {
-  padding-bottom: 1.5rem;
-  margin-bottom: 1.5rem;
-
-  border-bottom: 1px solid var(--border-color);
+.playlist-nova-cabecalho {
+  margin-bottom: 22px;
 }
 
-.section-label {
-  margin: 0;
-
-  color: var(--primary);
-
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.12rem;
+.rotulo-secao {
+  color: var(--app-golden-sand);
+  font-family: Consolas, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
-.playlist-nova-header h1 {
-  margin: 0.5rem 0 0;
-
-  color: var(--text-primary);
-
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-  line-height: 1.1;
+.playlist-nova-cabecalho h1 {
+  margin: 6px 0 0;
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  letter-spacing: -0.03em;
 }
 
-.playlist-nova-header > p:last-child {
-  margin: 0.5rem 0 0;
-
-  color: var(--text-secondary);
-  font-size: 1rem;
+.playlist-nova-cabecalho p {
+  max-width: 46ch;
+  margin: 8px 0 0;
+  color: var(--app-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .playlist-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 16px;
+  padding: 20px;
+  background: var(--app-panel);
+  border: 1px solid var(--app-line);
+  border-radius: 17px;
 }
 
 .campo {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 6px;
 }
 
 .campo label {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
+  color: var(--app-muted);
+  font-size: 0.76rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .campo input,
 .campo textarea {
-  padding: 0.75rem 1rem;
-
-  color: var(--text-primary);
-  background-color: var(--field-background);
-
-  border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
-
-  font-size: 0.95rem;
-  font-family: inherit;
-
-  transition: border-color 150ms ease;
+  padding: 9px 12px;
+  color: var(--app-text);
+  background: var(--app-panel-raised);
+  border: 1px solid var(--app-line);
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
 }
 
-.campo input:focus,
-.campo textarea:focus {
-  outline: none;
-  border-color: var(--primary);
+.campo input:focus-visible,
+.campo textarea:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 1px;
 }
 
 .campo input.campo-invalido {
-  border-color: var(--error);
-}
-
-.campo textarea {
-  resize: vertical;
+  border-color: #c95d49;
 }
 
 .mensagem-validacao {
   margin: 0;
-  color: var(--error);
-  font-size: 0.85rem;
+  color: #f2a08e;
+  font-size: 0.78rem;
 }
 
 .status-message {
-  padding: 1rem;
-
-  background-color: var(--field-background);
-  border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
 }
 
 .status-message p {
   margin: 0;
-  font-size: 0.9rem;
 }
 
 .error-message {
-  color: var(--error);
-  border-color: rgb(255 107 107 / 40%);
+  color: #fff2ec;
+  background: #52231c;
+  border: 1px solid #c95d49;
 }
 
-.criar-button {
-  align-self: flex-start;
+.acoes-form {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
 
-  min-width: 10rem;
-
-  padding: 0.8rem 1.4rem;
-
-  color: #000000;
-  background-color: var(--primary);
-
-  border: none;
-  border-radius: 999px;
-
-  font-size: 0.9rem;
-  font-weight: 700;
-
+.botao-secundario {
+  padding: 9px 18px;
+  color: var(--app-text);
+  background: var(--app-panel-raised);
+  border: 1px solid var(--app-line);
+  border-radius: 11px;
   cursor: pointer;
-
-  transition:
-    background-color 150ms ease,
-    transform 150ms ease;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
-.criar-button:hover:not(:disabled) {
-  background-color: var(--primary-hover);
-  transform: scale(1.03);
+.botao-secundario:hover {
+  border-color: var(--app-muted);
 }
 
-.criar-button:disabled {
-  color: #b3b3b3;
-  background-color: #333333;
-  cursor: not-allowed;
+.acao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  color: var(--app-text);
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 800;
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-@media (max-width: 700px) {
-  .playlist-nova-page {
-    padding: 1rem;
-  }
+.acao--principal {
+  color: var(--app-button-text);
+  background: var(--app-apricot-cream);
+}
 
-  .playlist-nova-card {
-    padding: 1.25rem;
-  }
+.acao--principal:not(:disabled):hover {
+  opacity: 0.88;
+}
 
-  .criar-button {
-    width: 100%;
-  }
+.acao--principal:not(:disabled):active,
+.botao-secundario:active {
+  transform: scale(0.97);
+}
+
+.acao--principal:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }

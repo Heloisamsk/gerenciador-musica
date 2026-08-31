@@ -1,64 +1,74 @@
-<section class="playlist-nova-page">
-  <div class="playlist-nova-card">
+<div class="playlist-nova-shell">
+  <a class="voltar-link" routerLink="/playlists">← Voltar para playlists</a>
 
-    <a class="voltar-link" routerLink="/playlists">
-      ← Voltar para playlists
-    </a>
+  <header class="playlist-nova-cabecalho">
+    <span class="rotulo-secao">Nova playlist</span>
+    <h1>Criar playlist</h1>
+    <p>Dê um nome e, se quiser, uma descrição e uma capa para a sua nova playlist.</p>
+  </header>
 
-    <header class="playlist-nova-header">
-      <p class="section-label">Nova playlist</p>
-      <h1>Criar playlist</h1>
-      <p>
-        Dê um nome e, se quiser, uma descrição para a sua nova playlist.
-      </p>
-    </header>
+  <form [formGroup]="formulario" (ngSubmit)="enviar()" class="playlist-form">
 
-    <form [formGroup]="formulario" (ngSubmit)="enviar()" class="playlist-form">
+    <div class="campo">
+      <label for="nome">Nome</label>
+      <input
+        id="nome"
+        type="text"
+        formControlName="nome"
+        placeholder="Ex: Foco no trabalho"
+        [class.campo-invalido]="formulario.controls.nome.invalid && formulario.controls.nome.touched"
+      />
 
-      <div class="campo">
-        <label for="nome">Nome</label>
-        <input
-          id="nome"
-          type="text"
-          formControlName="nome"
-          placeholder="Ex: Foco no trabalho"
-          [class.campo-invalido]="formulario.controls.nome.invalid && formulario.controls.nome.touched"
-        />
-
-        @if (formulario.controls.nome.invalid && formulario.controls.nome.touched) {
+      @if (formulario.controls.nome.invalid && formulario.controls.nome.touched) {
         <p class="mensagem-validacao">O nome da playlist é obrigatório.</p>
-        }
-      </div>
+      }
+    </div>
 
-      <div class="campo">
-        <label for="descricao">Descrição (opcional)</label>
-        <textarea
-          id="descricao"
-          formControlName="descricao"
-          placeholder="Do que se trata essa playlist?"
-          rows="3"
-        ></textarea>
-      </div>
+    <div class="campo">
+      <label for="descricao">Descrição (opcional)</label>
+      <textarea
+        id="descricao"
+        formControlName="descricao"
+        placeholder="Do que se trata essa playlist?"
+        rows="3"
+      ></textarea>
+    </div>
 
-      @if (mensagemErro) {
+    <div class="campo">
+      <label for="capaUrl">Link da capa (opcional)</label>
+      <input
+        id="capaUrl"
+        type="url"
+        inputmode="url"
+        formControlName="capaUrl"
+        placeholder="https://exemplo.com/capa.jpg"
+        [class.campo-invalido]="formulario.controls.capaUrl.invalid && formulario.controls.capaUrl.touched"
+      />
+
+      @if (formulario.controls.capaUrl.invalid && formulario.controls.capaUrl.touched) {
+        <p class="mensagem-validacao">Informe um link iniciado por http:// ou https://.</p>
+      }
+    </div>
+
+    @if (mensagemErro) {
       <div class="status-message error-message" role="alert">
         <p>{{ mensagemErro }}</p>
       </div>
-      }
+    }
 
-      <button
-        class="criar-button"
-        type="submit"
-        [disabled]="enviando"
-      >
-        @if (enviando) {
-        Criando...
-        } @else {
-        Criar playlist
-        }
+    <div class="acoes-form">
+      <button class="botao-secundario" type="button" routerLink="/playlists">
+        Cancelar
       </button>
 
-    </form>
+      <button class="acao acao--principal" type="submit" [disabled]="enviando">
+        @if (enviando) {
+          Criando...
+        } @else {
+          Criar playlist
+        }
+      </button>
+    </div>
 
-  </div>
-</section>
+  </form>
+</div>
