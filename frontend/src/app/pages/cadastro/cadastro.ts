@@ -8,10 +8,12 @@ import {
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth';
+import { AlbumBackdrop } from '../../shared/album-backdrop/album-backdrop';
+import { VinylMark } from '../../shared/vinyl-mark/vinyl-mark';
 
 @Component({
   selector: 'app-cadastro',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, VinylMark, AlbumBackdrop],
   templateUrl: './cadastro.html',
   styleUrl: './cadastro.css',
 })

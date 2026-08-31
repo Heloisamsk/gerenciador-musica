@@ -32,6 +32,16 @@ describe('Cadastro (integração com AuthService)', () => {
     router = TestBed.inject(Router);
 
     fixture.detectChanges();
+
+    /*
+     * O template também renderiza o app-album-backdrop, que busca
+     * as capas públicas no ngOnInit. Sem isso, httpMock.verify()
+     * encontraria essa requisição em aberto em todo teste.
+     */
+    httpMock
+      .expectOne('http://localhost:8080/api/public/albuns/capas')
+      .flush([]);
+
     await fixture.whenStable();
   });
 

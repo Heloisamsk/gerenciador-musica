@@ -8,10 +8,12 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth';
+import { AlbumBackdrop } from '../../shared/album-backdrop/album-backdrop';
+import { VinylMark } from '../../shared/vinyl-mark/vinyl-mark';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, VinylMark, AlbumBackdrop],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
