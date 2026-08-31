@@ -1,24 +1,17 @@
 <section class="musicas-page">
   <div class="musicas-card">
+    <a class="voltar-link" routerLink="/admin/painel">
+      ← Voltar para o painel
+    </a>
+
     <header class="musicas-header">
-      <div
-        class="musicas-title-wrapper"
-        style="display: flex; align-items: center; gap: 1.5rem;"
-      >
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg"
-          alt="Logo do Spotify"
-          style="width: 45px; height: auto;"
-        />
+      <div class="musicas-title">
+        <p class="section-label">Painel administrativo</p>
+        <h1>Catálogo de Músicas</h1>
 
-        <div class="musicas-title">
-          <p class="section-label">Painel administrativo</p>
-          <h1>Catálogo de Músicas</h1>
-
-          <p>
-            Veja as músicas cadastradas no sistema.
-          </p>
-        </div>
+        <p>
+          Veja as músicas cadastradas no sistema.
+        </p>
       </div>
 
       <button
@@ -52,13 +45,6 @@
       {{ mensagemErroExclusao() }}
     </div>
     }
-
-    <div class="database-visual">
-      <img
-        src="/ari.gif"
-        alt="ari"
-      />
-    </div>
 
     @if (carregando()) {
     <output

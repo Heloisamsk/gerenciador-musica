@@ -1,367 +1,204 @@
 :host {
+  --cool-steel: var(--app-cool-steel);
+  --dry-sage: var(--app-dry-sage);
+  --golden-sand: var(--app-golden-sand);
+  --apricot-cream: var(--app-apricot-cream);
+  --palm-leaf: var(--app-palm-leaf);
+  --ink: var(--app-ink);
+  --background: var(--app-background);
+  --surface: var(--app-surface);
+  --panel: var(--app-panel);
+  --panel-raised: var(--app-panel-raised);
+  --text: var(--app-text);
+  --muted: var(--app-muted);
+  --line: var(--app-line);
   display: block;
-
-  --background: #0f0f0f;
-  --card-background: #181818;
-  --table-background: #202020;
-  --table-row-hover: #292929;
-  --border-color: #343434;
-  --primary: #1ed760;
-  --primary-hover: #1fdf64;
-  --text-primary: #ffffff;
-  --text-secondary: #b3b3b3;
-  --error: #ff6b6b;
-
   min-height: 100vh;
-  color: var(--text-primary);
-  background-color: var(--background);
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+  color: var(--text);
+  background: var(--background);
+  font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-}
+:host * { box-sizing: border-box; }
 
 .musicas-page {
   min-height: 100vh;
-  padding: 2rem;
-
+  padding: 28px clamp(18px, 4vw, 64px) 72px;
   background:
-    radial-gradient(
-      circle at top,
-      #1c1c1c 0%,
-      var(--background) 45%
-    );
+    linear-gradient(90deg, var(--app-grid) 1px, transparent 1px) 0 0 / 72px 72px,
+    radial-gradient(circle at 80% 0%, #9cafb72b, transparent 32rem),
+    var(--background);
 }
 
 .musicas-card {
   width: 100%;
-  max-width: 1200px;
-  min-height: calc(100vh - 4rem);
-
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
-
-  background-color: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: 1.25rem;
-
-  box-shadow:
-    0 1.5rem 4rem
-    rgb(0 0 0 / 35%);
+  padding: clamp(22px, 4vw, 44px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 32px 90px var(--app-shadow);
 }
+
+.voltar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 24px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.voltar-link:hover, .voltar-link:focus-visible { color: var(--apricot-cream); }
 
 .musicas-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 2rem;
-
-  padding-bottom: 2rem;
-  margin-bottom: 2rem;
-
-  border-bottom:
-    1px solid var(--border-color);
-}
-
-.musicas-title {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  padding-bottom: 1.75rem;
+  margin-bottom: 1.75rem;
+  border-bottom: 1px solid var(--line);
 }
 
 .section-label {
-  margin: 0;
-
-  color: var(--primary);
-
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.12rem;
+  margin: 0 0 8px;
+  color: var(--golden-sand);
+  font: 800 .68rem Consolas, monospace;
+  letter-spacing: .14em;
   text-transform: uppercase;
 }
 
 .musicas-title h1 {
   margin: 0;
-
-  color: var(--text-primary);
-
+  font-family: "Trebuchet MS", sans-serif;
   font-size: clamp(2rem, 5vw, 3.5rem);
-  line-height: 1.1;
+  letter-spacing: -.05em;
 }
 
-.musicas-title > p:last-child {
-  margin: 0.5rem 0 0;
+.musicas-title > p:last-child { margin: .5rem 0 0; color: var(--muted); }
 
-  color: var(--text-secondary);
-  font-size: 1rem;
+.atualizar-button {
+  min-width: 9rem;
+  min-height: 43px;
+  padding: 0 1.4rem;
+  color: var(--ink);
+  background: var(--apricot-cream);
+  border: 1px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: .82rem;
+  font-weight: 800;
 }
 
-.atualizar-button,
 .tentar-novamente-button {
   min-width: 9rem;
-
-  padding: 0.8rem 1.4rem;
-
-  color: #000000;
-  background-color: var(--primary);
-
-  border: none;
-  border-radius: 999px;
-
-  font-size: 0.9rem;
-  font-weight: 700;
-
+  min-height: 43px;
+  padding: 0 1.4rem;
+  color: var(--ink);
+  background: var(--apricot-cream);
+  border: 1px solid transparent;
+  border-radius: 0;
   cursor: pointer;
-
-  transition:
-    background-color 150ms ease,
-    transform 150ms ease;
+  font-size: .82rem;
+  font-weight: 800;
 }
 
-.atualizar-button:hover:not(:disabled),
-.tentar-novamente-button:hover {
-  background-color: var(--primary-hover);
-  transform: scale(1.03);
-}
+.atualizar-button:hover:not(:disabled), .tentar-novamente-button:hover { background: var(--golden-sand); }
 
-.atualizar-button:disabled {
-  color: #b3b3b3;
-  background-color: #333333;
-  cursor: not-allowed;
-}
+.atualizar-button:disabled { color: var(--muted); background: var(--panel); cursor: not-allowed; }
 
-.database-visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 10rem;
-  margin-bottom: 2rem;
-}
-
-.feedback-sucesso,
-.feedback-erro {
-  display: block;
-  padding: 1rem;
-  margin-bottom: 1.25rem;
-  border-radius: 0.75rem;
-}
-
-.feedback-sucesso {
-  color: #8ff0b1;
-  background-color: #193021;
-  border: 1px solid var(--primary);
-}
-
-.feedback-erro {
-  color: #ff9c9c;
-  background-color: #3b2424;
-  border: 1px solid #7a3535;
-}
-
-.database-visual img {
-  display: block;
-
-  width: 8rem;
-  max-width: 100%;
-  height: 8rem;
-
-  object-fit: contain;
-  border-radius: 1rem;
-}
+.feedback-sucesso, .feedback-erro { display: block; padding: 1rem; margin-bottom: 1.25rem; font-size: .82rem; }
+.feedback-sucesso { color: var(--ink); background: var(--golden-sand); }
+.feedback-erro { color: var(--apricot-cream); background: #f6ca8313; border: 1px solid #f6ca8355; }
 
 .status-message {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  min-height: 18rem;
-
+  min-height: 15rem;
   padding: 2rem;
-
+  color: var(--muted);
   text-align: center;
-
-  background-color: var(--table-background);
-  border: 1px solid var(--border-color);
-  border-radius: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
 }
 
-.status-message h2 {
-  margin: 0 0 0.75rem;
-}
+.status-message h2 { margin: 0 0 .75rem; font-family: "Trebuchet MS", sans-serif; color: var(--text); }
+.status-message p { margin: 0; color: var(--muted); }
 
-.status-message p {
-  margin: 0;
-  color: var(--text-secondary);
-}
+.error-message { color: var(--apricot-cream); border-color: #f6ca8355; }
+.error-message p { margin-bottom: 1.5rem; }
 
-.error-message {
-  color: var(--error);
-  border-color: rgb(255 107 107 / 40%);
-}
+.table-information { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.table-information p { margin: 0; color: var(--muted); }
+.table-information strong { color: var(--text); }
 
-.error-message p {
-  margin-bottom: 1.5rem;
-}
+.table-container { width: 100%; overflow-x: auto; background: var(--panel); border: 1px solid var(--line); }
 
-.table-information {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.musicas-table { width: 100%; min-width: 78rem; border-collapse: collapse; }
 
-  margin-bottom: 1rem;
-}
-
-.table-information p {
-  margin: 0;
-  color: var(--text-secondary);
-}
-
-.table-information strong {
-  color: var(--text-primary);
-}
-
-.table-container {
-  width: 100%;
-  overflow-x: auto;
-
-  background-color: var(--table-background);
-  border: 1px solid var(--border-color);
-  border-radius: 1rem;
-}
-
-.musicas-table {
-  width: 100%;
-  min-width: 78rem;
-
-  border-collapse: collapse;
-}
-
-.musicas-table th,
-.musicas-table td {
-  padding: 1rem 1.25rem;
-  text-align: left;
-}
+.musicas-table th, .musicas-table td { padding: 1rem 1.25rem; text-align: left; }
 
 .musicas-table th {
-  color: var(--text-secondary);
-  background-color: #171717;
-
-  border-bottom:
-    1px solid var(--border-color);
-
-  font-size: 0.75rem;
-  letter-spacing: 0.08rem;
+  color: var(--golden-sand);
+  background: var(--panel-raised);
+  border-bottom: 1px solid var(--line);
+  font-family: Consolas, monospace;
+  font-size: .68rem;
+  letter-spacing: .08rem;
   text-transform: uppercase;
 }
 
-.musicas-table td {
-  color: var(--text-primary);
+.musicas-table td { color: var(--text); border-bottom: 1px solid var(--line); }
 
-  border-bottom:
-    1px solid var(--border-color);
-}
+.musicas-table tbody tr { transition: background-color .15s ease; }
+.musicas-table tbody tr:hover { background: var(--panel-raised); }
+.musicas-table tbody tr:last-child td { border-bottom: none; }
 
-.musicas-table tbody tr {
-  transition: background-color 150ms ease;
-}
-
-.musicas-table tbody tr:hover {
-  background-color: var(--table-row-hover);
-}
-
-.musicas-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.paginacao {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-}
+.paginacao { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
 
 .paginacao-button {
-  padding: 0.65rem 1rem;
-  color: var(--text-primary);
-  background-color: #292929;
-  border: 1px solid var(--border-color);
-  border-radius: 999px;
-  font-weight: 700;
+  min-height: 40px;
+  padding: 0 1rem;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid #9cafb76a;
+  border-radius: 0;
   cursor: pointer;
+  font-weight: 700;
 }
 
-.paginacao-button:hover:not(:disabled) {
-  color: #000000;
-  background-color: var(--primary);
-}
+.paginacao-button:hover:not(:disabled) { border-color: var(--apricot-cream); color: var(--apricot-cream); }
+.paginacao-button:disabled { color: var(--muted); cursor: not-allowed; opacity: .55; }
 
-.paginacao-button:disabled {
-  color: #727272;
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
-.paginacao-status {
-  min-width: 9rem;
-  color: var(--text-secondary);
-  text-align: center;
-}
+.paginacao-status { min-width: 9rem; color: var(--muted); text-align: center; }
 
 .sr-only {
   position: absolute;
-
   width: 1px;
   height: 1px;
-
   padding: 0;
   margin: -1px;
-
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
-
   white-space: nowrap;
   border: 0;
 }
 
 @media (max-width: 700px) {
-  .musicas-page {
-    padding: 1rem;
-  }
+  .musicas-page { padding: 18px 14px 56px; }
 
-  .musicas-card {
-    min-height: calc(100vh - 2rem);
-    padding: 1.25rem;
-  }
+  .musicas-card { padding: 1.25rem; }
 
-  .musicas-header {
-    align-items: stretch;
-    flex-direction: column;
-  }
+  .musicas-header { align-items: stretch; flex-direction: column; }
 
-  .atualizar-button {
-    width: 100%;
-  }
+  .atualizar-button { width: 100%; }
 
-  .musicas-title h1 {
-    font-size: 2rem;
-  }
+  .table-information { align-items: flex-start; flex-direction: column; gap: .5rem; }
 
-  .table-information {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .paginacao-button {
-    flex: 1 1 8rem;
-  }
-
+  .paginacao-button { flex: 1 1 8rem; }
 }

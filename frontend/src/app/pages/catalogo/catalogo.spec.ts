@@ -5,6 +5,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { vi } from 'vitest';
 import { Catalogo } from './catalogo';
 import { MusicaListagem } from '../../models/MusicaListagem';
 import { PlaylistResponse } from '../../models/PlaylistResponse';
@@ -114,9 +115,13 @@ describe('Catalogo', () => {
   });
 
   it('deve atualizar as músicas ao pesquisar por título', () => {
+    vi.useFakeTimers();
+
     component.atualizarBusca(
       criarEventoDeBusca('  Queen  ')
     );
+    vi.advanceTimersByTime(300);
+    vi.useRealTimers();
 
     const requisicao = httpMock.expectOne(
       `${musicasUrl}?titulo=Queen&page=0&size=100`
@@ -131,6 +136,30 @@ describe('Catalogo', () => {
     });
 
     expect(component.musicas()).toEqual([]);
+  });
+
+  it('deve descartar buscas digitadas rapidamente e considerar só a última', () => {
+    vi.useFakeTimers();
+
+    component.atualizarBusca(criarEventoDeBusca('Q'));
+    vi.advanceTimersByTime(100);
+    component.atualizarBusca(criarEventoDeBusca('Qu'));
+    vi.advanceTimersByTime(100);
+    component.atualizarBusca(criarEventoDeBusca('Queen'));
+    vi.advanceTimersByTime(300);
+    vi.useRealTimers();
+
+    httpMock
+      .expectOne(`${musicasUrl}?titulo=Queen&page=0&size=100`)
+      .flush({
+        itens: [musicaDeExemplo()],
+        paginaAtual: 0,
+        tamanhoPagina: 100,
+        totalItens: 1,
+        totalPaginas: 1
+      });
+
+    expect(component.musicas()).toHaveLength(1);
   });
 
   it('deve informar erro ao carregar catálogo e playlist', () => {
@@ -307,9 +336,13 @@ describe('Catalogo', () => {
 
   for (const cenario of cenariosDeErro) {
     it(`deve tratar erro ${cenario.status} durante a busca`, () => {
+      vi.useFakeTimers();
+
       component.atualizarBusca(
         criarEventoDeBusca('Queen')
       );
+      vi.advanceTimersByTime(300);
+      vi.useRealTimers();
 
       httpMock
         .expectOne(

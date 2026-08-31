@@ -178,7 +178,7 @@ describe('Perfil', () => {
     fixture.detectChanges();
 
     const opcoes = fixture.nativeElement.querySelectorAll(
-      '#favoritos-artistas + .opcoes-favoritos .opcao-favorito'
+      '#favoritos-artistas ~ .opcoes-favoritos .opcao-favorito'
     );
 
     expect(catalogoServiceMock.listarArtistas).toHaveBeenCalledOnce();

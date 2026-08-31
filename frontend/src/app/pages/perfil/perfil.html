@@ -113,10 +113,11 @@
               </section>
             }
           </div>
-          <nav class="atalhos" aria-label="Atalhos do perfil">
-            <a routerLink="/playlists">Minhas playlists</a>
-            @if (perfil()!.role === 'ADMIN') { <a routerLink="/admin/painel">Painel administrativo</a> }
-          </nav>
+          @if (perfil()!.role === 'ADMIN') {
+            <nav class="atalhos" aria-label="Atalhos do perfil">
+              <a routerLink="/admin/painel">Painel administrativo</a>
+            </nav>
+          }
         </section>
       </div>
 
@@ -236,8 +237,15 @@
           } @else {
             <section class="selecao-categoria" aria-labelledby="favoritos-artistas">
               <h3 id="favoritos-artistas">Artistas</h3>
+              <div class="busca-favorito">
+                <label class="sr-only" for="busca-artista">Buscar artista por nome</label>
+                <input id="busca-artista" type="search" autocomplete="off"
+                  placeholder="Busque pelo nome do artista"
+                  [value]="buscaArtista()"
+                  (input)="atualizarBuscaArtista($event)">
+              </div>
               <div class="opcoes-favoritos">
-                @for (artista of artistas(); track artista.idArtista) {
+                @for (artista of artistasFiltrados(); track artista.idArtista) {
                   <label class="opcao-favorito" [class.opcao-favorito--destaque]="itemEhDestaque('ARTISTA', artista.idArtista)">
                     <input type="checkbox"
                       [checked]="estaSelecionado('idsArtistasFavoritos', artista.idArtista)"
@@ -245,14 +253,23 @@
                       (change)="alternarFavorito('idsArtistasFavoritos', 'ARTISTA', artista.idArtista, $event)">
                     <span>{{ artista.nome }}</span>
                   </label>
+                } @empty {
+                  <p class="busca-sem-resultado">Nenhum artista encontrado para essa busca.</p>
                 }
               </div>
             </section>
 
             <section class="selecao-categoria" aria-labelledby="favoritos-albuns">
               <h3 id="favoritos-albuns">Álbuns</h3>
+              <div class="busca-favorito">
+                <label class="sr-only" for="busca-album">Buscar álbum por título ou artista</label>
+                <input id="busca-album" type="search" autocomplete="off"
+                  placeholder="Busque pelo título do álbum ou artista"
+                  [value]="buscaAlbum()"
+                  (input)="atualizarBuscaAlbum($event)">
+              </div>
               <div class="opcoes-favoritos">
-                @for (album of albuns(); track album.idAlbum) {
+                @for (album of albunsFiltrados(); track album.idAlbum) {
                   <label class="opcao-favorito" [class.opcao-favorito--destaque]="itemEhDestaque('ALBUM', album.idAlbum)">
                     <input type="checkbox"
                       [checked]="estaSelecionado('idsAlbunsFavoritos', album.idAlbum)"
@@ -260,6 +277,8 @@
                       (change)="alternarFavorito('idsAlbunsFavoritos', 'ALBUM', album.idAlbum, $event)">
                     <span>{{ album.titulo }} <small>{{ album.artista.nome }}</small></span>
                   </label>
+                } @empty {
+                  <p class="busca-sem-resultado">Nenhum álbum encontrado para essa busca.</p>
                 }
               </div>
             </section>

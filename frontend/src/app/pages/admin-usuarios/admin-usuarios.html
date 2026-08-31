@@ -1,24 +1,17 @@
 <section class="usuarios-page">
   <div class="usuarios-card">
+    <a class="voltar-link" routerLink="/admin/painel">
+      ← Voltar para o painel
+    </a>
+
     <header class="usuarios-header">
-      <div
-        class="usuarios-title-wrapper"
-        style="display: flex; align-items: center; gap: 1.5rem;"
-      >
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg"
-          alt="Logo do Spotify"
-          style="width: 45px; height: auto;"
-        />
+      <div class="usuarios-title">
+        <p class="section-label">Painel administrativo</p>
+        <h1>Usuários</h1>
 
-        <div class="usuarios-title">
-          <p class="section-label">Painel administrativo</p>
-          <h1>Banco de Dados</h1>
-
-          <p>
-            Veja os usuários registrados no sistema.
-          </p>
-        </div>
+        <p>
+          Veja os usuários registrados no sistema.
+        </p>
       </div>
 
       <button
@@ -34,13 +27,6 @@
         }
       </button>
     </header>
-
-    <div class="database-visual">
-      <img
-        src="/dog.gif"
-        alt="dog"
-      />
-    </div>
 
     @if (carregando) {
     <output

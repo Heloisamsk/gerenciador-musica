@@ -5,7 +5,7 @@ import {
   signal
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { MusicaListagem } from '../../models/MusicaListagem';
@@ -21,6 +21,7 @@ interface ErroApi {
 @Component({
   selector: 'app-admin-musicas',
   imports: [
+    RouterLink,
     AcoesMusica,
     CapaMusica,
     ParticipantesMusica
