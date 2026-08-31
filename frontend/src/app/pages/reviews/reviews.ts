@@ -1,57 +1,59 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import type { PaginaResponse } from '../../models/PaginaResponse';
 import type { Review } from '../../models/Review';
 import { ReviewService } from '../../services/review';
 import { ReviewCard } from '../../shared/review-card/review-card';
-import { ReviewForm } from '../../shared/review-form/review-form';
 
-type Aba = 'FEED' | 'MINHAS';
+type Escopo = 'TODAS' | 'MINHAS';
 
 @Component({
   selector: 'app-reviews',
-  imports: [RouterLink, ReviewCard, ReviewForm],
+  imports: [RouterLink, ReviewCard],
   templateUrl: './reviews.html',
   styleUrl: './reviews.css'
 })
 export class Reviews implements OnInit {
 
-  protected abaAtiva = signal<Aba>('FEED');
-  protected pagina = signal<PaginaResponse<Review> | null>(null);
-  protected carregando = signal(false);
-  protected erro = signal<string | null>(null);
+  protected readonly escopo = signal<Escopo>('TODAS');
+  protected readonly reviews = signal<Review[]>([]);
+  protected readonly carregando = signal(false);
+  protected readonly erro = signal<string | null>(null);
 
-  protected criandoReview = signal(false);
-  protected reviewEmEdicao = signal<Review | null>(null);
+  protected readonly reviewsAlbuns = computed(
+    () => this.reviews().filter(review => review.alvo.tipo === 'ALBUM')
+  );
+
+  protected readonly reviewsMusicas = computed(
+    () => this.reviews().filter(review => review.alvo.tipo === 'MUSICA')
+  );
 
   constructor(private readonly reviewService: ReviewService) {}
 
   ngOnInit(): void {
-    this.carregarPagina(0);
+    this.carregar();
   }
 
-  protected trocarAba(aba: Aba): void {
-    if (this.abaAtiva() === aba) {
+  protected trocarEscopo(escopo: Escopo): void {
+    if (this.escopo() === escopo) {
       return;
     }
 
-    this.abaAtiva.set(aba);
-    this.fecharFormularios();
-    this.carregarPagina(0);
+    this.escopo.set(escopo);
+    this.carregar();
   }
 
-  protected carregarPagina(numeroPagina: number): void {
+  private carregar(): void {
     this.carregando.set(true);
     this.erro.set(null);
 
-    const requisicao = this.abaAtiva() === 'FEED'
-      ? this.reviewService.listarFeed(numeroPagina)
-      : this.reviewService.listarMinhas(numeroPagina);
+    const requisicao = this.escopo() === 'TODAS'
+      ? this.reviewService.listarFeed()
+      : this.reviewService.listarMinhas();
 
     requisicao.subscribe({
       next: pagina => {
-        this.pagina.set(pagina);
+        this.reviews.set(pagina.itens);
         this.carregando.set(false);
       },
       error: (erro: Error) => {
@@ -59,56 +61,5 @@ export class Reviews implements OnInit {
         this.carregando.set(false);
       }
     });
-  }
-
-  protected paginaAnterior(): void {
-    const atual = this.pagina();
-
-    if (atual && atual.paginaAtual > 0) {
-      this.carregarPagina(atual.paginaAtual - 1);
-    }
-  }
-
-  protected proximaPagina(): void {
-    const atual = this.pagina();
-
-    if (atual && atual.paginaAtual + 1 < atual.totalPaginas) {
-      this.carregarPagina(atual.paginaAtual + 1);
-    }
-  }
-
-  protected abrirNovaReview(): void {
-    this.reviewEmEdicao.set(null);
-    this.criandoReview.set(true);
-  }
-
-  protected editarReview(review: Review): void {
-    this.criandoReview.set(false);
-    this.reviewEmEdicao.set(review);
-  }
-
-  protected excluirReview(review: Review): void {
-    const confirmou = confirm(
-      `Excluir sua avaliação de "${review.alvo.titulo}"?`
-    );
-
-    if (!confirmou) {
-      return;
-    }
-
-    this.reviewService.excluir(review.idReview).subscribe({
-      next: () => this.carregarPagina(this.pagina()?.paginaAtual ?? 0),
-      error: (erro: Error) => this.erro.set(erro.message)
-    });
-  }
-
-  protected aoSalvarFormulario(): void {
-    this.fecharFormularios();
-    this.carregarPagina(0);
-  }
-
-  protected fecharFormularios(): void {
-    this.criandoReview.set(false);
-    this.reviewEmEdicao.set(null);
   }
 }
