@@ -51,6 +51,17 @@ public class ReviewController {
     }
 
     /**
+     * GET /api/reviews/{id} — página individual da review: qualquer
+     * usuário autenticado pode ver; só o autor edita ou exclui.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ReviewResponseDTO> buscarPorId(
+            @PathVariable("id") Long id
+    ) {
+        return ResponseEntity.ok(reviewService.buscarPorId(id));
+    }
+
+    /**
      * GET /api/reviews — feed com as reviews mais recentes de todos os
      * usuários, inspirado na atividade de amigos do Letterboxd.
      */

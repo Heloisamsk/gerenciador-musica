@@ -13,6 +13,7 @@ import gerenciador_musica_backend.exception.ReviewAcessoNegadoException;
 import gerenciador_musica_backend.exception.ReviewJaExisteException;
 import gerenciador_musica_backend.exception.ReviewNaoEncontradaException;
 import gerenciador_musica_backend.model.Album;
+import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Musica;
 import gerenciador_musica_backend.model.Review;
 import gerenciador_musica_backend.model.TipoAlvoReview;
@@ -94,6 +95,20 @@ public class ReviewService {
 
         review.setNota(request.nota());
         review.setTexto(normalizarTexto(request.texto()));
+
+        return converterParaResponse(review, usuario);
+    }
+
+    /*
+     * Qualquer usuário autenticado pode ver qualquer review (a página
+     * da review é pública dentro do app, só a edição/exclusão é
+     * restrita ao autor). minhaReview no retorno diz ao frontend se
+     * deve mostrar os controles de editar/excluir.
+     */
+    @Transactional(readOnly = true)
+    public ReviewResponseDTO buscarPorId(Long idReview) {
+        Usuario usuario = obterUsuarioAutenticado();
+        Review review = obterEntidadePorId(idReview);
 
         return converterParaResponse(review, usuario);
     }
@@ -357,8 +372,9 @@ public class ReviewService {
     private ReviewAlvoDTO converterAlvo(Review review) {
         if (review.getMusica() != null) {
             Musica musica = review.getMusica();
-            String artista = musica.getArtistaPrincipal() != null
-                    ? musica.getArtistaPrincipal().getNome()
+            Artista artistaPrincipal = musica.getArtistaPrincipal();
+            String artista = artistaPrincipal != null
+                    ? artistaPrincipal.getNome()
                     : null;
             String capaUrl = musica.getAlbum() != null
                     ? musica.getAlbum().getCapaUrl()
