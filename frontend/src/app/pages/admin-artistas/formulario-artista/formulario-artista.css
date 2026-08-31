@@ -1,178 +1,131 @@
 :host {
+  --cool-steel: var(--app-cool-steel);
+  --golden-sand: var(--app-golden-sand);
+  --apricot-cream: var(--app-apricot-cream);
+  --ink: var(--app-ink);
+  --background: var(--app-background);
+  --surface: var(--app-surface);
+  --panel: var(--app-panel);
+  --text: var(--app-text);
+  --muted: var(--app-muted);
+  --line: var(--app-line);
   display: block;
+  font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
 }
+
+:host * { box-sizing: border-box; }
 
 .formulario-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 90vh;
+  align-items: center;
+  justify-content: center;
   padding: 2rem;
-  background-color: #121212;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  background: var(--background);
 }
 
 .formulario-card {
   width: 100%;
   max-width: 560px;
-  padding: 2.5rem;
-  background-color: #181818;
-  border: 1px solid #282828;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 32px 90px var(--app-shadow);
 }
 
 .formulario-title {
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  color: #ffffff;
+  margin: 0 0 1.5rem;
+  color: var(--text);
+  font-family: "Trebuchet MS", sans-serif;
   font-size: 1.8rem;
   text-align: center;
 }
 
-.formulario-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  width: 100%;
-}
+.formulario-form { display: flex; flex-direction: column; gap: 1.2rem; width: 100%; }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
+.form-group { display: flex; flex-direction: column; gap: .45rem; }
 
 .form-group label {
-  color: #d1d1d1;
-  font-size: 0.9rem;
-  font-weight: 600;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
 }
 
 .form-input {
   box-sizing: border-box;
   width: 100%;
-  padding: 0.75rem;
-  color: #ffffff;
-  background-color: #282828;
-  border: 1px solid #3e3e3e;
-  border-radius: 6px;
+  min-height: 43px;
+  padding: 0 12px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid #9cafb74d;
+  border-radius: 0;
   font-family: inherit;
   font-size: 1rem;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  transition: border-color .18s ease, box-shadow .18s ease;
 }
 
-.form-input::placeholder {
-  color: #8f8f8f;
-}
+.form-input::placeholder { color: var(--muted); }
 
 .form-input:focus {
-  outline: none;
-  border-color: #1db954;
-  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+  outline: 0;
+  border-color: var(--apricot-cream);
+  box-shadow: 0 0 0 3px #f6ca831a;
 }
 
-.form-input.input-invalido {
-  border-color: #ff6b6b;
-}
+.form-input.input-invalido { border-color: var(--apricot-cream); }
 
-.form-input.input-invalido:focus {
-  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
-}
+.form-textarea { min-height: 120px; padding: 11px 12px; resize: vertical; line-height: 1.5; }
 
-.form-textarea {
-  min-height: 120px;
-  resize: vertical;
-  line-height: 1.5;
-}
+.error-message { display: block; margin-top: 2px; color: var(--apricot-cream); font-size: .78rem; font-weight: 600; }
+.campo-opcional, .campo-auxiliar { display: block; color: var(--muted); font-size: .78rem; }
 
-.error-message {
-  display: block;
-  margin-top: 2px;
-  color: #ff6b6b;
-  font-size: 0.8rem;
-}
+.formulario-acoes { display: flex; justify-content: flex-end; gap: .75rem; margin-top: .4rem; }
 
-.campo-opcional {
-  color: #8f8f8f;
-  font-size: 0.8rem;
-}
-
-.formulario-acoes {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 0.9rem;
-}
-
-.formulario-btn,
-.cancelar-btn {
-  flex: 1;
-  padding: 0.875rem;
-  border-radius: 500px;
+.formulario-btn, .cancelar-btn {
+  min-height: 43px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: 0;
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .04rem;
   text-transform: uppercase;
 }
 
-.formulario-btn {
-  color: #000000;
-  background-color: #1db954;
-  border: 1px solid #1db954;
-  transition:
-    background-color 0.2s,
-    transform 0.2s;
-}
+.formulario-btn { color: var(--ink); background: var(--apricot-cream); }
+.formulario-btn:hover:not(:disabled) { background: var(--golden-sand); }
 
-.cancelar-btn {
-  color: #ffffff;
-  background-color: transparent;
-  border: 1px solid #727272;
-}
+.cancelar-btn { color: var(--text); background: transparent; border-color: #9cafb76a; }
+.cancelar-btn:hover:not(:disabled) { border-color: var(--cool-steel); color: var(--cool-steel); }
 
-.formulario-btn:hover:not(:disabled) {
-  background-color: #1ed760;
-  transform: scale(1.01);
-}
-
-.formulario-btn:focus-visible,
-.cancelar-btn:focus-visible {
-  outline: 2px solid #ffffff;
+.formulario-btn:focus-visible, .cancelar-btn:focus-visible {
+  outline: 3px solid var(--apricot-cream);
   outline-offset: 3px;
 }
 
-.formulario-btn:disabled,
-.cancelar-btn:disabled {
-  color: #c7c7c7;
-  background-color: #535353;
+.formulario-btn:disabled, .cancelar-btn:disabled {
+  color: var(--muted);
+  background: var(--panel);
+  border-color: var(--line);
   cursor: not-allowed;
-  transform: none;
 }
 
 .alerta {
   display: block;
   margin-bottom: 1.25rem;
-  padding: 0.75rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 12px 16px;
+  font-size: .85rem;
   font-weight: 600;
   text-align: center;
 }
 
-.alerta-sucesso {
-  color: #1ed760;
-  background-color: #193021;
-  border: 1px solid #1db954;
-}
-
-.alerta-erro {
-  color: #ff8080;
-  background-color: #3b2424;
-  border: 1px solid #ff6b6b;
-}
+.alerta-sucesso { color: var(--ink); background: var(--golden-sand); }
+.alerta-erro { color: var(--apricot-cream); background: #f6ca8313; border: 1px solid #f6ca8355; }
 
 .sr-only {
   position: absolute;
@@ -187,21 +140,9 @@
 }
 
 @media (max-width: 600px) {
-  .formulario-container {
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 1rem;
-  }
-
-  .formulario-card {
-    padding: 1.5rem;
-  }
-
-  .formulario-title {
-    font-size: 1.5rem;
-  }
-
-  .formulario-acoes {
-    flex-direction: column-reverse;
-  }
+  .formulario-container { align-items: flex-start; min-height: 100vh; padding: 1rem; }
+  .formulario-card { padding: 1.5rem; }
+  .formulario-title { font-size: 1.5rem; }
+  .formulario-acoes { flex-direction: column-reverse; }
+  .formulario-btn, .cancelar-btn { width: 100%; }
 }

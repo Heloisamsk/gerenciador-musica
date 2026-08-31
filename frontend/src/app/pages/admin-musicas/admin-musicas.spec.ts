@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
@@ -100,6 +100,10 @@ describe('AdminMusicas', () => {
             navigate,
             currentNavigation
           }
+        },
+        {
+          provide: ActivatedRoute,
+          useValue: {}
         }
       ]
     }).compileComponents();

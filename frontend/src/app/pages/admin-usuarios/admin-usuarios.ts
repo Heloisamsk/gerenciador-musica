@@ -5,6 +5,7 @@ import {
 } from '@angular/core';
 
 import { HttpErrorResponse } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AdminUsuarioService } from '../../services/admin-usuario';
@@ -12,7 +13,7 @@ import { UsuarioListagem } from '../../models/usuario-listagem';
 
 @Component({
   selector: 'app-admin-usuarios',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './admin-usuarios.html',
   styleUrl: './admin-usuarios.css'
 })

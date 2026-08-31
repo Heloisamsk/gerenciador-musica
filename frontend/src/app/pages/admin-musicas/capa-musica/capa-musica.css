@@ -12,15 +12,12 @@
   width: 4rem;
   height: 4rem;
   object-fit: cover;
-  color: #d7d7d7;
-  background-color: #303030;
-  border: 1px solid #444444;
-  border-radius: 0.65rem;
+  color: var(--app-muted);
+  background: var(--app-panel);
+  border: 1px solid var(--app-line);
 }
 
-.capa-alternativa {
-  font-size: 1.6rem;
-}
+.capa-alternativa { color: var(--app-golden-sand); font-family: Georgia, serif; font-size: 1.6rem; }
 
 .texto-acessivel {
   position: absolute;

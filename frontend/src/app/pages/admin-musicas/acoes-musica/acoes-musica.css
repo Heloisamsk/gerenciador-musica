@@ -4,58 +4,46 @@
 
 .acoes-musica {
   display: flex;
-  gap: 0.6rem;
+  gap: .5rem;
 }
 
 .acao-button {
-  min-height: 2.5rem;
-  padding: 0.55rem 0.9rem;
-  color: var(--text-primary, #ffffff);
-  background-color: transparent;
-  border: 1px solid #666666;
-  border-radius: 999px;
+  min-height: 2.4rem;
+  padding: 0 .9rem;
+  color: var(--app-text);
+  background: transparent;
+  border: 1px solid #9cafb76a;
+  border-radius: 0;
   font: inherit;
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: .78rem;
+  font-weight: 800;
   cursor: pointer;
 }
 
 .editar-button:hover:not(:disabled) {
-  color: #101010;
-  background-color: var(--primary, #1ed760);
-  border-color: var(--primary, #1ed760);
+  color: var(--app-ink);
+  background: var(--app-apricot-cream);
+  border-color: var(--app-apricot-cream);
 }
 
-.excluir-button {
-  color: #ff8f8f;
-  border-color: #d94a4a;
-}
+.excluir-button { color: var(--app-apricot-cream); border-color: #f6ca8355; }
 
 .excluir-button:hover:not(:disabled) {
-  color: #101010;
-  background-color: #ef5c5c;
-  border-color: #ef5c5c;
+  color: var(--app-ink);
+  background: var(--app-apricot-cream);
+  border-color: var(--app-apricot-cream);
 }
 
-.acao-button:focus-visible {
-  outline: 3px solid rgba(255, 255, 255, 0.4);
-  outline-offset: 2px;
-}
+.acao-button:focus-visible { outline: 3px solid var(--app-apricot-cream); outline-offset: 2px; }
 
 .acao-button:disabled {
-  color: #c7c7c7;
-  background-color: #3a3a3a;
-  border-color: #535353;
+  color: var(--app-muted);
+  background: var(--app-panel);
+  border-color: var(--app-line);
   cursor: not-allowed;
 }
 
 @media (max-width: 700px) {
-  .acoes-musica {
-    min-width: 7.5rem;
-    flex-direction: column;
-  }
-
-  .acao-button {
-    width: 100%;
-  }
+  .acoes-musica { min-width: 7.5rem; flex-direction: column; }
+  .acao-button { width: 100%; }
 }

@@ -1,38 +1,47 @@
 :host {
+  --cool-steel: var(--app-cool-steel);
+  --dry-sage: var(--app-dry-sage);
+  --golden-sand: var(--app-golden-sand);
+  --apricot-cream: var(--app-apricot-cream);
+  --palm-leaf: var(--app-palm-leaf);
+  --ink: var(--app-ink);
+  --background: var(--app-background);
+  --panel: var(--app-panel);
+  --panel-raised: var(--app-panel-raised);
+  --text: var(--app-text);
+  --muted: var(--app-muted);
+  --line: var(--app-line);
   display: block;
   min-height: 100vh;
-  color: #ffffff;
-  background-color: #0f0f0f;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  background: var(--background);
+  font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
 }
 
-:host * {
-  box-sizing: border-box;
-}
+:host * { box-sizing: border-box; }
 
 .artistas-page {
   min-height: 100vh;
-  padding: 2rem;
-  background-color: #0f0f0f;
+  padding: 28px clamp(18px, 4vw, 64px) 72px;
+  background:
+    linear-gradient(90deg, var(--app-grid) 1px, transparent 1px) 0 0 / 72px 72px,
+    var(--background);
 }
 
-.artistas-container {
-  width: min(100%, 1120px);
-  margin: 0 auto;
-}
+.artistas-container { width: min(100%, 1280px); margin: 0 auto; }
 
 .voltar-link {
-  display: inline-block;
-  margin-bottom: 2rem;
-  color: #b3b3b3;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 24px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 700;
   text-decoration: none;
 }
 
-.voltar-link:hover,
-.voltar-link:focus-visible {
-  color: #1ed760;
-}
+.voltar-link:hover, .voltar-link:focus-visible { color: var(--apricot-cream); }
 
 .artistas-header {
   display: flex;
@@ -41,95 +50,58 @@
   gap: 2rem;
   padding-bottom: 1.75rem;
   margin-bottom: 1.75rem;
-  border-bottom: 1px solid #343434;
+  border-bottom: 1px solid var(--line);
 }
 
 .section-label {
-  margin: 0 0 0.5rem;
-  color: #1ed760;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12rem;
+  margin: 0 0 8px;
+  color: var(--golden-sand);
+  font: 800 .68rem Consolas, monospace;
+  letter-spacing: .14em;
   text-transform: uppercase;
 }
 
 .artistas-header h1 {
   margin: 0;
+  font-family: "Trebuchet MS", sans-serif;
   font-size: clamp(2.25rem, 6vw, 4rem);
+  letter-spacing: -.05em;
 }
 
-.artistas-header p:last-child {
-  margin: 0.75rem 0 0;
-  color: #b3b3b3;
-}
+.artistas-header p:last-child { margin: .75rem 0 0; color: var(--muted); }
 
-.header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
+.header-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
 
-.primary-link,
-.primary-button,
-.secondary-button,
-.card-button {
+.primary-link, .primary-button, .secondary-button, .card-button {
   display: inline-flex;
+  min-height: 43px;
   align-items: center;
   justify-content: center;
-  min-height: 2.75rem;
-  padding: 0.7rem 1.2rem;
-  border-radius: 999px;
-  font-weight: 700;
-  text-decoration: none;
+  padding: 0 1.2rem;
+  border: 1px solid transparent;
+  border-radius: 0;
   cursor: pointer;
+  font-size: .82rem;
+  font-weight: 800;
+  text-decoration: none;
 }
 
-.primary-link,
-.primary-button {
-  color: #121212;
-  background-color: #1ed760;
-  border: 1px solid #1ed760;
-}
+.primary-link, .primary-button { color: var(--ink); background: var(--apricot-cream); }
+.primary-link:hover, .primary-button:hover { background: var(--golden-sand); }
 
-.secondary-button,
-.card-button {
-  color: #ffffff;
-  background-color: transparent;
-  border: 1px solid #727272;
-}
+.secondary-button, .card-button { color: var(--text); background: transparent; border-color: #9cafb76a; }
+.secondary-button:hover:not(:disabled), .card-button:hover:not(:disabled) { border-color: var(--cool-steel); color: var(--cool-steel); }
 
-.secondary-button:disabled,
-.card-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
+.secondary-button:disabled, .card-button:disabled { opacity: .55; cursor: not-allowed; }
 
-.primary-link:focus-visible,
-.primary-button:focus-visible,
-.secondary-button:focus-visible,
-.card-button:focus-visible {
-  outline: 2px solid #ffffff;
+.primary-link:focus-visible, .primary-button:focus-visible, .secondary-button:focus-visible, .card-button:focus-visible {
+  outline: 3px solid var(--apricot-cream);
   outline-offset: 3px;
 }
 
-.feedback {
-  display: block;
-  padding: 1rem;
-  margin-bottom: 1.25rem;
-  border-radius: 0.75rem;
-}
-
-.success-feedback {
-  color: #8ff0b1;
-  background-color: #193021;
-  border: 1px solid #1db954;
-}
-
-.error-feedback {
-  color: #ff8f8f;
-  background-color: #3b2424;
-  border: 1px solid #7a3535;
-}
+.feedback { display: block; padding: 12px 18px; margin-bottom: 1.25rem; font-size: .82rem; }
+.success-feedback { color: var(--ink); background: var(--golden-sand); }
+.error-feedback { color: var(--apricot-cream); background: #f6ca8313; border: 1px solid #f6ca8355; }
 
 .state-card {
   display: flex;
@@ -137,33 +109,19 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
+  gap: .75rem;
   padding: 2rem;
-  color: #b3b3b3;
+  color: var(--muted);
   text-align: center;
-  background-color: #181818;
-  border: 1px solid #343434;
-  border-radius: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
 }
 
-.state-card h2,
-.state-card p {
-  margin: 0;
-}
+.state-card h2, .state-card p { margin: 0; }
+.error-card { color: var(--apricot-cream); border-color: #f6ca8355; }
 
-.error-card {
-  color: #ff8f8f;
-  border-color: #7a3535;
-}
-
-.total-artistas {
-  margin: 0 0 1rem;
-  color: #b3b3b3;
-}
-
-.total-artistas strong {
-  color: #ffffff;
-}
+.total-artistas { margin: 0 0 1rem; color: var(--muted); }
+.total-artistas strong { color: var(--text); }
 
 .artistas-grid {
   display: grid;
@@ -180,96 +138,50 @@
   gap: 1.25rem;
   height: 100%;
   padding: 1.25rem;
-  background-color: #181818;
-  border: 1px solid #343434;
-  border-radius: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--palm-leaf);
+  transition: background .18s ease, transform .18s ease;
 }
 
-.artista-foto {
-  width: 7rem;
-  height: 7rem;
-  object-fit: cover;
-  background-color: #282828;
-  border-radius: 50%;
-}
+.artista-card:hover { background: var(--panel-raised); }
 
-.artista-info {
-  min-width: 0;
-}
+.artista-foto { width: 7rem; height: 7rem; object-fit: cover; background: var(--panel-raised); border-radius: 50%; }
+
+.artista-info { min-width: 0; }
 
 .artista-info h2 {
   margin: 0;
+  font-family: "Trebuchet MS", sans-serif;
   font-size: 1.25rem;
   overflow-wrap: anywhere;
 }
 
-.nome-completo {
-  margin: 0.35rem 0 0;
-  color: #b3b3b3;
-  overflow-wrap: anywhere;
-}
+.nome-completo { margin: .35rem 0 0; color: var(--muted); overflow-wrap: anywhere; }
+.descricao { margin: .8rem 0 0; color: var(--muted); line-height: 1.5; overflow-wrap: anywhere; }
 
-.descricao {
-  margin: 0.8rem 0 0;
-  color: #d1d1d1;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
+.card-actions { display: flex; flex-direction: column; gap: .5rem; }
+.card-button { min-height: 2.5rem; padding: .55rem 1rem; }
 
-.card-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.card-button {
-  min-height: 2.5rem;
-  padding: 0.55rem 1rem;
-}
-
-.delete-button {
-  color: #ff8f8f;
-  border-color: #7a3535;
-}
+.delete-button { color: var(--apricot-cream); border-color: #f6ca8355; }
+.delete-button:hover:not(:disabled) { border-color: var(--apricot-cream); color: var(--apricot-cream); }
 
 @media (max-width: 900px) {
-  .artistas-grid {
-    grid-template-columns: 1fr;
-  }
+  .artistas-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
-  .artistas-page {
-    padding: 1.25rem;
-  }
+  .artistas-page { padding: 18px 14px 56px; }
 
-  .artistas-header {
-    align-items: stretch;
-    flex-direction: column;
-  }
+  .artistas-header { align-items: stretch; flex-direction: column; }
 
-  .header-actions,
-  .primary-link,
-  .secondary-button {
-    width: 100%;
-  }
+  .header-actions, .primary-link, .secondary-button { width: 100%; }
 
-  .artista-card {
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    gap: 1rem;
-  }
+  .artista-card { grid-template-columns: 4.5rem minmax(0, 1fr); gap: 1rem; }
 
-  .artista-foto {
-    width: 4.5rem;
-    height: 4.5rem;
-  }
+  .artista-foto { width: 4.5rem; height: 4.5rem; }
 
-  .card-actions {
-    grid-column: 1 / -1;
-    flex-direction: row;
-  }
+  .card-actions { grid-column: 1 / -1; flex-direction: row; }
 
-  .card-button {
-    width: 100%;
-  }
+  .card-button { width: 100%; }
 }
