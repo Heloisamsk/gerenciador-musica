@@ -63,6 +63,8 @@ export class Perfil implements OnInit {
   readonly musicas = signal<MusicaListagem[]>([]);
   readonly albuns = signal<AlbumResponse[]>([]);
   readonly buscaMusica = signal('');
+  readonly buscaArtista = signal('');
+  readonly buscaAlbum = signal('');
   readonly paginaMusicas = signal(0);
   readonly totalPaginasMusicas = signal(0);
   readonly totalMusicas = signal(0);
@@ -70,6 +72,26 @@ export class Perfil implements OnInit {
   readonly podeCarregarMaisMusicas = computed(
     () => this.paginaMusicas() + 1 < this.totalPaginasMusicas()
   );
+
+  readonly artistasFiltrados = computed(() => {
+    const termo = this.normalizarBusca(this.buscaArtista());
+    if (!termo) return this.artistas();
+
+    return this.artistas().filter(
+      artista => this.normalizarBusca(artista.nome).includes(termo)
+    );
+  });
+
+  readonly albunsFiltrados = computed(() => {
+    const termo = this.normalizarBusca(this.buscaAlbum());
+    if (!termo) return this.albuns();
+
+    return this.albuns().filter(
+      album =>
+        this.normalizarBusca(album.titulo).includes(termo) ||
+        this.normalizarBusca(album.artista.nome).includes(termo)
+    );
+  });
 
   readonly destaquePrincipal = computed<PerfilItem | null>(() => {
     const perfil = this.perfil();
@@ -252,6 +274,16 @@ export class Perfil implements OnInit {
   atualizarBuscaMusica(evento: Event): void {
     const campo = evento.currentTarget as HTMLInputElement;
     this.buscaMusica.set(campo.value);
+  }
+
+  atualizarBuscaArtista(evento: Event): void {
+    const campo = evento.currentTarget as HTMLInputElement;
+    this.buscaArtista.set(campo.value);
+  }
+
+  atualizarBuscaAlbum(evento: Event): void {
+    const campo = evento.currentTarget as HTMLInputElement;
+    this.buscaAlbum.set(campo.value);
   }
 
   pesquisarMusicas(): void {
@@ -475,6 +507,14 @@ export class Perfil implements OnInit {
       MUSICA: dados.idMusicaDestaque !== null,
       ALBUM: dados.idAlbumDestaque !== null
     }[dados.tipoDestaquePrincipal];
+  }
+
+  private normalizarBusca(valor: string): string {
+    return valor
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '');
   }
 
   private normalizarOpcional(valor: string): string | null {
