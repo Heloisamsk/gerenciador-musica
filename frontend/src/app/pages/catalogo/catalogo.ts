@@ -1,9 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MusicaService } from '../../services/musica';
 import { PlaylistService } from '../../services/playlist';
 import { MusicaListagem } from '../../models/MusicaListagem';
-import { forkJoin } from 'rxjs';
+import { Subject, forkJoin } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
@@ -12,7 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   templateUrl: './catalogo.html',
   styleUrls: ['./catalogo.css']
 })
-export class Catalogo implements OnInit {
+export class Catalogo implements OnInit, OnDestroy {
 
   musicas = signal<MusicaListagem[]>([]);
   loadingAdicionar = signal<{ [musicaId: number]: boolean }>({});
@@ -21,32 +22,48 @@ export class Catalogo implements OnInit {
   mensagemSucesso = signal<string | null>(null);
   playlistId!: number;
 
+  // switchMap garante que, se o usuário digitar rápido, apenas a resposta
+  // da busca mais recente é aplicada — sem isso, uma busca antiga (ex: só
+  // "a") podia responder depois de uma mais específica e sobrescrever a
+  // listagem com resultados que não correspondem ao termo digitado por último.
+  private readonly busca$ = new Subject<string>();
+
   constructor(
     private readonly musicaService: MusicaService,
     private readonly playlistService: PlaylistService,
     private readonly route: ActivatedRoute
-  ) {}
+  ) {
+    this.busca$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((termo) => this.musicaService.pesquisar({ titulo: termo }, 0, 100))
+      )
+      .subscribe({
+        next: (pagina) => {
+          this.musicas.set(pagina.itens);
+        },
+        error: (err: HttpErrorResponse) => {
+          this.tratarErro(
+            err,
+            'Erro ao pesquisar músicas no catálogo.'
+          );
+        }
+      });
+  }
 
   ngOnInit(): void {
     this.playlistId = Number(this.route.snapshot.paramMap.get('id'));
     this.carregarMusicas();
   }
 
+  ngOnDestroy(): void {
+    this.busca$.complete();
+  }
+
   atualizarBusca(evento: Event): void {
     const campo = evento.target as HTMLInputElement;
-    const termo = campo.value.trim();
-
-    this.musicaService.pesquisar({ titulo: termo }, 0, 100).subscribe({
-      next: (pagina) => {
-        this.musicas.set(pagina.itens);
-      },
-      error: (err: HttpErrorResponse) => {
-        this.tratarErro(
-          err,
-          'Erro ao pesquisar músicas no catálogo.'
-        );
-      }
-    });
+    this.busca$.next(campo.value.trim());
   }
 
   carregarMusicas(): void {
