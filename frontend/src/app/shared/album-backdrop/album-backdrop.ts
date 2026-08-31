@@ -64,7 +64,7 @@ export class AlbumBackdrop implements OnInit {
     const copia = [...itens];
 
     for (let indice = copia.length - 1; indice > 0; indice--) {
-      const sorteado = Math.floor(Math.random() * (indice + 1));
+      const sorteado = Math.floor(this.aleatorio() * (indice + 1));
 
       [copia[indice], copia[sorteado]] =
         [copia[sorteado], copia[indice]];
@@ -74,6 +74,19 @@ export class AlbumBackdrop implements OnInit {
   }
 
   private numeroEntre(minimo: number, maximo: number): number {
-    return Math.random() * (maximo - minimo) + minimo;
+    return this.aleatorio() * (maximo - minimo) + minimo;
+  }
+
+  /*
+   * O SonarCloud sinaliza Math.random() como sensível a segurança
+   * (previsível demais para uso criptográfico). Aqui o uso é só
+   * decorativo (embaralhar capas no fundo), mas trocar por
+   * crypto.getRandomValues() remove o alerta sem precisar justificar
+   * manualmente cada ocorrência no painel do Sonar.
+   */
+  private aleatorio(): number {
+    const valores = new Uint32Array(1);
+    crypto.getRandomValues(valores);
+    return valores[0] / 0x100000000;
   }
 }
