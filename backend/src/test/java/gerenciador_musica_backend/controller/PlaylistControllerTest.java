@@ -19,12 +19,14 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -152,6 +154,63 @@ class PlaylistControllerTest {
                 .when(playlistService).removerMusica(anyLong(), anyLong());
 
         mockMvc.perform(delete("/api/playlists/1/musicas/5"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveAtualizarPlaylistComSucesso() throws Exception {
+        PlaylistResponseDTO resposta = new PlaylistResponseDTO(
+                1L, "Favoritas atualizadas", "Nova descrição",
+                "https://exemplo.com/capa.jpg", List.of()
+        );
+
+        when(playlistService.atualizarPlaylist(eq(1L), any())).thenReturn(resposta);
+
+        mockMvc.perform(put("/api/playlists/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nome": "Favoritas atualizadas",
+                                    "descricao": "Nova descrição",
+                                    "capaUrl": "https://exemplo.com/capa.jpg"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Favoritas atualizadas"))
+                .andExpect(jsonPath("$.capaUrl").value("https://exemplo.com/capa.jpg"));
+    }
+
+    @Test
+    void deveRetornar403AoAtualizarPlaylistDeOutroUsuario() throws Exception {
+        when(playlistService.atualizarPlaylist(eq(1L), any()))
+                .thenThrow(new PlaylistAcessoNegadoException(
+                        "Você não possui permissão para acessar esta playlist."
+                ));
+
+        mockMvc.perform(put("/api/playlists/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nome": "Novo nome"
+                                }
+                                """))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveExcluirPlaylistComSucesso() throws Exception {
+        doNothing().when(playlistService).excluirPlaylist(1L);
+
+        mockMvc.perform(delete("/api/playlists/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deveRetornar404AoExcluirPlaylistInexistente() throws Exception {
+        doThrow(new PlaylistNaoEncontradaException("Playlist não encontrada."))
+                .when(playlistService).excluirPlaylist(999L);
+
+        mockMvc.perform(delete("/api/playlists/999"))
                 .andExpect(status().isNotFound());
     }
 }

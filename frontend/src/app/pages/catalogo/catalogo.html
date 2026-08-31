@@ -1,9 +1,12 @@
-<div class="spotify-container">
+<div class="catalogo-shell">
   <a class="voltar-link" [routerLink]="['/playlists', playlistId]">
     ← Voltar para a playlist
   </a>
 
-  <h2 class="page-title">Catálogo de Músicas</h2>
+  <header class="catalogo-cabecalho">
+    <span class="rotulo-secao">Adicionar músicas</span>
+    <h1>Catálogo de músicas</h1>
+  </header>
 
   <input
     class="campo-busca"
@@ -14,62 +17,53 @@
   >
 
   @if (mensagemSucesso()) {
-    <div class="alert success">
-      {{ mensagemSucesso() }}
+    <div class="status-message success-message" role="status">
+      <p>{{ mensagemSucesso() }}</p>
     </div>
   }
 
   @if (mensagemErro()) {
-    <div class="alert error">
-      {{ mensagemErro() }}
+    <div class="status-message error-message" role="alert">
+      <p>{{ mensagemErro() }}</p>
     </div>
   }
 
-  <div class="musica-list">
-
+  <ul class="lista-musicas">
     @for (musica of musicas(); track musica.id) {
-      <div class="musica-row">
+      <li class="linha-musica">
+        <span class="musica-capa">
+          <img
+            [src]="musica.album?.capaUrl || '/capa-padrao.png'"
+            [alt]="'Capa de ' + musica.titulo"
+            loading="lazy"
+          />
+        </span>
 
-        <div class="musica-left">
-          <div class="musica-cover">
-            <img class="musica-cover" src="/capa-padrao.png" alt="Capa de {{ musica.titulo }}" loading="lazy">
-          </div>
+        <span class="musica-info">
+          <strong>{{ musica.titulo }}</strong>
+          <span>{{ musica.artistaPrincipal?.nome || 'Desconhecido' }}</span>
+        </span>
 
-          <div class="musica-info">
-            <span class="musica-title">{{ musica.titulo }}</span>
-            <span class="musica-subtitle">
-              <span class="badge-explicit">E</span>
-              Música • {{ musica.artistaPrincipal?.nome || 'Desconhecido' }}
-            </span>
-          </div>
-        </div>
-
-        <div class="musica-right">
-          <span class="musica-badge">Música</span>
-
-          <button
-            class="btn-add"
-            (click)="musicasAdicionadas()[musica.id] ? removerMusica(musica.id) : adicionarMusica(musica.id)"
-            [disabled]="loadingAdicionar()[musica.id]"
-            [class.is-added]="musicasAdicionadas()[musica.id]"
-            [title]="musicasAdicionadas()[musica.id] ? 'Remover da playlist' : 'Adicionar à playlist'"
-          >
-            @if (loadingAdicionar()[musica.id]) {
-              <span class="loading-dots">...</span>
-            } @else if (musicasAdicionadas()[musica.id]) {
-              <span class="icon-added">✓</span>
-              <span class="icon-remove">-</span>
-            } @else {
-              <span>+</span>
-            }
-          </button>
-        </div>
-      </div>
+        <button
+          class="botao-adicionar"
+          type="button"
+          (click)="musicasAdicionadas()[musica.id] ? removerMusica(musica.id) : adicionarMusica(musica.id)"
+          [disabled]="loadingAdicionar()[musica.id]"
+          [class.botao-adicionar--adicionada]="musicasAdicionadas()[musica.id]"
+          [attr.aria-label]="musicasAdicionadas()[musica.id] ? 'Remover ' + musica.titulo + ' da playlist' : 'Adicionar ' + musica.titulo + ' à playlist'"
+        >
+          @if (loadingAdicionar()[musica.id]) {
+            <span>...</span>
+          } @else if (musicasAdicionadas()[musica.id]) {
+            <span class="icone-adicionada" aria-hidden="true">✓</span>
+            <span class="icone-remover" aria-hidden="true">−</span>
+          } @else {
+            <span aria-hidden="true">+</span>
+          }
+        </button>
+      </li>
     } @empty {
-      <div class="musica-row">
-        <p>Nenhuma música encontrada no catálogo.</p>
-      </div>
+      <li class="mensagem-estado">Nenhuma música encontrada no catálogo.</li>
     }
-
-  </div>
+  </ul>
 </div>

@@ -4,7 +4,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { PlaylistDetalhe } from './playlist-detalhe';
 import { PlaylistResponse } from '../../models/PlaylistResponse';
 import { vi } from 'vitest';
@@ -13,6 +13,7 @@ describe('PlaylistDetalhe', () => {
   let component: PlaylistDetalhe;
   let fixture: ComponentFixture<PlaylistDetalhe>;
   let httpMock: HttpTestingController;
+  let router: Router;
   const apiUrl = 'http://localhost:8080/api/playlists';
 
   beforeEach(async () => {
@@ -34,6 +35,7 @@ describe('PlaylistDetalhe', () => {
     fixture = TestBed.createComponent(PlaylistDetalhe);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
   });
 
   afterEach(() => {
@@ -46,7 +48,11 @@ describe('PlaylistDetalhe', () => {
       id: 10,
       nome: 'Favoritas',
       descricao: '',
-      musicas: [{ id: 5, titulo: 'Bohemian Rhapsody', artista: 'Queen' }],
+      capaUrl: 'https://exemplo.com/capa.jpg',
+      musicas: [{
+        id: 5, titulo: 'Bohemian Rhapsody', artista: 'Queen',
+        capaUrl: 'https://exemplo.com/capa-musica.jpg'
+      }],
     };
   }
 
@@ -123,5 +129,65 @@ describe('PlaylistDetalhe', () => {
 
     expect(component.mensagemErro).toBeTruthy();
     expect(component.playlist?.musicas).toHaveLength(1);
+  });
+
+  it('deve exibir a capa da playlist e o link para edição', () => {
+    fixture.detectChanges();
+    httpMock.expectOne(`${apiUrl}/10`).flush(playlistComUmaMusica());
+    fixture.detectChanges();
+
+    const capa = fixture.nativeElement.querySelector('.capa img');
+    expect(capa.getAttribute('src')).toBe('https://exemplo.com/capa.jpg');
+
+    const linkEditar = fixture.nativeElement.querySelector(
+      'a[href="/playlists/10/editar"]'
+    );
+    expect(linkEditar).not.toBeNull();
+
+    const capaMusica = fixture.nativeElement.querySelector('.musica-capa img');
+    expect(capaMusica.getAttribute('src')).toBe('https://exemplo.com/capa-musica.jpg');
+  });
+
+  it('deve excluir a playlist quando confirmado e navegar para a listagem', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    fixture.detectChanges();
+    httpMock.expectOne(`${apiUrl}/10`).flush(playlistComUmaMusica());
+
+    component.excluirPlaylist();
+
+    const requisicao = httpMock.expectOne(`${apiUrl}/10`);
+    expect(requisicao.request.method).toBe('DELETE');
+    requisicao.flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/playlists']);
+  });
+
+  it('não deve excluir a playlist quando o usuário cancela a confirmação', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+    fixture.detectChanges();
+    httpMock.expectOne(`${apiUrl}/10`).flush(playlistComUmaMusica());
+
+    component.excluirPlaylist();
+
+    httpMock.expectNone(`${apiUrl}/10`);
+  });
+
+  it('deve mostrar mensagem de erro quando a exclusão falha', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    fixture.detectChanges();
+    httpMock.expectOne(`${apiUrl}/10`).flush(playlistComUmaMusica());
+
+    component.excluirPlaylist();
+
+    httpMock
+      .expectOne(`${apiUrl}/10`)
+      .flush({ message: 'erro' }, { status: 500, statusText: 'Internal Server Error' });
+
+    expect(component.mensagemErro).toBeTruthy();
+    expect(component.excluindo).toBe(false);
   });
 });

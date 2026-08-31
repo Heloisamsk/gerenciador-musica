@@ -91,6 +91,28 @@ describe('Catalogo', () => {
     expect(component.musicas()).toHaveLength(1);
   });
 
+  it('deve exibir a capa real do álbum da música, quando disponível', () => {
+    fixture.detectChanges();
+
+    httpMock.expectOne(`${musicasUrl}?page=0&size=100`).flush({
+      itens: [{
+        ...musicaDeExemplo(),
+        album: { id: 1, titulo: 'A Night at the Opera', anoLancamento: 1975, capaUrl: 'https://exemplo.com/capa.jpg' }
+      }],
+      paginaAtual: 0,
+      tamanhoPagina: 100,
+      totalItens: 1,
+      totalPaginas: 1,
+    });
+    httpMock.expectOne(`${playlistsUrl}/1`).flush({
+      id: 1, nome: 'Playlist Teste', descricao: '', musicas: []
+    });
+    fixture.detectChanges();
+
+    const imagem = fixture.nativeElement.querySelector('.musica-capa img');
+    expect(imagem.getAttribute('src')).toBe('https://exemplo.com/capa.jpg');
+  });
+
   it('deve atualizar as músicas ao pesquisar por título', () => {
     component.atualizarBusca(
       criarEventoDeBusca('  Queen  ')
@@ -184,7 +206,8 @@ describe('Catalogo', () => {
       {
         id: 5,
         titulo: 'Bohemian Rhapsody',
-        artista: 'Queen'
+        artista: 'Queen',
+        capaUrl: null
       }
     ]);
 
@@ -217,7 +240,8 @@ describe('Catalogo', () => {
       {
         id: 5,
         titulo: 'Bohemian Rhapsody',
-        artista: 'Queen'
+        artista: 'Queen',
+        capaUrl: null
       }
     ]);
 

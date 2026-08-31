@@ -49,7 +49,7 @@ describe('PlaylistNova', () => {
   });
 
   it('não deve enviar requisição quando o formulário é inválido', () => {
-    component.formulario.setValue({ nome: '', descricao: '' });
+    component.formulario.setValue({ nome: '', descricao: '', capaUrl: '' });
 
     component.enviar();
 
@@ -59,14 +59,20 @@ describe('PlaylistNova', () => {
   it('deve navegar para a playlist criada quando o envio tem sucesso', () => {
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 
-    component.formulario.setValue({ nome: 'Favoritas', descricao: 'Minhas músicas' });
+    component.formulario.setValue({
+      nome: 'Favoritas', descricao: 'Minhas músicas', capaUrl: ''
+    });
 
     component.enviar();
 
-    httpMock.expectOne(apiUrl).flush({
+    const requisicao = httpMock.expectOne(apiUrl);
+    expect(requisicao.request.body.capaUrl).toBeNull();
+
+    requisicao.flush({
       id: 7,
       nome: 'Favoritas',
       descricao: 'Minhas músicas',
+      capaUrl: null,
       musicas: [],
     });
 
@@ -74,8 +80,36 @@ describe('PlaylistNova', () => {
     expect(component.enviando).toBe(false);
   });
 
+  it('deve enviar o link da capa quando informado', () => {
+    vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.formulario.setValue({
+      nome: 'Favoritas',
+      descricao: '',
+      capaUrl: 'https://exemplo.com/capa.jpg'
+    });
+
+    component.enviar();
+
+    const requisicao = httpMock.expectOne(apiUrl);
+    expect(requisicao.request.body.capaUrl).toBe('https://exemplo.com/capa.jpg');
+
+    requisicao.flush({
+      id: 7,
+      nome: 'Favoritas',
+      descricao: '',
+      capaUrl: 'https://exemplo.com/capa.jpg',
+      musicas: [],
+    });
+  });
+
+  it('deve recusar um link de capa sem protocolo http', () => {
+    component.formulario.controls.capaUrl.setValue('exemplo.com/capa.jpg');
+    expect(component.formulario.controls.capaUrl.hasError('urlHttp')).toBe(true);
+  });
+
   it('deve mostrar mensagem de erro quando o envio falha', () => {
-    component.formulario.setValue({ nome: 'Favoritas', descricao: '' });
+    component.formulario.setValue({ nome: 'Favoritas', descricao: '', capaUrl: '' });
 
     component.enviar();
 
@@ -102,7 +136,8 @@ describe('PlaylistNova', () => {
 
     component.formulario.setValue({
       nome: 'Favoritas',
-      descricao: ''
+      descricao: '',
+      capaUrl: ''
     });
 
     component.enviar();

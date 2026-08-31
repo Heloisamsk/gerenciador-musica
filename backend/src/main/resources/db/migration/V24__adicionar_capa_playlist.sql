@@ -1,0 +1,1 @@
+ALTER TABLE playlist ADD COLUMN capa_url VARCHAR(2048);

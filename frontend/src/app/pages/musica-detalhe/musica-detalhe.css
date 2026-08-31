@@ -125,6 +125,17 @@
   transform: scale(0.97);
 }
 
+.corpo-detalhe {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  gap: clamp(24px, 4vw, 44px);
+  align-items: start;
+}
+
+.conteudo-principal {
+  min-width: 0;
+}
+
 .secao {
   margin-bottom: 32px;
 }
@@ -147,6 +158,39 @@
   color: var(--app-text);
   line-height: 1.7;
   white-space: pre-line;
+}
+
+.sidebar-reviews {
+  min-width: 0;
+  padding: clamp(16px, 2vw, 22px);
+  background: var(--app-panel);
+  border: 1px solid var(--app-line);
+  border-radius: 18px;
+}
+
+.sidebar-reviews h2 {
+  margin: 0 0 14px;
+  color: var(--app-dry-sage);
+  font-family: 'Trebuchet MS', sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.lista-reviews-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mensagem-estado--sidebar {
+  padding: 14px;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 900px) {
+  .corpo-detalhe {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 640px) {

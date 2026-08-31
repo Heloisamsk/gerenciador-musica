@@ -137,9 +137,6 @@
 .favorito-vazio strong { color: var(--text); }
 .favorito-vazio small { margin-top: 4px; }
 
-.sobre { margin-top: 32px; padding: 23px 24px; color: var(--black); background: var(--cool-steel); }
-.sobre h3 { margin: 0; font-family: "Trebuchet MS", sans-serif; font-size: 1.15rem; }
-.sobre p { margin: 9px 0 0; color: #202725; line-height: 1.65; }
 .atalhos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
 .atalhos a { padding: 10px 13px; color: var(--dry-sage); border: 1px solid #adb9936e; font-size: .73rem; font-weight: 800; }
 .atalhos a:hover { color: var(--black); background: var(--dry-sage); }

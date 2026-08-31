@@ -127,6 +127,16 @@ describe('ReviewService', () => {
     });
   });
 
+  it('deve listar reviews de uma música com tamanho de página customizado', () => {
+    service.listarPorMusica(20, 0, 8).subscribe();
+
+    const requisicao = httpMock.expectOne(`${apiUrl}/musicas/20?page=0&size=8`);
+    expect(requisicao.request.method).toBe('GET');
+    requisicao.flush({
+      itens: [], paginaAtual: 0, tamanhoPagina: 8, totalItens: 0, totalPaginas: 0
+    });
+  });
+
   it('deve listar reviews de um álbum', () => {
     service.listarPorAlbum(10).subscribe();
 

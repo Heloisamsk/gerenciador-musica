@@ -1,0 +1,49 @@
+<section class="reviews-recentes-area" aria-labelledby="titulo-reviews-perfil">
+  <div class="secao-cabecalho">
+    <div><span>Atividade recente</span><h2 id="titulo-reviews-perfil">Reviews recentes</h2></div>
+    <a routerLink="/reviews">Ver todas</a>
+  </div>
+
+  <dl class="estatisticas-reviews">
+    <div>
+      <dt>Músicas avaliadas</dt>
+      <dd>{{ perfil().totalMusicasAvaliadas }}</dd>
+    </div>
+    <div>
+      <dt>Álbuns avaliados</dt>
+      <dd>{{ perfil().totalAlbunsAvaliadas }}</dd>
+    </div>
+  </dl>
+
+  @if (reviewsRecentes().length > 0) {
+    <div class="reviews-lista-horizontal">
+      @for (review of reviewsRecentes(); track review.idReview) {
+        <app-review-card [review]="review" />
+      }
+    </div>
+  } @else {
+    <p class="lista-vazia">Você ainda não fez nenhuma review.</p>
+  }
+</section>
+
+<section class="playlists-area" aria-labelledby="titulo-playlists-perfil">
+  <div class="secao-cabecalho">
+    <div><span>Sua biblioteca</span><h2 id="titulo-playlists-perfil">Suas playlists</h2></div>
+    <a routerLink="/playlists">Ver todas</a>
+  </div>
+
+  @if (playlists().length > 0) {
+    <div class="playlists-lista-horizontal">
+      @for (playlist of playlists(); track playlist.id) {
+        <app-playlist-card [playlist]="playlist" />
+      }
+    </div>
+  } @else {
+    <p class="lista-vazia">Você ainda não criou nenhuma playlist.</p>
+  }
+</section>
+
+<section class="sobre-area">
+  <h3>Sobre</h3>
+  <p>{{ perfil().biografia || 'Este perfil ainda não adicionou uma biografia.' }}</p>
+</section>

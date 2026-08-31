@@ -42,7 +42,11 @@ describe('PlaylistService', () => {
   });
 
   it('deve enviar POST para criar uma playlist', () => {
-    const novaPlaylist = { nome: 'Favoritas', descricao: 'Minhas músicas favoritas' };
+    const novaPlaylist = {
+      nome: 'Favoritas',
+      descricao: 'Minhas músicas favoritas',
+      capaUrl: null,
+    };
 
     service.criar(novaPlaylist).subscribe();
 
@@ -55,6 +59,7 @@ describe('PlaylistService', () => {
       id: 1,
       nome: 'Favoritas',
       descricao: 'Minhas músicas favoritas',
+      capaUrl: null,
       musicas: [],
     } as PlaylistResponse);
   });
@@ -70,7 +75,7 @@ describe('PlaylistService', () => {
     expect(requisicao.request.method).toBe('GET');
 
     requisicao.flush([
-      { id: 1, nome: 'Favoritas', descricao: '', musicas: [] },
+      { id: 1, nome: 'Favoritas', descricao: '', capaUrl: null, musicas: [] },
     ] as PlaylistResponse[]);
   });
 
@@ -85,8 +90,40 @@ describe('PlaylistService', () => {
       id: 1,
       nome: 'Favoritas',
       descricao: '',
+      capaUrl: null,
       musicas: [],
     } as PlaylistResponse);
+  });
+
+  it('deve enviar PUT para atualizar uma playlist', () => {
+    const dados = {
+      nome: 'Favoritas atualizadas',
+      descricao: 'Nova descrição',
+      capaUrl: 'https://exemplo.com/capa.jpg',
+    };
+
+    service.atualizar(1, dados).subscribe();
+
+    const requisicao = httpMock.expectOne(`${apiUrl}/1`);
+
+    expect(requisicao.request.method).toBe('PUT');
+    expect(requisicao.request.body).toEqual(dados);
+
+    requisicao.flush({
+      id: 1,
+      ...dados,
+      musicas: [],
+    } as PlaylistResponse);
+  });
+
+  it('deve enviar DELETE para excluir uma playlist', () => {
+    service.excluir(1).subscribe();
+
+    const requisicao = httpMock.expectOne(`${apiUrl}/1`);
+
+    expect(requisicao.request.method).toBe('DELETE');
+
+    requisicao.flush(null, { status: 204, statusText: 'No Content' });
   });
 
   it('deve propagar um erro amigável quando a requisição falha', () => {

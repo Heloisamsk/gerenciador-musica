@@ -1,104 +1,98 @@
-<section class="playlist-detalhe-page">
-  <div class="playlist-detalhe-card">
+<div class="playlist-detalhe-shell">
+  <a class="voltar-link" routerLink="/playlists">← Voltar para playlists</a>
 
-    <a class="voltar-link" routerLink="/playlists">
-      ← Voltar para playlists
-    </a>
-
-    @if (carregando) {
-    <output
-      class="status-message loading-message"
-      aria-live="polite"
-    >
-      <p>Carregando playlist...</p>
-    </output>
-    }
-
-    @else if (mensagemErro) {
-    <div
-      class="status-message error-message"
-      role="alert"
-    >
-      <h2>Não foi possível carregar a playlist</h2>
-
+  @if (carregando) {
+    <p class="mensagem-estado">Carregando playlist...</p>
+  } @else if (mensagemErro) {
+    <div class="status-message error-message" role="alert">
       <p>{{ mensagemErro }}</p>
 
       <button
-        class="tentar-novamente-button"
+        class="botao-secundario"
         type="button"
         (click)="carregarPlaylist()"
       >
         Tentar novamente
       </button>
     </div>
-    }
+  } @else if (playlist) {
+    <header class="cabecalho">
+      <span class="capa">
+        @if (playlist.capaUrl) {
+          <img
+            [src]="playlist.capaUrl"
+            [alt]="'Capa da playlist ' + playlist.nome"
+            (error)="aoFalharCapa($event)"
+          />
+        } @else {
+          <span class="capa-nota" aria-hidden="true">♪</span>
+        }
+      </span>
 
-    @else if (playlist) {
-    <header class="playlist-header">
-      <div class="playlist-header-linha">
-        <div>
-          <p class="section-label">Playlist</p>
-          <h1>{{ playlist.nome }}</h1>
+      <div class="info-principal">
+        <span class="rotulo-secao">Playlist</span>
+        <h1>{{ playlist.nome }}</h1>
 
-          @if (playlist.descricao) {
-          <p class="playlist-descricao">{{ playlist.descricao }}</p>
-          }
+        @if (playlist.descricao) {
+          <p class="descricao">{{ playlist.descricao }}</p>
+        }
+
+        <p class="contagem">
+          {{ playlist.musicas.length }}
+          {{ playlist.musicas.length === 1 ? 'música' : 'músicas' }}
+        </p>
+
+        <div class="acoes-cabecalho">
+          <a
+            class="acao acao--principal"
+            [routerLink]="['/playlists', playlist.id, 'catalogo']"
+          >
+            + Adicionar música
+          </a>
+
+          <a class="botao-secundario" [routerLink]="['/playlists', playlist.id, 'editar']">
+            Editar
+          </a>
+
+          <button
+            class="botao-perigo"
+            type="button"
+            [disabled]="excluindo"
+            (click)="excluirPlaylist()"
+          >
+            @if (excluindo) {
+              Excluindo...
+            } @else {
+              Excluir
+            }
+          </button>
         </div>
-
-        <a
-          class="nova-playlist-button"
-          [routerLink]="['/playlists', playlist.id, 'catalogo']"
-        >
-          + Adicionar música
-        </a>
       </div>
     </header>
 
     @if (playlist.musicas.length === 0) {
-    <output
-      class="status-message empty-message"
-      aria-live="polite"
-    >
-      <h2>Essa playlist ainda não tem músicas</h2>
-
-      <p>
-        Adicione músicas ao catálogo para começar a montar sua playlist.
+      <p class="mensagem-estado">
+        Essa playlist ainda não tem músicas. Adicione músicas ao catálogo para começar a montar sua playlist.
       </p>
-    </output>
-    }
-
-    @else {
-    <div class="table-information">
-      <p>
-        Total de músicas:
-        <strong>{{ playlist.musicas.length }}</strong>
-      </p>
-    </div>
-
-    <div class="table-container">
-      <table class="musicas-table">
-        <caption class="sr-only">
-          Músicas da playlist {{ playlist.nome }}
-        </caption>
-
-        <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Título</th>
-          <th scope="col">Artista</th>
-          <th scope="col">Ações</th>
-        </tr>
-        </thead>
-
-        <tbody>
+    } @else {
+      <ul class="lista-musicas">
         @for (musica of playlist.musicas; track musica.id; let i = $index) {
-        <tr>
-          <td data-label="#">{{ i + 1 }}</td>
-          <td data-label="Título">
-            <strong>{{ musica.titulo }}</strong>
-          </td>
-          <td data-label="Artista">{{ musica.artista }}</td>
-          <td data-label="Ações">
+          <li class="linha-musica">
+            <span class="marcador">{{ i + 1 }}</span>
+
+            <span class="musica-capa">
+              <img
+                [src]="musica.capaUrl || '/capa-padrao.png'"
+                [alt]="'Capa de ' + musica.titulo"
+                loading="lazy"
+              />
+            </span>
+
+            <span class="musica-info">
+              <strong>{{ musica.titulo }}</strong>
+              <span>{{ musica.artista }}</span>
+            </span>
+
             <button
               class="remover-button"
               type="button"
@@ -106,19 +100,14 @@
               (click)="removerMusica(musica.id)"
             >
               @if (removendoMusicaId === musica.id) {
-              Removendo...
+                Removendo...
               } @else {
-              Remover
+                Remover
               }
             </button>
-          </td>
-        </tr>
+          </li>
         }
-        </tbody>
-      </table>
-    </div>
+      </ul>
     }
-    }
-
-  </div>
-</section>
+  }
+</div>

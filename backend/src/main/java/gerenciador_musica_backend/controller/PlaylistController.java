@@ -50,6 +50,26 @@ public class PlaylistController {
         return ResponseEntity.ok(playlist);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<PlaylistResponseDTO> atualizarPlaylist(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody PlaylistRequestDTO dto
+    ) {
+        PlaylistResponseDTO playlistAtualizada =
+                playlistService.atualizarPlaylist(id, dto);
+
+        return ResponseEntity.ok(playlistAtualizada);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirPlaylist(
+            @PathVariable("id") Long id
+    ) {
+        playlistService.excluirPlaylist(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{playlistId}/musicas/{musicaId}")
     public ResponseEntity<Void> adicionarMusica(
             @PathVariable("playlistId") Long playlistId,

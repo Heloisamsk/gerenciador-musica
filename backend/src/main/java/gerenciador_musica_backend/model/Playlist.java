@@ -23,6 +23,9 @@ public class Playlist {
     @Column(name = "descricao", columnDefinition = "TEXT")
     private String descricao;
 
+    @Column(name = "capa_url", length = 2048)
+    private String capaUrl;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
@@ -85,6 +88,14 @@ public class Playlist {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getCapaUrl() {
+        return capaUrl;
+    }
+
+    public void setCapaUrl(String capaUrl) {
+        this.capaUrl = capaUrl;
     }
 
     public Usuario getUsuario() {

@@ -55,6 +55,32 @@ export class PlaylistService {
       );
   }
 
+  atualizar(
+    id: number,
+    playlist: PlaylistRequest
+  ): Observable<PlaylistResponse> {
+    return this.http
+      .put<PlaylistResponse>(
+        `${this.apiUrl}/${id}`,
+        playlist
+      )
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  excluir(
+    id: number
+  ): Observable<void> {
+    return this.http
+      .delete<void>(
+        `${this.apiUrl}/${id}`
+      )
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   adicionarMusica(
     playlistId: number,
     musicaId: number

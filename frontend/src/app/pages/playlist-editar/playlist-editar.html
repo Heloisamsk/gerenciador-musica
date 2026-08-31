@@ -1,0 +1,92 @@
+<div class="playlist-editar-shell">
+  <a class="voltar-link" [routerLink]="['/playlists', playlistId]">← Voltar para a playlist</a>
+
+  @if (carregando) {
+    <p class="mensagem-estado">Carregando playlist...</p>
+  } @else {
+    <header class="playlist-editar-cabecalho">
+      <span class="rotulo-secao">Editar playlist</span>
+      <h1>{{ formulario.value.nome || 'Editar playlist' }}</h1>
+    </header>
+
+    <form [formGroup]="formulario" (ngSubmit)="enviar()" class="playlist-form">
+
+      <div class="campo">
+        <label for="nome">Nome</label>
+        <input
+          id="nome"
+          type="text"
+          formControlName="nome"
+          placeholder="Ex: Foco no trabalho"
+          [class.campo-invalido]="formulario.controls.nome.invalid && formulario.controls.nome.touched"
+        />
+
+        @if (formulario.controls.nome.invalid && formulario.controls.nome.touched) {
+          <p class="mensagem-validacao">O nome da playlist é obrigatório.</p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="descricao">Descrição (opcional)</label>
+        <textarea
+          id="descricao"
+          formControlName="descricao"
+          placeholder="Do que se trata essa playlist?"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="campo">
+        <label for="capaUrl">Link da capa (opcional)</label>
+        <input
+          id="capaUrl"
+          type="url"
+          inputmode="url"
+          formControlName="capaUrl"
+          placeholder="https://exemplo.com/capa.jpg"
+          [class.campo-invalido]="formulario.controls.capaUrl.invalid && formulario.controls.capaUrl.touched"
+        />
+
+        @if (formulario.controls.capaUrl.invalid && formulario.controls.capaUrl.touched) {
+          <p class="mensagem-validacao">Informe um link iniciado por http:// ou https://.</p>
+        }
+      </div>
+
+      @if (mensagemErro) {
+        <div class="status-message error-message" role="alert">
+          <p>{{ mensagemErro }}</p>
+        </div>
+      }
+
+      <div class="acoes-form">
+        <button
+          class="botao-perigo"
+          type="button"
+          [disabled]="excluindo"
+          (click)="excluir()"
+        >
+          @if (excluindo) {
+            Excluindo...
+          } @else {
+            Excluir playlist
+          }
+        </button>
+
+        <span class="espacador"></span>
+
+        <button class="botao-secundario" type="button" [routerLink]="['/playlists', playlistId]">
+          Cancelar
+        </button>
+
+        <button class="acao acao--principal" type="submit" [disabled]="enviando">
+          @if (enviando) {
+            Salvando...
+          } @else {
+            Salvar alterações
+          }
+        </button>
+      </div>
+
+    </form>
+  }
+</div>

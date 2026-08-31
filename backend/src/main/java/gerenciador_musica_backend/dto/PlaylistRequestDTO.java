@@ -9,6 +9,8 @@ public class PlaylistRequestDTO {
 
     private String descricao;
 
+    private String capaUrl;
+
     public String getNome() {
         return nome;
     }
@@ -23,5 +25,13 @@ public class PlaylistRequestDTO {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getCapaUrl() {
+        return capaUrl;
+    }
+
+    public void setCapaUrl(String capaUrl) {
+        this.capaUrl = capaUrl;
     }
 }

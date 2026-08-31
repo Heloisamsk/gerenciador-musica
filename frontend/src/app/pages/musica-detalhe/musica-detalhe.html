@@ -58,32 +58,52 @@
       </div>
     </div>
 
-    @if (musica.youtubeVideoId) {
-      <section class="secao secao-player" aria-labelledby="titulo-player">
-        <h2 id="titulo-player">Ouvir música</h2>
-        <app-youtube-player
-          [videoId]="musica.youtubeVideoId"
-          [titulo]="musica.titulo"
-        />
-      </section>
-    }
+    <div class="corpo-detalhe">
+      <div class="conteudo-principal">
+        @if (musica.youtubeVideoId) {
+          <section class="secao secao-player" aria-labelledby="titulo-player">
+            <h2 id="titulo-player">Ouvir música</h2>
+            <app-youtube-player
+              [videoId]="musica.youtubeVideoId"
+              [titulo]="musica.titulo"
+            />
+          </section>
+        }
 
-    @if (musica.artistasParticipantes.length > 0) {
-      <section class="secao">
-        <h2>Participações</h2>
-        <p>
-          {{ musica.artistasParticipantes.map(a => a.nome).join(', ') }}
-        </p>
-      </section>
-    }
+        @if (musica.artistasParticipantes.length > 0) {
+          <section class="secao">
+            <h2>Participações</h2>
+            <p>
+              {{ musica.artistasParticipantes.map(a => a.nome).join(', ') }}
+            </p>
+          </section>
+        }
 
-    @if (musica.letra) {
-      <section class="secao">
-        <h2>Letra</h2>
-        <p class="letra">{{ musica.letra }}</p>
-      </section>
-    } @else {
-      <p class="mensagem-estado">Letra não disponível.</p>
-    }
+        @if (musica.letra) {
+          <section class="secao">
+            <h2>Letra</h2>
+            <p class="letra">{{ musica.letra }}</p>
+          </section>
+        } @else {
+          <p class="mensagem-estado">Letra não disponível.</p>
+        }
+      </div>
+
+      <aside class="sidebar-reviews" aria-labelledby="titulo-reviews-musica">
+        <h2 id="titulo-reviews-musica">Reviews</h2>
+
+        @if (reviewsDaMusica().length > 0) {
+          <div class="lista-reviews-sidebar">
+            @for (review of reviewsDaMusica(); track review.idReview) {
+              <app-review-card [review]="review" />
+            }
+          </div>
+        } @else {
+          <p class="mensagem-estado mensagem-estado--sidebar">
+            Nenhuma review ainda. Seja o primeiro a avaliar!
+          </p>
+        }
+      </aside>
+    </div>
   }
 </div>
