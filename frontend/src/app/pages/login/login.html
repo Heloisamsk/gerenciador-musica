@@ -1,7 +1,7 @@
 <main class="login-container">
   <section class="login-card">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Logo do Spotify" class="login-logo" />
-    <h1  class="login-title">Entrar</h1>
+    <img src="/favicon.svg" alt="Crotchet - Music Hub" class="login-logo" width="52" height="52" />
+    <h1 class="login-title">Entrar</h1>
 
     <form class="login-form" [formGroup]="loginForm" (ngSubmit)="entrar()">
       <div class="form-group">
@@ -14,14 +14,18 @@
           formControlName="email"
           autocomplete="email"
           placeholder="Digite seu e-mail"
+          [attr.aria-invalid]="email.touched && email.invalid"
+          [attr.aria-describedby]="email.touched && email.invalid ? 'login-email-error' : null"
         />
 
-        @if (email.touched && email.hasError('required')) {
-        <small class="error-message">O e-mail é obrigatório.</small>
-        }
-
-        @if (email.touched && email.hasError('email')) {
-        <small class="error-message">Digite um e-mail válido.</small>
+        @if (email.touched && email.invalid) {
+          <small id="login-email-error" class="error-message" aria-live="polite">
+            @if (email.hasError('required')) {
+              O e-mail é obrigatório.
+            } @else {
+              Digite um e-mail válido.
+            }
+          </small>
         }
       </div>
 
@@ -35,14 +39,18 @@
           formControlName="senha"
           autocomplete="current-password"
           placeholder="Digite sua senha"
+          [attr.aria-invalid]="senha.touched && senha.invalid"
+          [attr.aria-describedby]="senha.touched && senha.invalid ? 'login-senha-error' : null"
         />
 
-        @if (senha.touched && senha.hasError('required')) {
-        <small class="error-message">A senha é obrigatória.</small>
-        }
-
-        @if (senha.touched && senha.hasError('minlength')) {
-        <small class="error-message">A senha deve possuir pelo menos 6 caracteres.</small>
+        @if (senha.touched && senha.invalid) {
+          <small id="login-senha-error" class="error-message" aria-live="polite">
+            @if (senha.hasError('required')) {
+              A senha é obrigatória.
+            } @else {
+              A senha deve possuir pelo menos 6 caracteres.
+            }
+          </small>
         }
       </div>
 
@@ -51,8 +59,6 @@
       </button>
     </form>
 
-    <p class="cadastro-link">
-      Não tem uma conta? <a routerLink="/cadastro">Cadastre-se</a>
-    </p>
+    <p class="cadastro-link">Não tem uma conta? <a routerLink="/cadastro">Cadastre-se</a></p>
   </section>
 </main>
