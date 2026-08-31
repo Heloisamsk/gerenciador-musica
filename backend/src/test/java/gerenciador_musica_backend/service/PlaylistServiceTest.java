@@ -234,4 +234,71 @@ class PlaylistServiceTest {
 
         verify(playlistRepository, never()).save(any());
     }
+
+    @Test
+    void deveAtualizarNomeDescricaoECapaDaPlaylist() {
+        Playlist playlist = new Playlist("Rock", "Antiga descrição", usuarioLogado);
+
+        PlaylistRequestDTO dto = new PlaylistRequestDTO();
+        dto.setNome("Rock clássico");
+        dto.setDescricao("Nova descrição");
+        dto.setCapaUrl("https://exemplo.com/capa.jpg");
+
+        when(playlistRepository.buscarComMusicasPorId(10L))
+                .thenReturn(Optional.of(playlist));
+        when(playlistRepository.save(playlist)).thenReturn(playlist);
+
+        PlaylistResponseDTO resultado = playlistService.atualizarPlaylist(10L, dto);
+
+        assertThat(resultado.getNome()).isEqualTo("Rock clássico");
+        assertThat(resultado.getDescricao()).isEqualTo("Nova descrição");
+        assertThat(resultado.getCapaUrl()).isEqualTo("https://exemplo.com/capa.jpg");
+    }
+
+    @Test
+    void deveLancarExcecaoAoAtualizarPlaylistDeOutroUsuario() {
+        Usuario dono = new Usuario("Bruno", "bruno@email.com", "hash", Role.USER);
+        ReflectionTestUtils.setField(dono, "id", 2L);
+
+        Playlist playlistDeOutraPessoa = new Playlist("Rock", null, dono);
+
+        when(playlistRepository.buscarComMusicasPorId(10L))
+                .thenReturn(Optional.of(playlistDeOutraPessoa));
+
+        PlaylistRequestDTO dto = new PlaylistRequestDTO();
+        dto.setNome("Novo nome");
+
+        assertThatThrownBy(() -> playlistService.atualizarPlaylist(10L, dto))
+                .isInstanceOf(PlaylistAcessoNegadoException.class);
+
+        verify(playlistRepository, never()).save(any());
+    }
+
+    @Test
+    void deveExcluirPlaylistDoProprioUsuario() {
+        Playlist playlist = new Playlist("Rock", null, usuarioLogado);
+
+        when(playlistRepository.buscarComMusicasPorId(10L))
+                .thenReturn(Optional.of(playlist));
+
+        playlistService.excluirPlaylist(10L);
+
+        verify(playlistRepository).delete(playlist);
+    }
+
+    @Test
+    void deveLancarExcecaoAoExcluirPlaylistDeOutroUsuario() {
+        Usuario dono = new Usuario("Bruno", "bruno@email.com", "hash", Role.USER);
+        ReflectionTestUtils.setField(dono, "id", 2L);
+
+        Playlist playlistDeOutraPessoa = new Playlist("Rock", null, dono);
+
+        when(playlistRepository.buscarComMusicasPorId(10L))
+                .thenReturn(Optional.of(playlistDeOutraPessoa));
+
+        assertThatThrownBy(() -> playlistService.excluirPlaylist(10L))
+                .isInstanceOf(PlaylistAcessoNegadoException.class);
+
+        verify(playlistRepository, never()).delete(any());
+    }
 }

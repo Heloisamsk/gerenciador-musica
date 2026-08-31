@@ -46,10 +46,52 @@ public class PlaylistService {
                 dto.getDescricao(),
                 usuario
         );
+        playlist.setCapaUrl(dto.getCapaUrl());
 
         Playlist playlistSalva = playlistRepository.save(playlist);
 
         return converterParaResponseDTO(playlistSalva);
+    }
+
+    @Transactional
+    public PlaylistResponseDTO atualizarPlaylist(
+            Long id,
+            PlaylistRequestDTO dto
+    ) {
+        Usuario usuario = obterUsuarioAutenticado();
+
+        Playlist playlist = playlistRepository.buscarComMusicasPorId(id)
+                .orElseThrow(() ->
+                        new PlaylistNaoEncontradaException(
+                                PLAYLIST_NAO_ENCONTRADA
+                        )
+                );
+
+        verificarProprietario(playlist, usuario);
+
+        playlist.setNome(dto.getNome());
+        playlist.setDescricao(dto.getDescricao());
+        playlist.setCapaUrl(dto.getCapaUrl());
+
+        Playlist playlistSalva = playlistRepository.save(playlist);
+
+        return converterParaResponseDTO(playlistSalva);
+    }
+
+    @Transactional
+    public void excluirPlaylist(Long id) {
+        Usuario usuario = obterUsuarioAutenticado();
+
+        Playlist playlist = playlistRepository.buscarComMusicasPorId(id)
+                .orElseThrow(() ->
+                        new PlaylistNaoEncontradaException(
+                                PLAYLIST_NAO_ENCONTRADA
+                        )
+                );
+
+        verificarProprietario(playlist, usuario);
+
+        playlistRepository.delete(playlist);
     }
 
     @Transactional(readOnly = true)
@@ -176,6 +218,9 @@ public class PlaylistService {
                         musica.getTitulo(),
                         musica.getArtistaPrincipal() != null
                                 ? musica.getArtistaPrincipal().getNome()
+                                : null,
+                        musica.getAlbum() != null
+                                ? musica.getAlbum().getCapaUrl()
                                 : null
                 ))
                 .toList();
@@ -184,6 +229,7 @@ public class PlaylistService {
         response.setId(playlist.getId());
         response.setNome(playlist.getNome());
         response.setDescricao(playlist.getDescricao());
+        response.setCapaUrl(playlist.getCapaUrl());
         response.setMusicas(musicas);
 
         return response;
