@@ -46,12 +46,24 @@
   content: '';
 }
 
+/*
+ * grid-template-columns aqui (não padding-left em porcentagem no
+ * próprio card) porque um item de grid com faixa "auto" resolve
+ * porcentagem no padding contra a largura do CONTAINER pai, não
+ * contra a própria largura do item. Isso passava despercebido
+ * enquanto o card ficava com 100% de largura (telas estreitas), mas
+ * a partir do momento em que ele atinge o teto de 940px, o padding
+ * calculado ficava enorme e espremia o formulário quase a zero.
+ * Como faixa de grid-template-columns, a porcentagem resolve contra
+ * a largura definida do próprio card, que é o comportamento certo.
+ */
 .login-card,
 .cadastro-card {
   position: relative;
+  display: grid;
+  grid-template-columns: 46% 1fr;
   width: min(100%, 940px);
   min-height: 590px;
-  padding: 60px 64px 54px calc(46% + 64px);
   overflow: hidden;
   background: var(--app-surface);
   border: 1px solid var(--app-line);
@@ -104,14 +116,11 @@
   content: '';
 }
 
-.login-logo,
-.login-title,
-.cadastro-title,
-.login-form,
-.cadastro-form,
-.cadastro-link {
+.auth-content {
   position: relative;
   z-index: 1;
+  grid-column: 2;
+  padding: 60px 64px 54px 64px;
 }
 
 .login-logo {
@@ -281,7 +290,12 @@
 @media (max-width: 780px) {
   .login-card,
   .cadastro-card {
+    grid-template-columns: 1fr;
     min-height: 0;
+  }
+
+  .auth-content {
+    grid-column: 1;
     padding: 190px clamp(24px, 7vw, 48px) 44px;
   }
 
@@ -326,8 +340,11 @@
 
   .login-card,
   .cadastro-card {
-    padding: 172px 20px 30px;
     box-shadow: 8px 9px 0 var(--app-shadow);
+  }
+
+  .auth-content {
+    padding: 172px 20px 30px;
   }
 
   .login-title,
