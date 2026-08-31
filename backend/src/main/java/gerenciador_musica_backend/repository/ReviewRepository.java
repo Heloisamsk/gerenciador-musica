@@ -33,4 +33,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             Long idAlbum,
             Pageable pageable
     );
+
+    long countByUsuario_IdAndMusicaIsNotNull(Long idUsuario);
+
+    long countByUsuario_IdAndAlbumIsNotNull(Long idUsuario);
 }

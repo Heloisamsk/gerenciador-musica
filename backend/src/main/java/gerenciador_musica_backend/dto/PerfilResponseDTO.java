@@ -22,6 +22,8 @@ public record PerfilResponseDTO(
         PerfilItemResponseDTO albumDestaque,
         List<PerfilItemResponseDTO> artistasFavoritos,
         List<PerfilItemResponseDTO> albunsFavoritos,
-        List<PerfilItemResponseDTO> musicasFavoritas
+        List<PerfilItemResponseDTO> musicasFavoritas,
+        long totalMusicasAvaliadas,
+        long totalAlbunsAvaliadas
 ) {
 }
