@@ -12,6 +12,7 @@ import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.PerfilRepository;
+import gerenciador_musica_backend.repository.ReviewRepository;
 import gerenciador_musica_backend.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +43,8 @@ class PerfilServiceTest {
     private MusicaRepository musicaRepository;
     @Mock
     private AlbumRepository albumRepository;
+    @Mock
+    private ReviewRepository reviewRepository;
 
     @InjectMocks
     private PerfilService perfilService;
@@ -191,5 +194,18 @@ class PerfilServiceTest {
 
         assertThat(resposta.tipoDestaquePrincipal())
                 .isEqualTo(TipoDestaquePerfil.ARTISTA);
+    }
+
+    @Test
+    void deveIncluirEstatisticasDeReviewsNoPerfil() {
+        when(reviewRepository.countByUsuario_IdAndMusicaIsNotNull(7L))
+                .thenReturn(4L);
+        when(reviewRepository.countByUsuario_IdAndAlbumIsNotNull(7L))
+                .thenReturn(2L);
+
+        PerfilResponseDTO resposta = perfilService.obterPerfil(usuario);
+
+        assertThat(resposta.totalMusicasAvaliadas()).isEqualTo(4L);
+        assertThat(resposta.totalAlbunsAvaliadas()).isEqualTo(2L);
     }
 }

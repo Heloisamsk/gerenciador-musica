@@ -113,10 +113,6 @@
               </section>
             }
           </div>
-          <div class="sobre">
-            <h3>Sobre</h3>
-            <p>{{ perfil()!.biografia || 'Este perfil ainda não adicionou uma biografia.' }}</p>
-          </div>
           @if (perfil()!.role === 'ADMIN') {
             <nav class="atalhos" aria-label="Atalhos do perfil">
               <a routerLink="/admin/painel">Painel administrativo</a>
@@ -124,6 +120,12 @@
           }
         </section>
       </div>
+
+      <app-perfil-atividade
+        [perfil]="perfil()!"
+        [reviewsRecentes]="reviewsRecentes()"
+        [playlists]="playlists()"
+      />
     </article>
   }
 </main>

@@ -9,10 +9,11 @@ import { finalize } from 'rxjs';
 
 import { PlaylistResponse } from '../../models/PlaylistResponse';
 import { PlaylistService } from '../../services/playlist';
+import { PlaylistCard } from '../../shared/playlist-card/playlist-card';
 
 @Component({
   selector: 'app-playlists',
-  imports: [RouterLink],
+  imports: [RouterLink, PlaylistCard],
   templateUrl: './playlists.html',
   styleUrls: ['./playlists.css']
 })

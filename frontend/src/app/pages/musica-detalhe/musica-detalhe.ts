@@ -9,10 +9,13 @@ import { formatarDuracao } from '../../shared/formatar-duracao';
 import { YoutubePlayer } from '../../shared/youtube-player/youtube-player';
 import type { Review } from '../../models/Review';
 import { ReviewService } from '../../services/review';
+import { ReviewCard } from '../../shared/review-card/review-card';
+
+const TAMANHO_LISTA_REVIEWS = 8;
 
 @Component({
   selector: 'app-musica-detalhe',
-  imports: [RouterLink, YoutubePlayer],
+  imports: [RouterLink, YoutubePlayer, ReviewCard],
   templateUrl: './musica-detalhe.html',
   styleUrls: ['./musica-detalhe.css']
 })
@@ -27,6 +30,9 @@ export class MusicaDetalhe implements OnInit {
   // Minha review desta música, se existir — usada para trocar o botão
   // "Avaliar" por "Ver minha review" e evitar tentar criar duplicada.
   minhaReview = signal<Review | null>(null);
+
+  // Reviews mais recentes desta música, exibidas na barra lateral.
+  reviewsDaMusica = signal<Review[]>([]);
 
   // Filtros/página da pesquisa que trouxe o usuário até aqui, recebidos via
   // router state (não vão pra URL). Se a página for aberta direto (sem vir
@@ -43,7 +49,7 @@ export class MusicaDetalhe implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.voltarQueryParams.set(window.history.state?.queryParams ?? {});
     this.carregarMusica(id);
-    this.carregarMinhaReview(id);
+    this.carregarReviews(id);
   }
 
   private carregarMusica(id: number): void {
@@ -62,10 +68,12 @@ export class MusicaDetalhe implements OnInit {
       });
   }
 
-  private carregarMinhaReview(id: number): void {
-    this.reviewService.listarPorMusica(id)
+  private carregarReviews(id: number): void {
+    this.reviewService.listarPorMusica(id, 0, TAMANHO_LISTA_REVIEWS)
       .pipe(catchError(() => of(null)))
       .subscribe(pagina => {
+        this.reviewsDaMusica.set(pagina?.itens ?? []);
+
         const minha = pagina?.itens.find(review => review.minhaReview);
         this.minhaReview.set(minha ?? null);
       });

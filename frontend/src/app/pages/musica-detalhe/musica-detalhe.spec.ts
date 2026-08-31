@@ -14,7 +14,7 @@ describe('MusicaDetalhe', () => {
   let httpMock: HttpTestingController;
 
   const musicaUrl = 'http://localhost:8080/api/musicas/1';
-  const reviewsUrl = 'http://localhost:8080/api/reviews/musicas/1?page=0';
+  const reviewsUrl = 'http://localhost:8080/api/reviews/musicas/1?page=0&size=8';
 
   function configurarTestBed() {
     TestBed.configureTestingModule({
@@ -151,6 +151,49 @@ describe('MusicaDetalhe', () => {
     const link = fixture.nativeElement.querySelector('.acao-avaliar');
     expect(link.textContent).toContain('Ver minha review');
     expect(link.getAttribute('href')).toBe('/reviews/7');
+  });
+
+  it('deve exibir a lista de reviews recentes da música na barra lateral', () => {
+    configurarTestBed();
+    fixture.detectChanges();
+
+    httpMock.expectOne(musicaUrl).flush(musicaDeExemplo());
+    httpMock.expectOne(reviewsUrl).flush({
+      itens: [{
+        idReview: 3,
+        autor: { id: 2, nome: 'Ísis Borges' },
+        alvo: { tipo: 'MUSICA', id: 1, titulo: 'Bohemian Rhapsody', artista: 'Queen', capaUrl: null },
+        nota: 4,
+        texto: 'Clássico atemporal.',
+        criadaEm: '2026-01-02T00:00:00Z',
+        atualizadaEm: '2026-01-02T00:00:00Z',
+        minhaReview: false
+      }],
+      paginaAtual: 0,
+      tamanhoPagina: 8,
+      totalItens: 1,
+      totalPaginas: 1
+    });
+    fixture.detectChanges();
+
+    const cartoes = fixture.nativeElement.querySelectorAll(
+      '.sidebar-reviews .review-card'
+    );
+    expect(cartoes.length).toBe(1);
+    expect(fixture.nativeElement.querySelector('.sidebar-reviews').textContent)
+      .toContain('Ísis Borges');
+  });
+
+  it('deve exibir mensagem de estado vazio quando a música não tem reviews', () => {
+    configurarTestBed();
+    fixture.detectChanges();
+
+    httpMock.expectOne(musicaUrl).flush(musicaDeExemplo());
+    httpMock.expectOne(reviewsUrl).flush(paginaVazia());
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.sidebar-reviews').textContent)
+      .toContain('Nenhuma review ainda');
   });
 
   function musicaDeExemplo() {

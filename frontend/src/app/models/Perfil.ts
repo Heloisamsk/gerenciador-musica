@@ -27,6 +27,8 @@ export interface PerfilResponse {
   artistasFavoritos: PerfilItem[];
   albunsFavoritos: PerfilItem[];
   musicasFavoritas: PerfilItem[];
+  totalMusicasAvaliadas: number;
+  totalAlbunsAvaliadas: number;
 }
 
 export interface AtualizarPerfilRequest {

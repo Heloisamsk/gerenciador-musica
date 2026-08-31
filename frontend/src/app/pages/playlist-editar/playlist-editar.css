@@ -11,7 +11,7 @@
   box-sizing: border-box;
 }
 
-.playlist-nova-shell {
+.playlist-editar-shell {
   max-width: 560px;
   margin: 0 auto;
   padding: clamp(22px, 3.5vw, 56px);
@@ -30,7 +30,16 @@
   color: var(--app-apricot-cream);
 }
 
-.playlist-nova-cabecalho {
+.mensagem-estado {
+  padding: 20px;
+  color: var(--app-muted);
+  background: var(--app-panel);
+  border-radius: 14px;
+  font-size: 0.86rem;
+  text-align: center;
+}
+
+.playlist-editar-cabecalho {
   margin-bottom: 22px;
 }
 
@@ -42,19 +51,12 @@
   text-transform: uppercase;
 }
 
-.playlist-nova-cabecalho h1 {
+.playlist-editar-cabecalho h1 {
   margin: 6px 0 0;
+  overflow-wrap: anywhere;
   font-family: 'Trebuchet MS', sans-serif;
   font-size: clamp(1.7rem, 3vw, 2.3rem);
   letter-spacing: -0.03em;
-}
-
-.playlist-nova-cabecalho p {
-  max-width: 46ch;
-  margin: 8px 0 0;
-  color: var(--app-muted);
-  font-size: 0.9rem;
-  line-height: 1.5;
 }
 
 .playlist-form {
@@ -126,14 +128,17 @@
 
 .acoes-form {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
   gap: 10px;
 }
 
-.botao-secundario {
+.espacador {
+  flex: 1;
+}
+
+.botao-secundario,
+.botao-perigo {
   padding: 9px 18px;
-  color: var(--app-text);
-  background: var(--app-panel-raised);
   border: 1px solid var(--app-line);
   border-radius: 11px;
   cursor: pointer;
@@ -142,8 +147,32 @@
   transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
+.botao-secundario {
+  color: var(--app-text);
+  background: var(--app-panel-raised);
+}
+
 .botao-secundario:hover {
   border-color: var(--app-muted);
+}
+
+.botao-perigo {
+  color: #f2a08e;
+  background: transparent;
+}
+
+.botao-perigo:hover:not(:disabled) {
+  border-color: #d66d5b;
+}
+
+.botao-perigo:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.botao-secundario:active,
+.botao-perigo:not(:disabled):active {
+  transform: scale(0.97);
 }
 
 .acao {
@@ -171,12 +200,25 @@
   opacity: 0.88;
 }
 
-.acao--principal:not(:disabled):active,
-.botao-secundario:active {
+.acao--principal:not(:disabled):active {
   transform: scale(0.97);
 }
 
 .acao--principal:disabled {
   cursor: wait;
   opacity: 0.55;
+}
+
+@media (max-width: 500px) {
+  .acoes-form {
+    flex-wrap: wrap;
+  }
+
+  .espacador {
+    display: none;
+  }
+
+  .acoes-form > * {
+    flex: 1 1 auto;
+  }
 }

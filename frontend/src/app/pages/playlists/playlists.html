@@ -1,101 +1,43 @@
-<section class="playlists-page">
-  <div class="playlists-card">
-    <a class="voltar-link" routerLink="/home">
-      ← Voltar para a Home
+<div class="playlists-shell">
+  <a class="voltar-link" routerLink="/home">← Voltar para a home</a>
+
+  <div class="playlists-cabecalho">
+    <div>
+      <h1>Playlists</h1>
+      <p class="playlists-subtitulo">
+        Organize suas músicas favoritas em coleções para todos os momentos.
+      </p>
+    </div>
+
+    <a class="acao acao--principal" routerLink="/playlists/nova">
+      + Nova playlist
     </a>
+  </div>
 
-    <header class="playlists-header">
-      <div
-        class="playlists-title-wrapper"
-        style="display: flex; align-items: center; gap: 1.5rem;"
-      >
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg"
-          alt="Logo do Spotify"
-          style="width: 45px; height: auto;"
-        />
-
-        <div class="playlists-title">
-          <p class="section-label">Minha biblioteca</p>
-          <h1>Minhas Playlists</h1>
-
-          <p>
-            Veja as playlists que você criou.
-          </p>
-        </div>
-      </div>
-
-      <a class="nova-playlist-button" routerLink="/playlists/nova">
-        + Nova playlist
-      </a>
-    </header>
-
-    @if (carregando) {
-    <output
-      class="status-message loading-message"
-      aria-live="polite"
-    >
-      <p>Carregando playlists...</p>
-    </output>
-    }
-
-    @else if (mensagemErro) {
-    <div
-      class="status-message error-message"
-      role="alert"
-    >
-      <h2>Não foi possível carregar a listagem</h2>
-
+  @if (carregando) {
+    <p class="mensagem-estado">Carregando playlists...</p>
+  } @else if (mensagemErro) {
+    <div class="status-message error-message" role="alert">
       <p>{{ mensagemErro }}</p>
 
       <button
-        class="tentar-novamente-button"
+        class="botao-secundario"
         type="button"
         (click)="carregarPlaylists()"
       >
         Tentar novamente
       </button>
     </div>
-    }
-
-    @else if (playlists.length === 0) {
-    <output
-      class="status-message empty-message"
-      aria-live="polite"
-    >
-      <h2>Nenhuma playlist criada ainda</h2>
-
-      <p>
-        Crie sua primeira playlist para começar a organizar suas músicas.
-      </p>
-
-      <a class="nova-playlist-button" routerLink="/playlists/nova">
-        + Nova playlist
-      </a>
-    </output>
-    }
-
-    @else {
-    <div class="playlists-grid">
+  } @else if (playlists.length === 0) {
+    <p class="mensagem-estado">
+      Você ainda não criou nenhuma playlist.
+      <a routerLink="/playlists/nova">Crie a primeira</a> para começar.
+    </p>
+  } @else {
+    <div class="grade-playlists">
       @for (playlist of playlists; track playlist.id) {
-      <a
-        class="playlist-card"
-        [routerLink]="['/playlists', playlist.id]"
-      >
-        <h3>{{ playlist.nome }}</h3>
-
-        @if (playlist.descricao) {
-        <p class="playlist-descricao">{{ playlist.descricao }}</p>
-        }
-
-        <p class="playlist-contagem">
-          {{ playlist.musicas.length }}
-          {{ playlist.musicas.length === 1 ? 'música' : 'músicas' }}
-        </p>
-      </a>
+        <app-playlist-card [playlist]="playlist" />
       }
     </div>
-    }
-
-  </div>
-</section>
+  }
+</div>

@@ -28,9 +28,16 @@ import type {
   PerfilResponse,
   TipoDestaquePerfil
 } from '../../models/Perfil';
+import type { PlaylistResponse } from '../../models/PlaylistResponse';
+import type { Review } from '../../models/Review';
 import { CatalogoService } from '../../services/catalogo';
 import { MusicaService } from '../../services/musica';
 import { PerfilService } from '../../services/perfil';
+import { PlaylistService } from '../../services/playlist';
+import { ReviewService } from '../../services/review';
+import { PerfilAtividade } from './perfil-atividade/perfil-atividade';
+
+const TAMANHO_REVIEWS_RECENTES = 5;
 
 type CampoFavoritos =
   | 'idsArtistasFavoritos'
@@ -40,7 +47,7 @@ type CampoFavoritos =
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, PerfilAtividade],
   templateUrl: './perfil.html',
   styleUrls: ['./perfil.css']
 })
@@ -58,6 +65,9 @@ export class Perfil implements OnInit {
   readonly mensagemErro = signal('');
   readonly mensagemSucesso = signal('');
   readonly mensagemErroMusicas = signal('');
+
+  readonly reviewsRecentes = signal<Review[]>([]);
+  readonly playlists = signal<PlaylistResponse[]>([]);
 
   readonly artistas = signal<ArtistaResponse[]>([]);
   readonly musicas = signal<MusicaListagem[]>([]);
@@ -166,7 +176,9 @@ export class Perfil implements OnInit {
   constructor(
     private readonly perfilService: PerfilService,
     private readonly catalogoService: CatalogoService,
-    private readonly musicaService: MusicaService
+    private readonly musicaService: MusicaService,
+    private readonly reviewService: ReviewService,
+    private readonly playlistService: PlaylistService
   ) {
     effect(() => {
       const dialog = this.editorDialog()?.nativeElement;
@@ -182,6 +194,8 @@ export class Perfil implements OnInit {
 
   ngOnInit(): void {
     this.carregarPerfil();
+    this.carregarReviewsRecentes();
+    this.carregarPlaylists();
   }
 
   abrirEdicao(): void {
@@ -367,6 +381,20 @@ export class Perfil implements OnInit {
         this.carregando.set(false);
         this.mensagemErro.set(this.extrairMensagemErro(erro));
       }
+    });
+  }
+
+  private carregarReviewsRecentes(): void {
+    this.reviewService.listarMinhas(0, TAMANHO_REVIEWS_RECENTES).subscribe({
+      next: pagina => this.reviewsRecentes.set(pagina.itens),
+      error: () => this.reviewsRecentes.set([])
+    });
+  }
+
+  private carregarPlaylists(): void {
+    this.playlistService.listarMinhas().subscribe({
+      next: playlists => this.playlists.set(playlists),
+      error: () => this.playlists.set([])
     });
   }
 

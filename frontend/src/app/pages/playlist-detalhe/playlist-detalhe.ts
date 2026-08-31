@@ -3,7 +3,7 @@ import {
   Component,
   OnInit
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { finalize } from 'rxjs';
 
@@ -22,9 +22,11 @@ export class PlaylistDetalhe implements OnInit {
   carregando = false;
   mensagemErro = '';
   removendoMusicaId: number | null = null;
+  excluindo = false;
 
   constructor(
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly playlistService: PlaylistService,
     private readonly changeDetectorRef: ChangeDetectorRef
   ) {}
@@ -112,5 +114,45 @@ export class PlaylistDetalhe implements OnInit {
             'Não foi possível remover a música. Tente novamente.';
         }
       });
+  }
+
+  excluirPlaylist(): void {
+    if (!this.playlist || this.excluindo) {
+      return;
+    }
+
+    const confirmacao = window.confirm(
+      'Tem certeza que deseja excluir esta playlist? Essa ação não pode ser desfeita.'
+    );
+
+    if (!confirmacao) {
+      return;
+    }
+
+    this.excluindo = true;
+    this.mensagemErro = '';
+
+    this.playlistService.excluir(this.playlist.id)
+      .pipe(
+        finalize(() => {
+          this.excluindo = false;
+          this.changeDetectorRef.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/playlists']);
+        },
+        error: (erro: HttpErrorResponse) => {
+          console.error(erro);
+          this.mensagemErro =
+            'Não foi possível excluir a playlist. Tente novamente.';
+        }
+      });
+  }
+
+  aoFalharCapa(evento: Event): void {
+    const imagem = evento.target as HTMLImageElement;
+    imagem.src = '/capa-padrao.png';
   }
 }

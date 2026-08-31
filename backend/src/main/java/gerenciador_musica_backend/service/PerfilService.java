@@ -17,6 +17,7 @@ import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.PerfilRepository;
+import gerenciador_musica_backend.repository.ReviewRepository;
 import gerenciador_musica_backend.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,19 +34,22 @@ public class PerfilService {
     private final ArtistaRepository artistaRepository;
     private final MusicaRepository musicaRepository;
     private final AlbumRepository albumRepository;
+    private final ReviewRepository reviewRepository;
 
     public PerfilService(
             PerfilRepository perfilRepository,
             UsuarioRepository usuarioRepository,
             ArtistaRepository artistaRepository,
             MusicaRepository musicaRepository,
-            AlbumRepository albumRepository
+            AlbumRepository albumRepository,
+            ReviewRepository reviewRepository
     ) {
         this.perfilRepository = perfilRepository;
         this.usuarioRepository = usuarioRepository;
         this.artistaRepository = artistaRepository;
         this.musicaRepository = musicaRepository;
         this.albumRepository = albumRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     @Transactional
@@ -324,7 +328,9 @@ public class PerfilService {
                         .toList(),
                 perfil.getMusicasFavoritas().stream()
                         .map(this::converterMusica)
-                        .toList()
+                        .toList(),
+                reviewRepository.countByUsuario_IdAndMusicaIsNotNull(usuario.getId()),
+                reviewRepository.countByUsuario_IdAndAlbumIsNotNull(usuario.getId())
         );
     }
 
