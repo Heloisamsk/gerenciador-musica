@@ -22,6 +22,10 @@ describe('Perfil', () => {
     pesquisar: ReturnType<typeof vi.fn>;
     buscarPorId: ReturnType<typeof vi.fn>;
   };
+  let catalogoServiceMock: {
+    listarArtistas: ReturnType<typeof vi.fn>;
+    listarAlbuns: ReturnType<typeof vi.fn>;
+  };
 
   const perfil: PerfilResponse = {
     idUsuario: 1,
@@ -58,9 +62,38 @@ describe('Perfil', () => {
       buscarPorId: vi.fn().mockReturnValue(of(musicaFavorita()))
     };
 
-    const catalogoServiceMock = {
-      listarArtistas: vi.fn().mockReturnValue(of([])),
-      listarAlbuns: vi.fn().mockReturnValue(of([]))
+    catalogoServiceMock = {
+      listarArtistas: vi.fn().mockReturnValue(of([
+        {
+          idArtista: 5,
+          nome: 'Marina Sena',
+          nomeCompleto: 'Marina Sena',
+          descricao: 'Cantora e compositora brasileira.',
+          fotoPerfilUrl: null
+        },
+        {
+          idArtista: 6,
+          nome: 'Liniker',
+          nomeCompleto: 'Liniker de Barros Ferreira Campos',
+          descricao: 'Cantora e compositora brasileira.',
+          fotoPerfilUrl: null
+        }
+      ])),
+      listarAlbuns: vi.fn().mockReturnValue(of([
+        {
+          idAlbum: 20,
+          titulo: 'De Primeira',
+          anoLancamento: 2021,
+          capaUrl: null,
+          artista: {
+            id: 5,
+            nome: 'Marina Sena',
+            nomeCompleto: 'Marina Sena',
+            descricao: 'Cantora e compositora brasileira.',
+            fotoPerfilUrl: null
+          }
+        }
+      ]))
     };
 
     await TestBed.configureTestingModule({
@@ -109,11 +142,48 @@ describe('Perfil', () => {
 
   it('deve abrir o editor preenchido com os dados atuais', () => {
     component.abrirEdicao();
+    fixture.detectChanges();
 
     expect(component.editando()).toBe(true);
     expect(component.formulario.controls.username.value).toBe('analiz');
     expect(component.formulario.controls.fotoUrl.value)
       .toBe('https://exemplo.com/foto.jpg');
+    expect(fixture.nativeElement.querySelector('.editor').tagName)
+      .toBe('DIALOG');
+  });
+
+  it('deve carregar e exibir os artistas no seletor de favoritos', () => {
+    component.abrirEdicao();
+    fixture.detectChanges();
+
+    const opcoes = fixture.nativeElement.querySelectorAll(
+      '#favoritos-artistas + .opcoes-favoritos .opcao-favorito'
+    );
+
+    expect(catalogoServiceMock.listarArtistas).toHaveBeenCalledOnce();
+    expect(opcoes).toHaveLength(2);
+    expect(opcoes[0].textContent).toContain('Marina Sena');
+    expect(opcoes[1].textContent).toContain('Liniker');
+    expect(opcoes[0].querySelector('input').type).toBe('checkbox');
+  });
+
+  it('deve abrir o editor quando a API omite coleções vazias', () => {
+    component.perfil.set({
+      nome: 'Perfil novo',
+      role: 'USER'
+    } as PerfilResponse);
+
+    expect(() => component.abrirEdicao()).not.toThrow();
+    fixture.detectChanges();
+
+    expect(component.editando()).toBe(true);
+    expect(component.formulario.controls.idsArtistasFavoritos.value)
+      .toEqual([]);
+    expect(component.formulario.controls.idsAlbunsFavoritos.value)
+      .toEqual([]);
+    expect(component.formulario.controls.idsMusicasFavoritas.value)
+      .toEqual([]);
+    expect(catalogoServiceMock.listarArtistas).toHaveBeenCalledOnce();
   });
 
   it('deve fechar o editor pela tecla Escape', () => {

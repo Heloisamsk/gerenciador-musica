@@ -8,6 +8,7 @@ import { TestBed } from '@angular/core/testing';
 import type { AlbumDetalhe } from '../models/AlbumDetalhe';
 import type { AlbumResponse } from '../models/AlbumResponse';
 import type { ArtistaDetalhe } from '../models/ArtistaDetalhe';
+import type { ArtistaResponse } from '../models/ArtistaResponse';
 import { CatalogoService } from './catalogo';
 
 describe('CatalogoService', () => {
@@ -66,6 +67,19 @@ describe('CatalogoService', () => {
     expect(resultado[0].titulo).toBe('A Night at the Opera');
   });
 
+  it('deve listar os artistas do catálogo', () => {
+    let resultado: ArtistaResponse[] = [];
+
+    service.listarArtistas().subscribe(artistas => resultado = artistas);
+
+    const requisicao = httpMock.expectOne(`${apiUrl}/artistas`);
+    expect(requisicao.request.method).toBe('GET');
+    requisicao.flush([artistaDeExemplo()]);
+
+    expect(resultado).toHaveLength(1);
+    expect(resultado[0].nome).toBe('Queen');
+  });
+
   it('deve buscar os detalhes agregados do álbum pelo id', () => {
     let resultado: AlbumDetalhe | undefined;
 
@@ -98,6 +112,16 @@ describe('CatalogoService', () => {
         descricao: 'Banda britânica de rock.',
         fotoPerfilUrl: null
       }
+    };
+  }
+
+  function artistaDeExemplo(): ArtistaResponse {
+    return {
+      idArtista: 7,
+      nome: 'Queen',
+      nomeCompleto: 'Queen',
+      descricao: 'Banda britânica de rock.',
+      fotoPerfilUrl: null
     };
   }
 

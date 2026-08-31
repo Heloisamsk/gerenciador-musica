@@ -51,7 +51,7 @@
       </header>
 
       @if (mensagemSucesso()) {
-        <p class="feedback feedback--sucesso" role="status">{{ mensagemSucesso() }}</p>
+        <output class="feedback feedback--sucesso" aria-live="polite">{{ mensagemSucesso() }}</output>
       }
 
       <div class="perfil-conteudo">
@@ -128,12 +128,11 @@
 </main>
 
 @if (editando()) {
-  <div class="editor-fundo">
-    <section class="editor" role="dialog" aria-modal="true" aria-labelledby="titulo-editor"
-      (keydown.escape)="fecharEdicao()">
+    <dialog #editorDialog class="editor" aria-labelledby="titulo-editor"
+      (close)="fecharEdicao()" (keydown.escape)="fecharEdicao()">
       <header class="editor-cabecalho">
         <div><span>Curadoria do perfil</span><h2 id="titulo-editor">Editar perfil</h2></div>
-        <button type="button" aria-label="Fechar edição" (click)="fecharEdicao()">
+        <button type="button" aria-label="Fechar edição" autofocus (click)="fecharEdicao()">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>
         </button>
       </header>
@@ -268,6 +267,7 @@
             <h3 id="favoritos-musicas">Músicas</h3>
           <div class="seletor-musica">
             <div class="busca-musica">
+              <label class="sr-only" for="busca-musica">Buscar música favorita por título</label>
               <input id="busca-musica" type="search" autocomplete="off"
                 placeholder="Busque pelo título da música"
                 [value]="buscaMusica()"
@@ -315,6 +315,5 @@
           </button>
         </footer>
       </form>
-    </section>
-  </div>
+    </dialog>
 }
