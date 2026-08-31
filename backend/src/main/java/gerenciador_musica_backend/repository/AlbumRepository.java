@@ -17,6 +17,8 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
             Long idArtista
     );
 
+    List<Album> findByCapaUrlIsNotNull();
+
     boolean existsByTituloIgnoreCaseAndArtistaIdArtistaAndAnoLancamento(
             String titulo,
             Long idArtista,
