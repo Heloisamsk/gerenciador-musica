@@ -31,6 +31,11 @@ export class Playlists implements OnInit {
     this.carregarPlaylists();
   }
 
+  aoFalharCapa(evento: Event): void {
+    const imagem = evento.target as HTMLImageElement;
+    imagem.src = '/capa-padrao.png';
+  }
+
   carregarPlaylists(): void {
     this.carregando = true;
     this.mensagemErro = '';

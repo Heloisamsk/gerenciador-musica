@@ -46,12 +46,35 @@ describe('Playlists', () => {
     fixture.detectChanges();
 
     httpMock.expectOne(apiUrl).flush([
-      { id: 1, nome: 'Favoritas', descricao: '', musicas: [] },
+      { id: 1, nome: 'Favoritas', descricao: '', capaUrl: null, musicas: [] },
     ] as PlaylistResponse[]);
 
     expect(component.playlists).toHaveLength(1);
     expect(component.playlists[0].nome).toBe('Favoritas');
     expect(component.carregando).toBe(false);
+  });
+
+  it('deve exibir a capa da playlist quando disponível e trocar por padrão em caso de erro', () => {
+    fixture.detectChanges();
+
+    httpMock.expectOne(apiUrl).flush([
+      {
+        id: 1,
+        nome: 'Favoritas',
+        descricao: '',
+        capaUrl: 'https://exemplo.com/capa.jpg',
+        musicas: []
+      },
+    ] as PlaylistResponse[]);
+    fixture.detectChanges();
+
+    const imagem = fixture.nativeElement.querySelector(
+      '.playlist-card__capa img'
+    ) as HTMLImageElement;
+    expect(imagem.src).toBe('https://exemplo.com/capa.jpg');
+
+    imagem.dispatchEvent(new Event('error'));
+    expect(imagem.src).toContain('/capa-padrao.png');
   });
 
   it('deve mostrar mensagem de erro quando a busca falha', () => {
