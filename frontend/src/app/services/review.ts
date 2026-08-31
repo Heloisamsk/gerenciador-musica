@@ -48,18 +48,28 @@ export class ReviewService {
       .pipe(catchError(this.handleError));
   }
 
-  listarFeed(pagina = 0): Observable<PaginaResponse<Review>> {
+  buscarPorId(id: number): Observable<Review> {
+    return this.http
+      .get<Review>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  listarFeed(pagina = 0, tamanho = 60): Observable<PaginaResponse<Review>> {
     return this.http
       .get<PaginaResponse<Review>>(this.apiUrl, {
-        params: new HttpParams().set('page', pagina)
+        params: new HttpParams()
+          .set('page', pagina)
+          .set('size', tamanho)
       })
       .pipe(catchError(this.handleError));
   }
 
-  listarMinhas(pagina = 0): Observable<PaginaResponse<Review>> {
+  listarMinhas(pagina = 0, tamanho = 60): Observable<PaginaResponse<Review>> {
     return this.http
       .get<PaginaResponse<Review>>(`${this.apiUrl}/minhas`, {
-        params: new HttpParams().set('page', pagina)
+        params: new HttpParams()
+          .set('page', pagina)
+          .set('size', tamanho)
       })
       .pipe(catchError(this.handleError));
   }
