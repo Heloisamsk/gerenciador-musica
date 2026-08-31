@@ -65,18 +65,29 @@
   inset: 0 auto 0 0;
   width: 46%;
   background:
-    radial-gradient(
-      circle at 68% 45%,
-      var(--app-apricot-cream) 0 5%,
-      var(--app-ink) 5% 10%,
-      var(--app-palm-leaf) 10% 11%,
-      var(--app-ink) 11% 33%,
-      transparent 33.5%
-    ),
     repeating-radial-gradient(circle at 68% 45%, transparent 0 9px, #080a0821 9px 11px),
     linear-gradient(145deg, var(--auth-panel-start), var(--auth-panel-end));
   border-right: 1px solid var(--app-line);
   content: '';
+}
+
+/*
+ * O disco antes vinha de um radial-gradient com paradas em porcentagem,
+ * cujo raio real depende da distância até o canto mais distante da caixa.
+ * Como o painel não é quadrado, isso descentraliza e deforma o círculo
+ * conforme a altura do card muda. Um SVG com viewBox fixa garante um
+ * disco sempre circular e centralizado, em qualquer proporção.
+ */
+.auth-vinyl {
+  position: absolute;
+  top: 45%;
+  left: 31%;
+  z-index: 1;
+  width: clamp(120px, 16vw, 200px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(7px 8px 0 var(--app-shadow));
+  pointer-events: none;
 }
 
 .login-card::after,
@@ -280,14 +291,6 @@
     width: 100%;
     height: 142px;
     background:
-      radial-gradient(
-        circle at 74% 52%,
-        var(--app-apricot-cream) 0 7%,
-        var(--app-ink) 7% 14%,
-        var(--app-palm-leaf) 14% 16%,
-        var(--app-ink) 16% 42%,
-        transparent 42.5%
-      ),
       repeating-radial-gradient(circle at 74% 52%, transparent 0 8px, #080a0821 8px 10px),
       linear-gradient(110deg, var(--auth-panel-start), var(--auth-panel-end));
     border: 0;
@@ -300,6 +303,12 @@
     left: 24px;
     bottom: auto;
     width: 38%;
+  }
+
+  .auth-vinyl {
+    top: 71px;
+    left: 74%;
+    width: clamp(84px, 20vw, 120px);
   }
 }
 

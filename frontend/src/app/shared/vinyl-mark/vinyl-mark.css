@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.vinyl-mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: vinyl-spin 26s linear infinite;
+}
+
+.vinyl-mark__body {
+  fill: var(--app-ink);
+}
+
+.vinyl-mark__groove {
+  fill: none;
+  stroke: var(--app-panel-raised);
+  stroke-width: 1;
+  opacity: 0.6;
+}
+
+.vinyl-mark__accent {
+  fill: none;
+  stroke: var(--app-palm-leaf);
+  stroke-width: 3;
+}
+
+.vinyl-mark__label {
+  fill: var(--app-apricot-cream);
+}
+
+.vinyl-mark__spindle {
+  fill: var(--app-ink);
+}
+
+@keyframes vinyl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinyl-mark {
+    animation: none;
+  }
+}
