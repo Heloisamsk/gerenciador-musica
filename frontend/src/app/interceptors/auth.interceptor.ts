@@ -13,7 +13,8 @@ const API_URL = `${environment.apiUrl}/api`;
 
 const ENDPOINTS_PUBLICOS = new Set([
   `${API_URL}/auth/login`,
-  `${API_URL}/auth/register`
+  `${API_URL}/auth/register`,
+  `${API_URL}/public/albuns/capas`
 ]);
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {

@@ -1,0 +1,20 @@
+<div class="album-backdrop" aria-hidden="true">
+  @for (capa of capas(); track capa.id) {
+    <img
+      class="album-backdrop__capa"
+      [src]="capa.capaUrl"
+      alt=""
+      loading="lazy"
+      [style.top.%]="capa.top"
+      [style.left.%]="capa.left"
+      [style.width.px]="capa.tamanho"
+      [style.height.px]="capa.tamanho"
+      [style.opacity]="capa.opacidade"
+      [style.animation-duration.s]="capa.duracao"
+      [style.animation-delay.s]="capa.atraso"
+      [style.--drift-x]="capa.deslocamentoX"
+      [style.--drift-y]="capa.deslocamentoY"
+      (error)="aoFalharImagem($event)"
+    />
+  }
+</div>

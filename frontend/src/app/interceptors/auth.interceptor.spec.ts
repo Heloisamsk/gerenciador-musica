@@ -91,6 +91,24 @@ describe('authInterceptor', () => {
     requisicao.flush({});
   });
 
+  it('não deve adicionar JWT ao fundo público de capas', () => {
+    localStorage.setItem('token', 'token-antigo');
+
+    http.get(
+      'http://localhost:8080/api/public/albuns/capas'
+    ).subscribe();
+
+    const requisicao = httpTesting.expectOne(
+      'http://localhost:8080/api/public/albuns/capas'
+    );
+
+    expect(
+      requisicao.request.headers.has('Authorization')
+    ).toBe(false);
+
+    requisicao.flush([]);
+  });
+
   it('deve limpar a sessão e redirecionar no erro 401', () => {
     localStorage.setItem('token', 'token-invalido');
     localStorage.setItem('role', 'USER');

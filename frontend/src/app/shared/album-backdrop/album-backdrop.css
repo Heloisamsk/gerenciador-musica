@@ -1,0 +1,51 @@
+:host {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.album-backdrop {
+  position: absolute;
+  inset: 0;
+}
+
+.album-backdrop__capa {
+  position: absolute;
+  border-radius: 3px;
+  object-fit: cover;
+  animation-name: album-backdrop-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  /*
+   * Escurece a própria capa em vez de sobrepor uma camada escura fixa:
+   * assim o fundo continua a cor de --app-background no claro e no
+   * escuro, só a capa fica discreta.
+   */
+  filter: saturate(0.7) brightness(0.55);
+}
+
+@keyframes album-backdrop-drift {
+  from {
+    transform: translate(0, 0);
+  }
+
+  to {
+    transform: translate(var(--drift-x, 20px), var(--drift-y, 20px));
+  }
+}
+
+@media (max-width: 480px) {
+  :host {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .album-backdrop__capa {
+    animation: none;
+  }
+}
