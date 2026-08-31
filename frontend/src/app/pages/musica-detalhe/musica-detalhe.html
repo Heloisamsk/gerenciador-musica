@@ -36,6 +36,25 @@
             }
           </div>
         }
+
+        @if (minhaReview(); as review) {
+          <a class="acao acao-avaliar" [routerLink]="['/reviews', review.idReview]">
+            ★ Ver minha review
+          </a>
+        } @else {
+          <a
+            class="acao acao-avaliar"
+            routerLink="/reviews/nova"
+            [queryParams]="{
+              tipo: 'MUSICA',
+              id: musica.id,
+              titulo: musica.titulo,
+              artista: musica.artistaPrincipal.nome
+            }"
+          >
+            ★ Avaliar
+          </a>
+        }
       </div>
     </div>
 
