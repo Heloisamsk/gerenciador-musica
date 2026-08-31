@@ -43,6 +43,8 @@ class ReproducaoTriggerIntegrationTest {
     void naoDevePermitirReproducaoMaiorQueADuracaoDaMusica() {
         MusicaDuracao musica = buscarMusica();
         Long usuarioId = buscarUsuarioId();
+        Long musicaId = musica.id();
+        int duracaoInvalida = musica.duracaoSegundos() + 1;
 
         assertThatThrownBy(() -> jdbcTemplate.update("""
                 INSERT INTO reproducao (
@@ -52,8 +54,8 @@ class ReproducaoTriggerIntegrationTest {
                 ) VALUES (?, ?, ?)
                 """,
                 usuarioId,
-                musica.id(),
-                musica.duracaoSegundos() + 1
+                musicaId,
+                duracaoInvalida
         ))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining(
@@ -77,13 +79,14 @@ class ReproducaoTriggerIntegrationTest {
                 usuarioId,
                 musica.id()
         );
+        int duracaoInvalida = musica.duracaoSegundos() + 1;
 
         assertThatThrownBy(() -> jdbcTemplate.update("""
                 UPDATE reproducao
                 SET segundos_ouvidos = ?
                 WHERE id_reproducao = ?
                 """,
-                musica.duracaoSegundos() + 1,
+                duracaoInvalida,
                 reproducaoId
         ))
                 .isInstanceOf(DataIntegrityViolationException.class)

@@ -348,9 +348,12 @@ public class PerfilService {
 
         Artista artista = musica.getArtistaPrincipal();
         Album album = musica.getAlbum();
-        String imagem = album != null
-                ? album.getCapaUrl()
-                : artista == null ? null : artista.getFotoPerfilUrl();
+        String imagem = null;
+        if (album != null) {
+            imagem = album.getCapaUrl();
+        } else if (artista != null) {
+            imagem = artista.getFotoPerfilUrl();
+        }
 
         return new PerfilItemResponseDTO(
                 TipoDestaquePerfil.MUSICA,

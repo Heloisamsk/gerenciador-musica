@@ -11,6 +11,9 @@ import java.util.List;
 @Repository
 public class RelatorioRepository {
 
+    private static final String COLUNA_DURACAO_TOTAL_SEGUNDOS =
+            "duracao_total_segundos";
+
     private static final String CONSULTA_RESUMO = """
             SELECT
                 COUNT(*) AS total_artistas,
@@ -66,7 +69,7 @@ public class RelatorioRepository {
                         resultado.getLong("total_albuns"),
                         resultado.getLong("total_musicas"),
                         resultado.getLong("total_participacoes"),
-                        resultado.getLong("duracao_total_segundos")
+                        resultado.getLong(COLUNA_DURACAO_TOTAL_SEGUNDOS)
                 ))
                 .single();
     }
@@ -79,7 +82,7 @@ public class RelatorioRepository {
                         resultado.getLong("total_albuns"),
                         resultado.getLong("total_musicas_principais"),
                         resultado.getLong("total_participacoes"),
-                        resultado.getLong("duracao_total_segundos")
+                        resultado.getLong(COLUNA_DURACAO_TOTAL_SEGUNDOS)
                 ))
                 .list();
     }
@@ -92,7 +95,7 @@ public class RelatorioRepository {
                         resultado.getString("nome_artista"),
                         resultado.getShort("ano_lancamento"),
                         resultado.getLong("total_musicas"),
-                        resultado.getLong("duracao_total_segundos")
+                        resultado.getLong(COLUNA_DURACAO_TOTAL_SEGUNDOS)
                 ))
                 .list();
     }
