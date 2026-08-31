@@ -128,6 +128,39 @@ describe('ReviewForm', () => {
     httpMock.expectOne(`${apiUrl}/reviews/1`).flush(reviewExistente);
   });
 
+  it('deve criar review de alvo fixo sem buscar catálogo nem exibir seletor', () => {
+    fixture.componentRef.setInput('alvoFixo', {
+      tipo: 'ALBUM',
+      id: 10,
+      titulo: 'A Night at the Opera',
+      artista: 'Queen'
+    });
+    fixture.detectChanges();
+
+    expect(
+      fixture.nativeElement.querySelector('#review-alvo')
+    ).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('A Night at the Opera');
+
+    fixture.componentInstance['nota'].set(4);
+    fixture.detectChanges();
+
+    const botaoSalvar = fixture.nativeElement.querySelector(
+      '.review-form__salvar'
+    ) as HTMLButtonElement;
+    botaoSalvar.click();
+
+    const requisicao = httpMock.expectOne(`${apiUrl}/reviews`);
+    expect(requisicao.request.body).toEqual({
+      idMusica: null,
+      idAlbum: 10,
+      nota: 4,
+      texto: null
+    });
+
+    requisicao.flush({} as Review);
+  });
+
   it('deve emitir cancelado ao clicar em cancelar', () => {
     fixture.detectChanges();
     httpMock.expectOne(`${apiUrl}/musicas?size=100`).flush({
