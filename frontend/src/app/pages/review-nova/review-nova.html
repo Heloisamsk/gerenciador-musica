@@ -1,0 +1,11 @@
+<div class="review-nova-container">
+  <a class="voltar-link" routerLink="/reviews">← Voltar para reviews</a>
+
+  <h1 class="page-title">Nova review</h1>
+
+  <app-review-form
+    [alvoFixo]="alvoFixo()"
+    (salvo)="aoSalvar($event)"
+    (cancelado)="aoCancelar()"
+  />
+</div>
