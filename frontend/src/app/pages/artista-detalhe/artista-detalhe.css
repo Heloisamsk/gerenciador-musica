@@ -40,7 +40,7 @@
 .cartao-album { min-width: 0; padding: 10px 10px 16px; background: var(--app-panel); border: 1px solid var(--app-line); border-radius: 0; transition: transform .18s, background .18s; }
 .cartao-album:hover { background: var(--app-panel-raised); transform: translateY(-4px); }
 .link-album { display: block; color: inherit; text-decoration: none; }
-.capa-album { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 0; box-shadow: 8px 9px 0 var(--app-cool-steel); }
+.capa-album { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 0; }
 .dados-album h3 { margin: 18px 0 7px; overflow: hidden; font-family: "Trebuchet MS", sans-serif; font-size: 1rem; text-overflow: ellipsis; white-space: nowrap; }
 .dados-album p { margin: 5px 0 0; }
 

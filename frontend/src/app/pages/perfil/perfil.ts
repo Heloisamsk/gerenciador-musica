@@ -1,5 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, computed, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  computed,
+  effect,
+  signal,
+  viewChild
+} from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -37,6 +45,9 @@ type CampoFavoritos =
   styleUrls: ['./perfil.css']
 })
 export class Perfil implements OnInit {
+
+  private readonly editorDialog =
+    viewChild<ElementRef<HTMLDialogElement>>('editorDialog');
 
   readonly perfil = signal<PerfilResponse | null>(null);
   readonly carregando = signal(true);
@@ -134,7 +145,18 @@ export class Perfil implements OnInit {
     private readonly perfilService: PerfilService,
     private readonly catalogoService: CatalogoService,
     private readonly musicaService: MusicaService
-  ) {}
+  ) {
+    effect(() => {
+      const dialog = this.editorDialog()?.nativeElement;
+      if (!dialog || dialog.open) return;
+
+      if (typeof dialog.showModal === 'function') {
+        dialog.showModal();
+      } else {
+        dialog.setAttribute('open', '');
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.carregarPerfil();
@@ -413,10 +435,13 @@ export class Perfil implements OnInit {
       idArtistaDestaque: perfil.artistaDestaque?.id ?? null,
       idMusicaDestaque: perfil.musicaDestaque?.id ?? null,
       idAlbumDestaque: perfil.albumDestaque?.id ?? null,
-      tipoDestaquePrincipal: perfil.tipoDestaquePrincipal,
-      idsArtistasFavoritos: perfil.artistasFavoritos.map(item => item.id),
-      idsAlbunsFavoritos: perfil.albunsFavoritos.map(item => item.id),
-      idsMusicasFavoritas: perfil.musicasFavoritas.map(item => item.id)
+      tipoDestaquePrincipal: perfil.tipoDestaquePrincipal ?? null,
+      idsArtistasFavoritos: (perfil.artistasFavoritos ?? [])
+        .map(item => item.id),
+      idsAlbunsFavoritos: (perfil.albunsFavoritos ?? [])
+        .map(item => item.id),
+      idsMusicasFavoritas: (perfil.musicasFavoritas ?? [])
+        .map(item => item.id)
     });
   }
 
