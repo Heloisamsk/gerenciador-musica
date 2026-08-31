@@ -1,0 +1,72 @@
+<form class="review-form" (submit)="salvar($event)">
+  @if (!estaEditando()) {
+    <div class="review-form__tipo" role="radiogroup" aria-label="Tipo de avaliação">
+      <button
+        type="button"
+        class="review-form__tipo-botao"
+        [class.review-form__tipo-botao--ativo]="tipoAlvo() === 'MUSICA'"
+        (click)="selecionarTipo('MUSICA')"
+      >
+        Música
+      </button>
+      <button
+        type="button"
+        class="review-form__tipo-botao"
+        [class.review-form__tipo-botao--ativo]="tipoAlvo() === 'ALBUM'"
+        (click)="selecionarTipo('ALBUM')"
+      >
+        Álbum
+      </button>
+    </div>
+
+    <div class="review-form__campo">
+      <label for="review-alvo">
+        {{ tipoAlvo() === 'ALBUM' ? 'Álbum' : 'Música' }}
+      </label>
+      <select id="review-alvo" (change)="aoSelecionarAlvo($event)">
+        <option value="">Selecione...</option>
+        @for (opcao of opcoesAlvo(); track opcao.id) {
+          <option [value]="opcao.id">{{ opcao.rotulo }}</option>
+        }
+      </select>
+    </div>
+  }
+
+  <div class="review-form__campo">
+    <span class="review-form__rotulo">Sua nota</span>
+    <app-star-rating
+      [nota]="nota()"
+      [interativo]="true"
+      rotulo="Sua nota"
+      (notaEscolhida)="nota.set($event)"
+    />
+  </div>
+
+  <div class="review-form__campo">
+    <label for="review-texto">Comentário (opcional)</label>
+    <textarea
+      id="review-texto"
+      rows="3"
+      placeholder="O que você achou?"
+      [value]="texto()"
+      (input)="aoDigitarTexto($event)"
+    ></textarea>
+  </div>
+
+  @if (erro()) {
+    <p class="review-form__erro" role="alert">{{ erro() }}</p>
+  }
+
+  <div class="review-form__acoes">
+    <button type="button" class="review-form__cancelar" (click)="cancelar()">
+      Cancelar
+    </button>
+    <button
+      type="submit"
+      class="review-form__salvar"
+      [disabled]="!podeSalvar() || enviando()"
+    >
+      {{ enviando() ? 'Salvando...' : 'Salvar' }}
+    </button>
+  </div>
+</form>

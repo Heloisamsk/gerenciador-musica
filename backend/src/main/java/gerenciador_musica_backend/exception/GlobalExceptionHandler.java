@@ -401,4 +401,56 @@ public class GlobalExceptionHandler {
                 Map.of()
         );
     }
+
+    @ExceptionHandler(ReviewNaoEncontradaException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarReviewNaoEncontrada(
+            ReviewNaoEncontradaException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
+    @ExceptionHandler(DadosReviewInvalidosException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarDadosReviewInvalidos(
+            DadosReviewInvalidosException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
+    @ExceptionHandler(ReviewJaExisteException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarReviewJaExiste(
+            ReviewJaExisteException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
+    @ExceptionHandler(ReviewAcessoNegadoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarReviewAcessoNegado(
+            ReviewAcessoNegadoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.FORBIDDEN,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
 }

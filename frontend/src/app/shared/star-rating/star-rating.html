@@ -1,0 +1,44 @@
+@if (interativo()) {
+  <div
+    class="star-rating star-rating--interativo"
+    role="radiogroup"
+    [attr.aria-label]="rotulo()"
+  >
+    @for (valor of estrelas; track valor) {
+      <button
+        type="button"
+        class="star-rating__botao"
+        role="radio"
+        [attr.aria-checked]="nota() === valor"
+        [attr.aria-label]="valor + (valor > 1 ? ' estrelas' : ' estrela')"
+        (mouseenter)="aoPassarMouse(valor)"
+        (mouseleave)="aoSairMouse()"
+        (click)="aoClicar(valor)"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            [class.estrela-preenchida]="notaExibida() >= valor"
+            [class.estrela-vazia]="notaExibida() < valor"
+            d="M12 2.5 14.9 9l7.1.6-5.4 4.7 1.7 6.9L12 17.4 5.7 21.2l1.7-6.9L2 9.6 9.1 9z"
+          />
+        </svg>
+      </button>
+    }
+  </div>
+} @else {
+  <div
+    class="star-rating"
+    role="img"
+    [attr.aria-label]="rotulo() + ': ' + nota() + ' de 5'"
+  >
+    @for (valor of estrelas; track valor) {
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          [class.estrela-preenchida]="notaExibida() >= valor"
+          [class.estrela-vazia]="notaExibida() < valor"
+          d="M12 2.5 14.9 9l7.1.6-5.4 4.7 1.7 6.9L12 17.4 5.7 21.2l1.7-6.9L2 9.6 9.1 9z"
+        />
+      </svg>
+    }
+  </div>
+}
