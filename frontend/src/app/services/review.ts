@@ -76,12 +76,18 @@ export class ReviewService {
 
   listarPorMusica(
     idMusica: number,
-    pagina = 0
+    pagina = 0,
+    tamanho?: number
   ): Observable<PaginaResponse<Review>> {
+    let params = new HttpParams().set('page', pagina);
+    if (tamanho !== undefined) {
+      params = params.set('size', tamanho);
+    }
+
     return this.http
       .get<PaginaResponse<Review>>(
         `${this.apiUrl}/musicas/${idMusica}`,
-        { params: new HttpParams().set('page', pagina) }
+        { params }
       )
       .pipe(catchError(this.handleError));
   }
