@@ -6,9 +6,13 @@ import { vi } from 'vitest';
 import type { MusicaListagem } from '../../models/MusicaListagem';
 import type { PaginaResponse } from '../../models/PaginaResponse';
 import type { PerfilResponse } from '../../models/Perfil';
+import type { PlaylistResponse } from '../../models/PlaylistResponse';
+import type { Review } from '../../models/Review';
 import { CatalogoService } from '../../services/catalogo';
 import { MusicaService } from '../../services/musica';
 import { PerfilService } from '../../services/perfil';
+import { PlaylistService } from '../../services/playlist';
+import { ReviewService } from '../../services/review';
 import { Perfil } from './perfil';
 
 describe('Perfil', () => {
@@ -25,6 +29,12 @@ describe('Perfil', () => {
   let catalogoServiceMock: {
     listarArtistas: ReturnType<typeof vi.fn>;
     listarAlbuns: ReturnType<typeof vi.fn>;
+  };
+  let reviewServiceMock: {
+    listarMinhas: ReturnType<typeof vi.fn>;
+  };
+  let playlistServiceMock: {
+    listarMinhas: ReturnType<typeof vi.fn>;
   };
 
   const perfil: PerfilResponse = {
@@ -49,7 +59,9 @@ describe('Perfil', () => {
       subtitulo: 'Artista', imagemUrl: null
     }],
     albunsFavoritos: [],
-    musicasFavoritas: []
+    musicasFavoritas: [],
+    totalMusicasAvaliadas: 4,
+    totalAlbunsAvaliadas: 1
   };
 
   beforeEach(async () => {
@@ -96,13 +108,22 @@ describe('Perfil', () => {
       ]))
     };
 
+    reviewServiceMock = {
+      listarMinhas: vi.fn().mockReturnValue(of(paginaReviews([])))
+    };
+    playlistServiceMock = {
+      listarMinhas: vi.fn().mockReturnValue(of([]))
+    };
+
     await TestBed.configureTestingModule({
       imports: [Perfil],
       providers: [
         provideRouter([]),
         { provide: PerfilService, useValue: perfilServiceMock },
         { provide: CatalogoService, useValue: catalogoServiceMock },
-        { provide: MusicaService, useValue: musicaServiceMock }
+        { provide: MusicaService, useValue: musicaServiceMock },
+        { provide: ReviewService, useValue: reviewServiceMock },
+        { provide: PlaylistService, useValue: playlistServiceMock }
       ]
     }).compileComponents();
 
@@ -310,4 +331,75 @@ describe('Perfil', () => {
       totalPaginas
     };
   }
+
+  function paginaReviews(itens: Review[]): PaginaResponse<Review> {
+    return {
+      itens,
+      paginaAtual: 0,
+      tamanhoPagina: 5,
+      totalItens: itens.length,
+      totalPaginas: 1
+    };
+  }
+
+  function playlistDeExemplo(): PlaylistResponse {
+    return {
+      id: 1,
+      nome: 'Favoritas',
+      descricao: '',
+      capaUrl: null,
+      musicas: [{ id: 10, titulo: 'Por Supuesto', artista: 'Marina Sena', capaUrl: null }]
+    };
+  }
+
+  it('deve exibir as estatísticas de reviews do perfil', () => {
+    const estatisticas = fixture.nativeElement.querySelectorAll(
+      '.estatisticas-reviews dd'
+    );
+
+    expect(estatisticas[0].textContent.trim()).toBe('4');
+    expect(estatisticas[1].textContent.trim()).toBe('1');
+  });
+
+  it('deve exibir as reviews recentes do perfil', () => {
+    reviewServiceMock.listarMinhas.mockReturnValue(of(paginaReviews([{
+      idReview: 3,
+      autor: { id: 1, nome: 'Ana Liz Novaes' },
+      alvo: { tipo: 'MUSICA', id: 10, titulo: 'Por Supuesto', artista: 'Marina Sena', capaUrl: null },
+      nota: 5,
+      texto: null,
+      criadaEm: '2026-01-01T00:00:00Z',
+      atualizadaEm: '2026-01-01T00:00:00Z',
+      minhaReview: true
+    }])));
+
+    fixture = TestBed.createComponent(Perfil);
+    fixture.detectChanges();
+
+    const cartoes = fixture.nativeElement.querySelectorAll(
+      '.reviews-lista-horizontal .review-card'
+    );
+    expect(cartoes.length).toBe(1);
+  });
+
+  it('deve exibir mensagem de estado vazio quando não há reviews', () => {
+    expect(fixture.nativeElement.querySelector('.reviews-recentes-area').textContent)
+      .toContain('ainda não fez nenhuma review');
+  });
+
+  it('deve exibir as playlists do usuário', () => {
+    playlistServiceMock.listarMinhas.mockReturnValue(of([playlistDeExemplo()]));
+
+    fixture = TestBed.createComponent(Perfil);
+    fixture.detectChanges();
+
+    const cartoes = fixture.nativeElement.querySelectorAll('.playlist-mini-card');
+    expect(cartoes.length).toBe(1);
+    expect(cartoes[0].textContent).toContain('Favoritas');
+  });
+
+  it('deve exibir mensagem de estado vazio quando não há playlists', () => {
+    expect(fixture.nativeElement.querySelector('.playlists-area').textContent)
+      .toContain('ainda não criou nenhuma playlist');
+  });
 });

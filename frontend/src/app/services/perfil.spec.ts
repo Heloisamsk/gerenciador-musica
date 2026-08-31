@@ -88,7 +88,9 @@ describe('PerfilService', () => {
       albumDestaque: null,
       artistasFavoritos: [],
       albunsFavoritos: [],
-      musicasFavoritas: []
+      musicasFavoritas: [],
+      totalMusicasAvaliadas: 0,
+      totalAlbunsAvaliadas: 0
     };
   }
 });
