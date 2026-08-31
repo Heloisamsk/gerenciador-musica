@@ -6,6 +6,7 @@ import { authGuard } from './guards/auth-guard';
 import { Playlists } from './pages/playlists/playlists';
 import { PlaylistDetalhe } from './pages/playlist-detalhe/playlist-detalhe';
 import { PlaylistNova } from './pages/playlist-nova/playlist-nova';
+import { PlaylistEditar } from './pages/playlist-editar/playlist-editar';
 import { Catalogo } from './pages/catalogo/catalogo';
 
 export const routes: Routes = [
@@ -179,6 +180,12 @@ export const routes: Routes = [
 {
   path: 'playlists/:id/catalogo',
   component: Catalogo,
+  canActivate: [authGuard]
+},
+
+{
+  path: 'playlists/:id/editar',
+  component: PlaylistEditar,
   canActivate: [authGuard]
 },
 
