@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { catchError, of } from 'rxjs';
 
 import type { AlbumDetalhe } from '../../models/AlbumDetalhe';
+import type { Review } from '../../models/Review';
 import { CatalogoService } from '../../services/catalogo';
+import { ReviewService } from '../../services/review';
 import { DetalheCatalogoBase } from '../../shared/detalhe-catalogo';
 import { formatarDuracao } from '../../shared/formatar-duracao';
 
@@ -22,8 +25,13 @@ export class AlbumDetalhePage
   readonly idAlbum = this.idRecurso;
   readonly formatarDuracao = formatarDuracao;
 
+  // Minha review deste álbum, se existir — troca o botão "Avaliar"
+  // por "Ver minha review" e evita tentar criar uma duplicada.
+  readonly minhaReview = signal<Review | null>(null);
+
   constructor(
     catalogoService: CatalogoService,
+    private readonly reviewService: ReviewService,
     private readonly route: ActivatedRoute
   ) {
     super(
@@ -39,6 +47,18 @@ export class AlbumDetalhePage
   }
 
   ngOnInit(): void {
-    this.inicializar(this.route.snapshot.paramMap.get('id'));
+    const idRota = this.route.snapshot.paramMap.get('id');
+    this.inicializar(idRota);
+
+    const id = Number(idRota);
+
+    if (Number.isInteger(id) && id > 0) {
+      this.reviewService.listarPorAlbum(id)
+        .pipe(catchError(() => of(null)))
+        .subscribe(pagina => {
+          const minha = pagina?.itens.find(review => review.minhaReview);
+          this.minhaReview.set(minha ?? null);
+        });
+    }
   }
 }

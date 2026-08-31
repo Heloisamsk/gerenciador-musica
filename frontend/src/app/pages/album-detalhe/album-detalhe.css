@@ -26,6 +26,32 @@
 .generos, .lista-faixas { margin: 0; padding: 0; list-style: none; }
 .generos li { padding: 5px 10px; color: var(--app-ink); border: 1px solid #11161152; border-radius: 0; font: 700 .7rem Consolas, monospace; text-transform: uppercase; }
 
+/*
+ * .botao-secundario (do CSS compartilhado) foi pensado pra ficar sobre
+ * o fundo escuro da página, não sobre o degradê claro do cabeçalho do
+ * álbum — aqui inverte pra manter contraste com esse fundo específico.
+ */
+.acao-avaliar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 18px;
+  color: var(--app-apricot-cream);
+  text-decoration: none;
+  background: var(--app-ink);
+  transition: transform 0.15s ease;
+}
+
+.acao-avaliar:hover {
+  background: #1b241d;
+}
+
+.acao-avaliar:active {
+  transform: scale(0.97);
+}
+
 .secao-faixas { margin-top: 62px; padding: clamp(20px, 3vw, 36px); background: var(--app-surface); border: 1px solid var(--app-line); }
 .cabecalho-secao { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid var(--app-line); }
 .cabecalho-secao h2 { margin: 0; font-family: "Trebuchet MS", sans-serif; font-size: clamp(1.7rem, 3vw, 2.3rem); letter-spacing: -.04em; }
