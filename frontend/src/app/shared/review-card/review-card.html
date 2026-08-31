@@ -1,0 +1,55 @@
+<article class="review-card">
+  <a class="review-card__capa" [routerLink]="rotaAlvo(review())">
+    <img
+      [src]="review().alvo.capaUrl || '/capa-padrao.png'"
+      [alt]="'Capa de ' + review().alvo.titulo"
+      loading="lazy"
+      (error)="aoFalharCapa($event)"
+    />
+  </a>
+
+  <div class="review-card__conteudo">
+    <div class="review-card__cabecalho">
+      <div class="review-card__alvo">
+        <a class="review-card__titulo" [routerLink]="rotaAlvo(review())">
+          {{ review().alvo.titulo }}
+        </a>
+        <span class="review-card__meta">
+          <span class="review-card__tipo">
+            {{ review().alvo.tipo === 'ALBUM' ? 'Álbum' : 'Música' }}
+          </span>
+          @if (review().alvo.artista) {
+            · {{ review().alvo.artista }}
+          }
+        </span>
+      </div>
+
+      @if (review().minhaReview) {
+        <div class="review-card__acoes">
+          <button type="button" class="review-card__acao" (click)="aoClicarEditar()">
+            Editar
+          </button>
+          <button
+            type="button"
+            class="review-card__acao review-card__acao--excluir"
+            (click)="aoClicarExcluir()"
+          >
+            Excluir
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="review-card__avaliacao">
+      <app-star-rating [nota]="review().nota" />
+      <span class="review-card__autor">
+        {{ review().minhaReview ? 'Você' : review().autor.nome }}
+      </span>
+      <span class="review-card__data">{{ formatarData(review().criadaEm) }}</span>
+    </div>
+
+    @if (review().texto) {
+      <p class="review-card__texto">{{ review().texto }}</p>
+    }
+  </div>
+</article>

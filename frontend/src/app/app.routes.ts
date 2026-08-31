@@ -222,6 +222,13 @@ export const routes: Routes = [
   },
 
 {
+  path: 'reviews',
+  loadComponent: () =>
+    import('./pages/reviews/reviews').then(modulo => modulo.Reviews),
+  canActivate: [authGuard]
+},
+
+{
   path: '**',
   redirectTo: 'login'
 }

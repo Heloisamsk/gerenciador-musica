@@ -1,0 +1,129 @@
+:host {
+  display: block;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: var(--app-panel);
+  border: 1px solid var(--app-line);
+  border-radius: 17px;
+}
+
+.review-form__tipo {
+  display: inline-flex;
+  gap: 6px;
+  padding: 3px;
+  background: var(--app-panel-raised);
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.review-form__tipo-botao {
+  padding: 6px 14px;
+  color: var(--app-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.review-form__tipo-botao--ativo {
+  color: var(--app-button-text);
+  background: var(--app-accent);
+}
+
+.review-form__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.review-form__campo label,
+.review-form__rotulo {
+  color: var(--app-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.review-form__campo select,
+.review-form__campo textarea {
+  padding: 9px 12px;
+  color: var(--app-text);
+  background: var(--app-panel-raised);
+  border: 1px solid var(--app-line);
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
+}
+
+.review-form__campo select:focus-visible,
+.review-form__campo textarea:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 1px;
+}
+
+.review-form__erro {
+  margin: 0;
+  padding: 8px 10px;
+  color: #fff2ec;
+  background: #52231c;
+  border: 1px solid #c95d49;
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.review-form__acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.review-form__cancelar,
+.review-form__salvar {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 700;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.review-form__cancelar {
+  color: var(--app-muted);
+  background: var(--app-panel-raised);
+}
+
+.review-form__salvar {
+  color: var(--app-button-text);
+  background: var(--app-accent);
+}
+
+.review-form__salvar:not(:disabled):hover,
+.review-form__cancelar:hover {
+  opacity: 0.85;
+}
+
+.review-form__salvar:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+.review-form__salvar:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-form__cancelar,
+  .review-form__salvar {
+    transition: none;
+  }
+}

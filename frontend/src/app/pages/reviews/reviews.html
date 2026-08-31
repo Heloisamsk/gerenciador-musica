@@ -1,0 +1,110 @@
+<div class="reviews-container">
+  <a class="voltar-link" routerLink="/home">
+    ← Voltar para a home
+  </a>
+
+  <div class="reviews-cabecalho">
+    <div>
+      <h1 class="page-title">Reviews</h1>
+      <p class="reviews-subtitulo">
+        Avalie músicas e álbuns de 1 a 5 estrelas, inspirado no Letterboxd.
+      </p>
+    </div>
+
+    @if (!criandoReview() && !reviewEmEdicao()) {
+      <button type="button" class="reviews-nova" (click)="abrirNovaReview()">
+        + Nova review
+      </button>
+    }
+  </div>
+
+  @if (criandoReview()) {
+    <app-review-form
+      (salvo)="aoSalvarFormulario()"
+      (cancelado)="fecharFormularios()"
+    />
+  }
+
+  @if (reviewEmEdicao(); as review) {
+    <app-review-form
+      [reviewParaEditar]="review"
+      (salvo)="aoSalvarFormulario()"
+      (cancelado)="fecharFormularios()"
+    />
+  }
+
+  <div class="reviews-abas" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      class="reviews-aba"
+      [class.reviews-aba--ativa]="abaAtiva() === 'FEED'"
+      (click)="trocarAba('FEED')"
+    >
+      Atividade recente
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="reviews-aba"
+      [class.reviews-aba--ativa]="abaAtiva() === 'MINHAS'"
+      (click)="trocarAba('MINHAS')"
+    >
+      Minhas reviews
+    </button>
+  </div>
+
+  @if (erro()) {
+    <div class="status-message error-message" role="alert">
+      <p>{{ erro() }}</p>
+    </div>
+  }
+
+  <div class="reviews-lista" aria-live="polite">
+    @if (carregando()) {
+      <p class="mensagem-estado">Carregando reviews...</p>
+    } @else if (pagina() && pagina()!.itens.length === 0) {
+      <p class="mensagem-estado">
+        @if (abaAtiva() === 'MINHAS') {
+          Você ainda não avaliou nenhuma música ou álbum.
+        } @else {
+          Ainda não há reviews por aqui.
+        }
+      </p>
+    } @else {
+      @for (review of pagina()?.itens; track review.idReview) {
+        <app-review-card
+          [review]="review"
+          (editar)="editarReview($event)"
+          (excluir)="excluirReview($event)"
+        />
+      }
+    }
+  </div>
+
+  @if (pagina() && pagina()!.totalPaginas > 1) {
+    <div class="paginacao">
+      <button
+        class="botao-pagina"
+        type="button"
+        [disabled]="carregando() || pagina()!.paginaAtual <= 0"
+        (click)="paginaAnterior()"
+      >
+        ← Anterior
+      </button>
+
+      <span class="pagina-info">
+        Página {{ pagina()!.paginaAtual + 1 }} de {{ pagina()!.totalPaginas }}
+      </span>
+
+      <button
+        class="botao-pagina"
+        type="button"
+        [disabled]="carregando() || pagina()!.paginaAtual + 1 >= pagina()!.totalPaginas"
+        (click)="proximaPagina()"
+      >
+        Próxima →
+      </button>
+    </div>
+  }
+</div>
