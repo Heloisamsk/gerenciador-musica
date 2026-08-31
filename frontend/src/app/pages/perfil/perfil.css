@@ -141,39 +141,6 @@
 .atalhos a { padding: 10px 13px; color: var(--dry-sage); border: 1px solid #adb9936e; font-size: .73rem; font-weight: 800; }
 .atalhos a:hover { color: var(--black); background: var(--dry-sage); }
 
-.reviews-recentes-area, .playlists-area, .sobre-area {
-  padding: 0 clamp(34px, 5vw, 68px) clamp(34px, 5vw, 68px);
-  border-top: 1px solid var(--line);
-}
-.reviews-recentes-area, .playlists-area { padding-top: clamp(30px, 4vw, 48px); }
-.reviews-recentes-area .secao-cabecalho, .playlists-area .secao-cabecalho { margin-bottom: 20px; }
-.reviews-recentes-area .secao-cabecalho > a, .playlists-area .secao-cabecalho > a {
-  color: var(--cool-steel); font-size: .78rem; font-weight: 800; white-space: nowrap;
-}
-.reviews-recentes-area .secao-cabecalho > a:hover, .playlists-area .secao-cabecalho > a:hover { color: var(--apricot-cream); }
-
-.estatisticas-reviews { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 0 0 22px; }
-.estatisticas-reviews > div { padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); }
-.estatisticas-reviews dt { margin: 0; color: var(--muted); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; }
-.estatisticas-reviews dd { margin: 6px 0 0; font-family: "Trebuchet MS", sans-serif; font-size: 1.9rem; }
-
-.reviews-lista-horizontal { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)); gap: 10px; overflow-x: auto; }
-.playlists-lista-horizontal { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
-
-.playlist-mini-card { display: flex; flex-direction: column; min-width: 0; padding: 8px 8px 13px; color: inherit; border: 1px solid transparent; border-radius: 17px; transition: transform .2s ease, border-color .2s ease; }
-.playlist-mini-card:hover { border-color: #adb99370; transform: translateY(-4px); }
-.playlist-mini-capa { display: grid; place-items: center; width: 100%; margin-bottom: 12px; overflow: hidden; aspect-ratio: 1; background: var(--panel-raised); border-radius: 12px; box-shadow: 0 15px 32px var(--app-shadow); }
-.playlist-mini-capa img { width: 100%; height: 100%; object-fit: cover; }
-.playlist-mini-nota { color: var(--golden-sand); font-family: Georgia, serif; font-size: 2.4rem; }
-.playlist-mini-card strong { overflow: hidden; padding: 0 3px; font-size: .88rem; text-overflow: ellipsis; white-space: nowrap; }
-.playlist-mini-card small { overflow: hidden; margin-top: 4px; padding: 0 3px; color: var(--muted); font-size: .71rem; text-overflow: ellipsis; white-space: nowrap; }
-
-.lista-vazia { margin: 0; padding: 18px; color: var(--muted); background: var(--panel); border: 1px dashed #9cafb765; font-size: .85rem; text-align: center; }
-
-.sobre-area { color: var(--black); background: var(--cool-steel); }
-.sobre-area h3 { margin: 0; padding-top: clamp(30px, 4vw, 48px); font-family: "Trebuchet MS", sans-serif; font-size: 1.15rem; }
-.sobre-area p { margin: 9px 0 0; color: #202725; line-height: 1.65; }
-
 .feedback { display: block; max-width: 1280px; margin: 0 auto; padding: 12px 18px; font-size: .8rem; }
 .feedback--sucesso { color: var(--black); background: var(--golden-sand); }
 .feedback--erro { color: var(--apricot-cream); background: #f6ca8313; border: 1px solid #f6ca8355; }
@@ -226,11 +193,6 @@
   .perfil-conteudo { grid-template-columns: 1fr; }
   .destaque-card { display: grid; grid-template-columns: minmax(170px, .8fr) 1fr; column-gap: 20px; align-items: start; }
   .destaque-imagem { grid-row: 1 / 6; margin: 0; }
-  .reviews-lista-horizontal { grid-template-columns: repeat(3, minmax(130px, 1fr)); }
-}
-
-@media (max-width: 600px) {
-  .reviews-lista-horizontal { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
 }
 
 @media (max-width: 560px) {
@@ -243,7 +205,6 @@
   .identidade h1 { font-size: 2.35rem; }
   .botao--editar { width: 100%; }
   .perfil-conteudo { padding: 30px 18px; }
-  .reviews-recentes-area, .playlists-area, .sobre-area { padding-left: 18px; padding-right: 18px; }
   .destaque-card { display: block; }
   .destaque-imagem { margin-bottom: 15px; }
   .editor { width: 100%; max-height: 100vh; min-height: 100vh; border: 0; }

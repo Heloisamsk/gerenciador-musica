@@ -9,10 +9,11 @@ import { finalize } from 'rxjs';
 
 import { PlaylistResponse } from '../../models/PlaylistResponse';
 import { PlaylistService } from '../../services/playlist';
+import { PlaylistCard } from '../../shared/playlist-card/playlist-card';
 
 @Component({
   selector: 'app-playlists',
-  imports: [RouterLink],
+  imports: [RouterLink, PlaylistCard],
   templateUrl: './playlists.html',
   styleUrls: ['./playlists.css']
 })
@@ -29,11 +30,6 @@ export class Playlists implements OnInit {
 
   ngOnInit(): void {
     this.carregarPlaylists();
-  }
-
-  aoFalharCapa(evento: Event): void {
-    const imagem = evento.target as HTMLImageElement;
-    imagem.src = '/capa-padrao.png';
   }
 
   carregarPlaylists(): void {

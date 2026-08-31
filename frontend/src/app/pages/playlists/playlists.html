@@ -36,26 +36,7 @@
   } @else {
     <div class="grade-playlists">
       @for (playlist of playlists; track playlist.id) {
-        <a class="playlist-card" [routerLink]="['/playlists', playlist.id]">
-          <span class="playlist-card__capa">
-            @if (playlist.capaUrl) {
-              <img
-                [src]="playlist.capaUrl"
-                [alt]="'Capa da playlist ' + playlist.nome"
-                loading="lazy"
-                (error)="aoFalharCapa($event)"
-              />
-            } @else {
-              <span class="playlist-card__nota" aria-hidden="true">♪</span>
-            }
-          </span>
-
-          <strong class="playlist-card__titulo">{{ playlist.nome }}</strong>
-          <span class="playlist-card__contagem">
-            {{ playlist.musicas.length }}
-            {{ playlist.musicas.length === 1 ? 'música' : 'músicas' }}
-          </span>
-        </a>
+        <app-playlist-card [playlist]="playlist" />
       }
     </div>
   }

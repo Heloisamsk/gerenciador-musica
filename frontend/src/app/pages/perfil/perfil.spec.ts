@@ -393,7 +393,7 @@ describe('Perfil', () => {
     fixture = TestBed.createComponent(Perfil);
     fixture.detectChanges();
 
-    const cartoes = fixture.nativeElement.querySelectorAll('.playlist-mini-card');
+    const cartoes = fixture.nativeElement.querySelectorAll('.playlist-card');
     expect(cartoes.length).toBe(1);
     expect(cartoes[0].textContent).toContain('Favoritas');
   });

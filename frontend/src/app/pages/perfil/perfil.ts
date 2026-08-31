@@ -35,7 +35,7 @@ import { MusicaService } from '../../services/musica';
 import { PerfilService } from '../../services/perfil';
 import { PlaylistService } from '../../services/playlist';
 import { ReviewService } from '../../services/review';
-import { ReviewCard } from '../../shared/review-card/review-card';
+import { PerfilAtividade } from './perfil-atividade/perfil-atividade';
 
 const TAMANHO_REVIEWS_RECENTES = 5;
 
@@ -47,7 +47,7 @@ type CampoFavoritos =
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, ReviewCard],
+  imports: [RouterLink, ReactiveFormsModule, PerfilAtividade],
   templateUrl: './perfil.html',
   styleUrls: ['./perfil.css']
 })
