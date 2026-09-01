@@ -1,4 +1,4 @@
-<div class="home-shell">
+<div class="home-shell" [class.home-shell--reduzido]="!bibliotecaExpandida()">
   <aside class="sidebar" aria-label="Sua biblioteca">
     <div class="biblioteca" [class.biblioteca--expandida]="bibliotecaExpandida()">
       <div class="biblioteca-topo">
@@ -6,7 +6,11 @@
           [attr.aria-expanded]="bibliotecaExpandida()"
           [attr.aria-label]="bibliotecaExpandida() ? 'Recolher biblioteca' : 'Expandir biblioteca'"
           (click)="alternarBiblioteca()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 19V6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v13"></path>
+            <path d="M9 19V4a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v15"></path>
+            <path d="m16 19 2.5-14.5a1 1 0 0 1 1.17-.8l1.62.3a1 1 0 0 1 .8 1.17L19.6 19"></path>
+          </svg>
           @if (bibliotecaExpandida()) { <span>Sua Biblioteca</span> }
         </button>
         <a class="biblioteca-criar" routerLink="/playlists/nova" title="Criar playlist" aria-label="Criar playlist">
