@@ -8,6 +8,7 @@ import { provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 
 import type { AlbumResponse } from '../../models/AlbumResponse';
+import type { ArtistaResponse } from '../../models/ArtistaResponse';
 import type { PerfilResponse } from '../../models/Perfil';
 import type { PlaylistResponse } from '../../models/PlaylistResponse';
 import { Home } from './home';
@@ -118,6 +119,7 @@ describe('Home', () => {
     );
     httpMock.expectOne(playlistsUrl).flush([]);
     httpMock.expectOne(`${apiUrl}/albuns/curtidos`).flush([]);
+    httpMock.expectOne(`${apiUrl}/artistas/seguidos`).flush([]);
     fixture.detectChanges();
 
     expect(component.albuns()).toEqual([]);
@@ -189,7 +191,8 @@ describe('Home', () => {
     albuns: AlbumResponse[],
     perfil: PerfilResponse = perfilDeExemplo(),
     playlists: PlaylistResponse[] = [],
-    albunsCurtidos: AlbumResponse[] = []
+    albunsCurtidos: AlbumResponse[] = [],
+    artistasSeguidos: ArtistaResponse[] = []
   ): void {
     fixture.detectChanges();
 
@@ -198,6 +201,7 @@ describe('Home', () => {
     httpMock.expectOne(`${apiUrl}/albuns`).flush(albuns);
     httpMock.expectOne(playlistsUrl).flush(playlists);
     httpMock.expectOne(`${apiUrl}/albuns/curtidos`).flush(albunsCurtidos);
+    httpMock.expectOne(`${apiUrl}/artistas/seguidos`).flush(artistasSeguidos);
     fixture.detectChanges();
   }
 
