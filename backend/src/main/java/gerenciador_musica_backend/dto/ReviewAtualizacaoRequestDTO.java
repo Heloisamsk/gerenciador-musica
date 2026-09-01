@@ -1,7 +1,9 @@
 package gerenciador_musica_backend.dto;
 
+import java.math.BigDecimal;
+
 public record ReviewAtualizacaoRequestDTO(
-        Short nota,
+        BigDecimal nota,
         String texto
 ) {
 }

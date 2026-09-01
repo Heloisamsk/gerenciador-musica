@@ -5,15 +5,15 @@
 .star-rating {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   margin: 0;
   padding: 0;
   border: 0;
 }
 
 svg.star-rating {
-  width: 97px;
-  height: 18px;
+  width: 150px;
+  height: 28px;
 }
 
 .estrela-preenchida {
@@ -37,46 +37,59 @@ svg.star-rating {
   border: 0;
 }
 
-.star-rating__botao {
+.star-rating__estrela {
   position: relative;
   display: inline-flex;
-  padding: 3px;
+  padding: 4px;
   cursor: pointer;
   transition: transform 0.12s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.star-rating__botao svg {
-  width: 22px;
-  height: 22px;
+.star-rating__estrela svg {
+  width: 36px;
+  height: 36px;
 }
 
-.star-rating__botao input {
+.star-rating__metade {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  width: 50%;
   margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
   opacity: 0;
   cursor: pointer;
 }
 
-.star-rating__botao:hover {
+.star-rating__metade--esquerda {
+  left: 0;
+}
+
+.star-rating__metade--direita {
+  right: 0;
+}
+
+.star-rating__estrela:hover {
   transform: scale(1.15);
 }
 
-.star-rating__botao:active {
+.star-rating__estrela:active {
   transform: scale(0.97);
 }
 
-.star-rating__botao:has(input:focus-visible) {
+.star-rating__estrela:has(.star-rating__metade:focus-visible) {
   outline: 2px solid var(--app-focus);
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .star-rating__botao {
+  .star-rating__estrela {
     transition: none;
   }
 
-  .star-rating__botao:hover {
+  .star-rating__estrela:hover {
     transform: none;
   }
 }

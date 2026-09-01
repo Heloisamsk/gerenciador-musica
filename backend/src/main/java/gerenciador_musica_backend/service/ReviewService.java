@@ -30,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.function.Function;
 
 @Service
@@ -38,8 +39,9 @@ public class ReviewService {
     private static final int TAMANHO_PAGINA_PADRAO = 20;
     private static final int TAMANHO_PAGINA_MAXIMO = 100;
 
-    private static final short NOTA_MINIMA = 1;
-    private static final short NOTA_MAXIMA = 5;
+    private static final BigDecimal NOTA_MINIMA = new BigDecimal("0.5");
+    private static final BigDecimal NOTA_MAXIMA = new BigDecimal("5");
+    private static final BigDecimal PASSO_NOTA = new BigDecimal("0.5");
 
     private final ReviewRepository reviewRepository;
     private final MusicaRepository musicaRepository;
@@ -241,7 +243,7 @@ public class ReviewService {
     private Review criarReviewDeMusica(
             Usuario usuario,
             Long idMusica,
-            Short nota,
+            BigDecimal nota,
             String texto
     ) {
         Musica musica = musicaRepository.findById(idMusica)
@@ -262,7 +264,7 @@ public class ReviewService {
     private Review criarReviewDeAlbum(
             Usuario usuario,
             Long idAlbum,
-            Short nota,
+            BigDecimal nota,
             String texto
     ) {
         Album album = albumRepository.findById(idAlbum)
@@ -333,11 +335,26 @@ public class ReviewService {
         validarNota(request.nota());
     }
 
-    private void validarNota(Short nota) {
-        if (nota == null || nota < NOTA_MINIMA || nota > NOTA_MAXIMA) {
+    private void validarNota(BigDecimal nota) {
+        if (nota == null
+                || nota.compareTo(NOTA_MINIMA) < 0
+                || nota.compareTo(NOTA_MAXIMA) > 0) {
             throw new DadosReviewInvalidosException(
                     "A nota deve estar entre "
                             + NOTA_MINIMA + " e " + NOTA_MAXIMA + "."
+            );
+        }
+
+        // nota / 0.5 tem que ser um inteiro pra garantir passos de meia
+        // estrela (0.5, 1, 1.5, ..., 5), rejeitando algo como 3.3.
+        boolean multiploDeMeiaEstrela = nota
+                .divide(PASSO_NOTA)
+                .stripTrailingZeros()
+                .scale() <= 0;
+
+        if (!multiploDeMeiaEstrela) {
+            throw new DadosReviewInvalidosException(
+                    "A nota deve ser em passos de 0.5 (ex.: 3, 3.5, 4)."
             );
         }
     }
