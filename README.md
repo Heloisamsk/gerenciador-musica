@@ -21,7 +21,9 @@ Projeto de Sistema web para gerenciamento de músicas, artistas, álbuns e playl
 - **Backend:** [gerenciador-musica-1.onrender.com](https://gerenciador-musica-1.onrender.com)
 
 → Acesso ADMIN:  
-**Email**: eloa93@example.net | **Senha**: Senha@123
+**Email**: admin.demo@gerenciador.com | **Senha**: senhadeteste0001
+
+> A conta de admin é criada por uma migration dedicada (não faz parte da carga de dados fictícios). As contas fictícias da carga inicial nunca têm privilégio de ADMIN, por segurança.
 
 </details>
 
@@ -528,6 +530,8 @@ Serviços disponíveis após a inicialização completa:
 - Backend: `http://localhost:8080`
 - PostgreSQL da aplicação: `localhost:5432`
 - PostgreSQL de testes: `localhost:5433`
+
+A mesma conta de administrador usada em produção (ver seção "Aplicação em Produção") já vem criada nesse banco local, pronta para uso.
 
 | Ação                       | Comando                                 |
 | -------------------------- | --------------------------------------- |
