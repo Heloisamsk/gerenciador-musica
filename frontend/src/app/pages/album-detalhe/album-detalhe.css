@@ -68,7 +68,8 @@
 .linha-faixa { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 74px; padding: 8px 52px 8px 8px; color: inherit; background: var(--app-panel); border: 1px solid var(--app-line); border-left: 4px solid var(--app-cool-steel); border-radius: 0; text-decoration: none; transition: transform .18s, background .18s; }
 .curtir-faixa { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); }
 .linha-faixa:hover { background: var(--app-panel-raised); transform: translateX(4px); }
-.marcador { display: grid; width: 38px; height: 38px; place-items: center; color: var(--app-button-text); background: var(--app-apricot-cream); border-radius: 50%; font-family: Georgia, serif; font-weight: 800; }
+.capa-faixa { display: block; width: 46px; height: 46px; overflow: hidden; background: var(--app-panel-raised); border-radius: 8px; }
+.capa-faixa img { width: 100%; height: 100%; object-fit: cover; }
 .dados-faixa { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
 .dados-faixa strong, .dados-faixa > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
