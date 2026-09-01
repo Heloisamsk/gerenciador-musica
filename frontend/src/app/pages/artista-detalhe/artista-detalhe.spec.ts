@@ -145,7 +145,8 @@ describe('ArtistaDetalhePage', () => {
         totalAlbuns: 1,
         totalMusicasPrincipais: 1,
         totalParticipacoes: 0,
-        duracaoTotalSegundos: 354
+        duracaoTotalSegundos: 354,
+        seguindo: false
       },
       albuns: [
         {

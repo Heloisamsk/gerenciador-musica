@@ -9,6 +9,7 @@ public record ArtistaCatalogoResumoDTO(
         Long totalAlbuns,
         Long totalMusicasPrincipais,
         Long totalParticipacoes,
-        Long duracaoTotalSegundos
+        Long duracaoTotalSegundos,
+        boolean seguindo
 ) {
 }

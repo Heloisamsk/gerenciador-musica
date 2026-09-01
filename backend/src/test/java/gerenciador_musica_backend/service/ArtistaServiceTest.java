@@ -13,6 +13,7 @@ import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.CurtidaAlbumRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
+import gerenciador_musica_backend.repository.SeguidorArtistaRepository;
 import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
 import gerenciador_musica_backend.repository.projection.ArtistaCatalogoResumoProjection;
 import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
@@ -65,6 +66,9 @@ class ArtistaServiceTest {
     @Mock
     private CurtidaAlbumRepository curtidaAlbumRepository;
 
+    @Mock
+    private SeguidorArtistaRepository seguidorArtistaRepository;
+
     @InjectMocks
     private ArtistaService artistaService;
 
@@ -87,6 +91,11 @@ class ArtistaServiceTest {
                         any(), any()
                 ))
                 .thenReturn(Collections.emptySet());
+
+        lenient()
+                .when(seguidorArtistaRepository
+                        .existsByUsuario_IdAndArtista_IdArtista(any(), any()))
+                .thenReturn(false);
     }
 
     @AfterEach

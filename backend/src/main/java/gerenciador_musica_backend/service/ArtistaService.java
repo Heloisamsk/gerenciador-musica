@@ -16,6 +16,7 @@ import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.CurtidaAlbumRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
+import gerenciador_musica_backend.repository.SeguidorArtistaRepository;
 import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
 import gerenciador_musica_backend.repository.projection.ArtistaCatalogoResumoProjection;
 import org.springframework.data.domain.PageRequest;
@@ -35,17 +36,20 @@ public class ArtistaService {
     private final AlbumRepository albumRepository;
     private final MusicaRepository musicaRepository;
     private final CurtidaAlbumRepository curtidaAlbumRepository;
+    private final SeguidorArtistaRepository seguidorArtistaRepository;
 
     public ArtistaService(
             ArtistaRepository artistaRepository,
             AlbumRepository albumRepository,
             MusicaRepository musicaRepository,
-            CurtidaAlbumRepository curtidaAlbumRepository
+            CurtidaAlbumRepository curtidaAlbumRepository,
+            SeguidorArtistaRepository seguidorArtistaRepository
     ) {
         this.artistaRepository = artistaRepository;
         this.albumRepository = albumRepository;
         this.musicaRepository = musicaRepository;
         this.curtidaAlbumRepository = curtidaAlbumRepository;
+        this.seguidorArtistaRepository = seguidorArtistaRepository;
     }
 
     @Transactional
@@ -194,8 +198,11 @@ public class ArtistaService {
                 .map(CatalogoProjectionMapper::converterMusica)
                 .toList();
 
+        boolean seguindo = seguidorArtistaRepository
+                .existsByUsuario_IdAndArtista_IdArtista(usuarioId, idArtista);
+
         return new ArtistaDetalheDTO(
-                converterResumoCatalogo(resumo),
+                converterResumoCatalogo(resumo, seguindo),
                 albuns,
                 musicas
         );
@@ -302,7 +309,8 @@ public class ArtistaService {
     }
 
     private ArtistaCatalogoResumoDTO converterResumoCatalogo(
-            ArtistaCatalogoResumoProjection resumo
+            ArtistaCatalogoResumoProjection resumo,
+            boolean seguindo
     ) {
         return new ArtistaCatalogoResumoDTO(
                 resumo.getIdArtista(),
@@ -313,7 +321,8 @@ public class ArtistaService {
                 resumo.getTotalAlbuns(),
                 resumo.getTotalMusicasPrincipais(),
                 resumo.getTotalParticipacoes(),
-                resumo.getDuracaoTotalSegundos()
+                resumo.getDuracaoTotalSegundos(),
+                seguindo
         );
     }
 
