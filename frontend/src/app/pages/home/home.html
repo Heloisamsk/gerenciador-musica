@@ -89,11 +89,70 @@
 
   <main class="conteudo">
     <header class="topo">
-      <form class="busca" role="search" (submit)="$event.preventDefault(); pesquisar()">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4 4"></path></svg>
-        <input class="campo-busca" type="search" name="termoBusca" placeholder="Busque por uma música" aria-label="Buscar músicas" autocomplete="off" (input)="atualizarBusca($event)">
-        <button type="submit" class="busca-botao">Buscar</button>
-      </form>
+      <div class="busca-wrapper">
+        <form class="busca" role="search" (submit)="$event.preventDefault(); pesquisar()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4 4"></path></svg>
+          <input class="campo-busca" type="search" name="termoBusca" placeholder="Busque por uma música" aria-label="Buscar músicas" autocomplete="off"
+            (input)="atualizarBusca($event)"
+            (focus)="reabrirResultadosBusca()"
+            (keydown)="tratarTeclaBusca($event)">
+          <button type="submit" class="busca-botao">Buscar</button>
+        </form>
+
+        @if (mostrarResultadosBusca()) {
+          <div class="busca-resultados" role="listbox" aria-label="Resultados da busca">
+            @if (buscandoInstantaneo()) {
+              <p class="busca-resultados-estado">Buscando...</p>
+            } @else if (resultadoBusca(); as resultado) {
+              @if (resultado.musicas.length === 0 && resultado.albuns.length === 0 && resultado.artistas.length === 0) {
+                <p class="busca-resultados-estado">Nenhum resultado encontrado.</p>
+              } @else {
+                @if (resultado.musicas.length > 0) {
+                  <div class="busca-resultados-grupo">
+                    <span class="busca-resultados-titulo">Músicas</span>
+                    @for (musica of resultado.musicas; track musica.id) {
+                      <a class="busca-resultado-item" [routerLink]="['/musicas', musica.id]" (click)="fecharResultadosBusca()">
+                        <img class="busca-resultado-capa" [src]="musica.album?.capaUrl || '/capa-padrao.png'" alt="" loading="lazy">
+                        <span class="busca-resultado-texto">
+                          <strong>{{ musica.titulo }}</strong>
+                          <small>{{ musica.artistaPrincipal.nome }}</small>
+                        </span>
+                      </a>
+                    }
+                  </div>
+                }
+                @if (resultado.albuns.length > 0) {
+                  <div class="busca-resultados-grupo">
+                    <span class="busca-resultados-titulo">Álbuns</span>
+                    @for (album of resultado.albuns; track album.idAlbum) {
+                      <a class="busca-resultado-item" [routerLink]="['/albuns', album.idAlbum]" (click)="fecharResultadosBusca()">
+                        <img class="busca-resultado-capa" [src]="album.capaUrl || '/capa-padrao.png'" alt="" loading="lazy">
+                        <span class="busca-resultado-texto">
+                          <strong>{{ album.titulo }}</strong>
+                          <small>{{ album.artista.nome }}</small>
+                        </span>
+                      </a>
+                    }
+                  </div>
+                }
+                @if (resultado.artistas.length > 0) {
+                  <div class="busca-resultados-grupo">
+                    <span class="busca-resultados-titulo">Artistas</span>
+                    @for (artista of resultado.artistas; track artista.idArtista) {
+                      <a class="busca-resultado-item" [routerLink]="['/artistas', artista.idArtista]" (click)="fecharResultadosBusca()">
+                        <img class="busca-resultado-capa busca-resultado-capa--redonda" [src]="artista.fotoPerfilUrl || '/avatar-artista.png'" alt="" loading="lazy">
+                        <span class="busca-resultado-texto">
+                          <strong>{{ artista.nome }}</strong>
+                        </span>
+                      </a>
+                    }
+                  </div>
+                }
+              }
+            }
+          </div>
+        }
+      </div>
       <div class="topo-conta">
         @if (isAdmin()) {
           <a class="topo-painel" routerLink="/admin/painel" aria-label="Abrir painel administrativo">
@@ -106,7 +165,7 @@
         }
         <a class="topo-perfil" routerLink="/perfil" aria-label="Abrir meu perfil">
           <img [src]="fotoPerfil()" alt="" referrerpolicy="no-referrer"
-            (error)="substituirImagem($event, '/avatar-padrao.png')">
+            (error)="substituirImagem($event, '/avatar-padrao.svg')">
           <span>{{ nomeUsuario() }}</span>
         </a>
         <button type="button" class="topo-sair" aria-label="Sair da conta"

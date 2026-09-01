@@ -1,17 +1,26 @@
 import {
   Component,
+  HostListener,
   OnInit,
   signal
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { Subject, finalize, of } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap
+} from 'rxjs/operators';
 
 import { AuthService } from '../../services/auth';
+import { BuscaService } from '../../services/busca';
 import { CatalogoService } from '../../services/catalogo';
 import { PerfilService } from '../../services/perfil';
 import { PlaylistService } from '../../services/playlist';
 import type { AlbumResponse } from '../../models/AlbumResponse';
 import type { ArtistaResponse } from '../../models/ArtistaResponse';
+import type { BuscaResultado } from '../../models/BuscaResultado';
 import type { PlaylistResponse } from '../../models/PlaylistResponse';
 import { CurtirBotao } from '../../shared/curtir-botao/curtir-botao';
 
@@ -24,7 +33,7 @@ import { CurtirBotao } from '../../shared/curtir-botao/curtir-botao';
 export class Home implements OnInit {
 
   nomeUsuario = signal('Usuário');
-  fotoPerfil = signal('/avatar-padrao.png');
+  fotoPerfil = signal('/avatar-padrao.svg');
   termoBusca = signal('');
   bibliotecaExpandida = signal(false);
 
@@ -42,13 +51,43 @@ export class Home implements OnInit {
   erroArtistas = signal('');
   erroAlbuns = signal('');
 
+  resultadoBusca = signal<BuscaResultado | null>(null);
+  buscandoInstantaneo = signal(false);
+  mostrarResultadosBusca = signal(false);
+
+  // switchMap garante que só o resultado da busca mais recente é aplicado,
+  // mesmo se uma resposta antiga demorar e chegar depois de uma mais nova.
+  private readonly buscaInstantanea$ = new Subject<string>();
+
   constructor(
     private readonly authService: AuthService,
+    private readonly buscaService: BuscaService,
     private readonly catalogoService: CatalogoService,
     private readonly perfilService: PerfilService,
     private readonly playlistService: PlaylistService,
     private readonly router: Router
-  ) {}
+  ) {
+    this.buscaInstantanea$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(termo => {
+          if (termo.trim().length === 0) {
+            return of(null);
+          }
+
+          this.buscandoInstantaneo.set(true);
+
+          return this.buscaService.buscar(termo.trim()).pipe(
+            catchError(() => of(null))
+          );
+        })
+      )
+      .subscribe(resultado => {
+        this.buscandoInstantaneo.set(false);
+        this.resultadoBusca.set(resultado);
+      });
+  }
 
   ngOnInit(): void {
     if (typeof window !== 'undefined') {
@@ -73,16 +112,46 @@ export class Home implements OnInit {
   atualizarBusca(evento: Event): void {
     const campo = evento.target as HTMLInputElement;
     this.termoBusca.set(campo.value);
+    this.mostrarResultadosBusca.set(campo.value.trim().length > 0);
+    this.buscaInstantanea$.next(campo.value);
   }
 
-  // A busca da home não filtra mais localmente: ela leva o usuário até a
-  // página de pesquisa de verdade, que já usa os filtros do backend (US06).
+  // A busca da home continua levando o usuário até a página de pesquisa
+  // completa ao pressionar Enter/clicar em Buscar (US06) — o dropdown
+  // instantâneo é só uma prévia enquanto o usuário digita.
   pesquisar(): void {
     const titulo = this.termoBusca().trim();
+
+    this.fecharResultadosBusca();
 
     this.router.navigate(['/musicas'], {
       queryParams: titulo ? { titulo } : {}
     });
+  }
+
+  fecharResultadosBusca(): void {
+    this.mostrarResultadosBusca.set(false);
+  }
+
+  reabrirResultadosBusca(): void {
+    if (this.termoBusca().trim().length > 0) {
+      this.mostrarResultadosBusca.set(true);
+    }
+  }
+
+  tratarTeclaBusca(evento: KeyboardEvent): void {
+    if (evento.key === 'Escape') {
+      this.fecharResultadosBusca();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  aoClicarFora(evento: MouseEvent): void {
+    const alvo = evento.target as HTMLElement;
+
+    if (!alvo.closest('.busca-wrapper')) {
+      this.fecharResultadosBusca();
+    }
   }
 
   logout(): void {
@@ -139,9 +208,9 @@ export class Home implements OnInit {
     this.perfilService.obter().subscribe({
       next: perfil => {
         this.nomeUsuario.set(perfil.nome || 'Usuário');
-        this.fotoPerfil.set(perfil.fotoUrl || '/avatar-padrao.png');
+        this.fotoPerfil.set(perfil.fotoUrl || '/avatar-padrao.svg');
       },
-      error: () => this.fotoPerfil.set('/avatar-padrao.png')
+      error: () => this.fotoPerfil.set('/avatar-padrao.svg')
     });
   }
 
