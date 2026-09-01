@@ -38,6 +38,7 @@ import {
   extrairYoutubeVideoId
 } from '../../../shared/youtube-video';
 import { SeletorParticipantes } from './seletor-participantes/seletor-participantes';
+import { Router, RouterLink } from '@angular/router';
 
 export type ModoFormularioMusica = 'cadastro' | 'edicao';
 
@@ -105,7 +106,8 @@ const validarYoutubeUrl: ValidatorFn = (
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    SeletorParticipantes
+    SeletorParticipantes,
+    RouterLink
   ],
   templateUrl: './formulario-musica.html',
   styleUrl: './formulario-musica.css'

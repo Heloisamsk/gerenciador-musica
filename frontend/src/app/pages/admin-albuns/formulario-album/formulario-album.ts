@@ -19,6 +19,7 @@ import { AlbumAtualizacaoRequest } from '../../../models/AlbumAtualizacaoRequest
 import { AlbumRequest } from '../../../models/AlbumRequestModel';
 import { AlbumResponse } from '../../../models/AlbumResponse';
 import { ArtistaResponse } from '../../../models/ArtistaResponse';
+import { RouterLink } from '@angular/router';
 
 export type ModoFormularioAlbum = 'cadastro' | 'edicao';
 
@@ -58,7 +59,7 @@ const urlValida: ValidatorFn = (
 
 @Component({
   selector: 'app-formulario-album',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './formulario-album.html',
   styleUrl: './formulario-album.css'
 })

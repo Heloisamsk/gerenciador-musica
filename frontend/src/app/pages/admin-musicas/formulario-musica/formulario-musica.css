@@ -1,3 +1,18 @@
+:host {
+  --cool-steel: var(--app-cool-steel);
+  --golden-sand: var(--app-golden-sand);
+  --apricot-cream: var(--app-apricot-cream);
+  --ink: var(--app-ink);
+  --background: var(--app-background);
+  --surface: var(--app-surface);
+  --panel: var(--app-panel);
+  --text: var(--app-text);
+  --muted: var(--app-muted);
+  --line: var(--app-line);
+  display: block;
+  font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+}
+
 .formulario-container {
   display: flex;
   justify-content: center;
@@ -120,3 +135,16 @@
   .formulario-acoes { flex-direction: column-reverse; }
   .formulario-btn, .cancelar-btn { width: 100%; }
 }
+
+.voltar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 24px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.voltar-link:hover, .voltar-link:focus-visible { color: var(--apricot-cream); }
