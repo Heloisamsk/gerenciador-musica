@@ -1,4 +1,5 @@
 import { Component, OnInit, input, output, signal } from '@angular/core';
+import type { Observable } from 'rxjs';
 
 import { CurtidaService } from '../../services/curtida';
 
@@ -39,15 +40,7 @@ export class CurtirBotao implements OnInit {
     this.curtido.set(novoValor);
     this.carregando.set(true);
 
-    const chamada = this.tipo() === 'musica'
-      ? (novoValor
-        ? this.curtidaService.curtirMusica(this.id())
-        : this.curtidaService.descurtirMusica(this.id()))
-      : (novoValor
-        ? this.curtidaService.curtirAlbum(this.id())
-        : this.curtidaService.descurtirAlbum(this.id()));
-
-    chamada.subscribe({
+    this.obterChamada(novoValor).subscribe({
       next: () => {
         this.carregando.set(false);
         this.curtidoChange.emit(novoValor);
@@ -57,5 +50,17 @@ export class CurtirBotao implements OnInit {
         this.carregando.set(false);
       }
     });
+  }
+
+  private obterChamada(curtir: boolean): Observable<void> {
+    if (this.tipo() === 'musica') {
+      return curtir
+        ? this.curtidaService.curtirMusica(this.id())
+        : this.curtidaService.descurtirMusica(this.id());
+    }
+
+    return curtir
+      ? this.curtidaService.curtirAlbum(this.id())
+      : this.curtidaService.descurtirAlbum(this.id());
   }
 }

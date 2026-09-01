@@ -92,7 +92,7 @@ export class PlaylistEditar implements OnInit {
     const dados: PlaylistRequest = {
       nome: this.formulario.value.nome!,
       descricao: this.formulario.value.descricao ?? '',
-      capaUrl: capaUrl ? capaUrl : null
+      capaUrl: capaUrl || null
     };
 
     this.playlistService.atualizar(this.playlistId, dados)

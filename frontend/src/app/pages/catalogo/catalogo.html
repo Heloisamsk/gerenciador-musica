@@ -17,9 +17,9 @@
   >
 
   @if (mensagemSucesso()) {
-    <div class="status-message success-message" role="status">
+    <output class="status-message success-message">
       <p>{{ mensagemSucesso() }}</p>
-    </div>
+    </output>
   }
 
   @if (mensagemErro()) {

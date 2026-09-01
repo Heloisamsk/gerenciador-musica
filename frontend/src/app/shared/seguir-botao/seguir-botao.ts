@@ -1,4 +1,5 @@
 import { Component, OnInit, input, output, signal } from '@angular/core';
+import type { Observable } from 'rxjs';
 
 import { SeguidorService } from '../../services/seguidor';
 
@@ -36,15 +37,7 @@ export class SeguirBotao implements OnInit {
     this.seguindo.set(novoValor);
     this.carregando.set(true);
 
-    const chamada = this.tipo() === 'usuario'
-      ? (novoValor
-        ? this.seguidorService.seguirUsuario(this.id())
-        : this.seguidorService.deixarDeSeguirUsuario(this.id()))
-      : (novoValor
-        ? this.seguidorService.seguirArtista(this.id())
-        : this.seguidorService.deixarDeSeguirArtista(this.id()));
-
-    chamada.subscribe({
+    this.obterChamada(novoValor).subscribe({
       next: () => {
         this.carregando.set(false);
         this.seguindoChange.emit(novoValor);
@@ -54,5 +47,17 @@ export class SeguirBotao implements OnInit {
         this.carregando.set(false);
       }
     });
+  }
+
+  private obterChamada(seguir: boolean): Observable<void> {
+    if (this.tipo() === 'usuario') {
+      return seguir
+        ? this.seguidorService.seguirUsuario(this.id())
+        : this.seguidorService.deixarDeSeguirUsuario(this.id());
+    }
+
+    return seguir
+      ? this.seguidorService.seguirArtista(this.id())
+      : this.seguidorService.deixarDeSeguirArtista(this.id());
   }
 }

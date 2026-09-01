@@ -57,7 +57,7 @@ export class PlaylistNova {
     const dados: PlaylistRequest = {
       nome: this.formulario.value.nome!,
       descricao: this.formulario.value.descricao ?? '',
-      capaUrl: capaUrl ? capaUrl : null
+      capaUrl: capaUrl || null
     };
 
     this.playlistService.criar(dados)
