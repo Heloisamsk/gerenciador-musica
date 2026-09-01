@@ -1,5 +1,8 @@
 <main class="formulario-container">
   <section class="formulario-card" [attr.aria-busy]="!formularioPronto()">
+     <a class="voltar-link" routerLink="/admin/painel">
+      ← Voltar para o painel
+    </a>
     <h1 class="formulario-title">
       {{ titulo() }}
     </h1>

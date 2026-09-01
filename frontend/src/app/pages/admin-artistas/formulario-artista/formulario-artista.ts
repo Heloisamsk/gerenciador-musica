@@ -1,3 +1,4 @@
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -38,7 +39,8 @@ const naoPermitirApenasEspacos: ValidatorFn = (
   selector: 'app-formulario-artista',
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './formulario-artista.html',
   styleUrls: ['./formulario-artista.css']

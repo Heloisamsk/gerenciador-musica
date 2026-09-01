@@ -142,3 +142,16 @@
   .formulario-acoes { flex-direction: column-reverse; }
   .formulario-btn, .cancelar-btn { width: 100%; }
 }
+
+.voltar-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 24px;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.voltar-link:hover, .voltar-link:focus-visible { color: var(--apricot-cream); }
