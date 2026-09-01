@@ -11,6 +11,7 @@ export class SeguirBotao implements OnInit {
 
   readonly id = input.required<number>();
   readonly seguindoInicial = input.required<boolean>();
+  readonly tipo = input<'artista' | 'usuario'>('artista');
 
   readonly seguindoChange = output<boolean>();
 
@@ -35,9 +36,13 @@ export class SeguirBotao implements OnInit {
     this.seguindo.set(novoValor);
     this.carregando.set(true);
 
-    const chamada = novoValor
-      ? this.seguidorService.seguirArtista(this.id())
-      : this.seguidorService.deixarDeSeguirArtista(this.id());
+    const chamada = this.tipo() === 'usuario'
+      ? (novoValor
+        ? this.seguidorService.seguirUsuario(this.id())
+        : this.seguidorService.deixarDeSeguirUsuario(this.id()))
+      : (novoValor
+        ? this.seguidorService.seguirArtista(this.id())
+        : this.seguidorService.deixarDeSeguirArtista(this.id()));
 
     chamada.subscribe({
       next: () => {

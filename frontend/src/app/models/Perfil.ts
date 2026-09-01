@@ -29,6 +29,10 @@ export interface PerfilResponse {
   musicasFavoritas: PerfilItem[];
   totalMusicasAvaliadas: number;
   totalAlbunsAvaliadas: number;
+  totalSeguidores?: number;
+  totalSeguindo?: number;
+  perfilDoUsuarioAutenticado?: boolean;
+  seguindoPorUsuarioAutenticado?: boolean;
 }
 
 export interface AtualizarPerfilRequest {

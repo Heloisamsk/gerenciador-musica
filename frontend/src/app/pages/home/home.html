@@ -119,7 +119,7 @@
             @if (buscandoInstantaneo()) {
               <p class="busca-resultados-estado">Buscando...</p>
             } @else if (resultadoBusca(); as resultado) {
-              @if (resultado.musicas.length === 0 && resultado.albuns.length === 0 && resultado.artistas.length === 0) {
+              @if (resultado.musicas.length === 0 && resultado.albuns.length === 0 && resultado.artistas.length === 0 && resultado.usuarios.length === 0) {
                 <p class="busca-resultados-estado">Nenhum resultado encontrado.</p>
               } @else {
                 @if (resultado.musicas.length > 0) {
@@ -158,6 +158,20 @@
                         <img class="busca-resultado-capa busca-resultado-capa--redonda" [src]="artista.fotoPerfilUrl || '/avatar-artista.png'" alt="" loading="lazy">
                         <span class="busca-resultado-texto">
                           <strong>{{ artista.nome }}</strong>
+                        </span>
+                      </a>
+                    }
+                  </div>
+                }
+                @if (resultado.usuarios.length > 0) {
+                  <div class="busca-resultados-grupo">
+                    <span class="busca-resultados-titulo">Perfis</span>
+                    @for (usuario of resultado.usuarios; track usuario.idUsuario) {
+                      <a class="busca-resultado-item" [routerLink]="['/perfil', usuario.idUsuario]" (click)="fecharResultadosBusca()">
+                        <img class="busca-resultado-capa busca-resultado-capa--redonda" src="/avatar-padrao.svg" alt="" loading="lazy">
+                        <span class="busca-resultado-texto">
+                          <strong>{{ usuario.nome }}</strong>
+                          @if (usuario.username) { <small>&#64;{{ usuario.username }}</small> }
                         </span>
                       </a>
                     }

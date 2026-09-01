@@ -1,6 +1,9 @@
 package gerenciador_musica_backend.service;
 
+import gerenciador_musica_backend.dto.UsuarioBuscaDTO;
 import gerenciador_musica_backend.dto.UsuarioListagemDTO;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -77,5 +80,32 @@ public class UsuarioService {
             listagem.add(dto);
         }
         return listagem;
+    }
+
+    /*
+     * Busca por perfis, usada pela busca unificada da home. Reaproveita
+     * o mesmo padrão de música/álbum/artista: contains case-insensitive
+     * em nome OU username, limitado aos N melhores resultados.
+     */
+    public List<UsuarioBuscaDTO> buscarPorNomeOuUsername(String termo, int limite) {
+        if (termo == null || termo.isBlank()) {
+            return List.of();
+        }
+
+        String termoNormalizado = termo.strip();
+
+        return usuarioRepository
+                .findByUsernameContainingIgnoreCaseOrNomeContainingIgnoreCase(
+                        termoNormalizado,
+                        termoNormalizado,
+                        PageRequest.of(0, limite, Sort.by(Sort.Direction.ASC, "nome"))
+                )
+                .stream()
+                .map(usuario -> new UsuarioBuscaDTO(
+                        usuario.getId(),
+                        usuario.getNome(),
+                        usuario.getUsername()
+                ))
+                .toList();
     }
 }

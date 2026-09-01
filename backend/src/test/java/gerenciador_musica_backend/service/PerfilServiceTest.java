@@ -13,6 +13,7 @@ import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.PerfilRepository;
 import gerenciador_musica_backend.repository.ReviewRepository;
+import gerenciador_musica_backend.repository.SeguidorUsuarioRepository;
 import gerenciador_musica_backend.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,8 @@ class PerfilServiceTest {
     private AlbumRepository albumRepository;
     @Mock
     private ReviewRepository reviewRepository;
+    @Mock
+    private SeguidorUsuarioRepository seguidorUsuarioRepository;
 
     @InjectMocks
     private PerfilService perfilService;

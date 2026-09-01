@@ -5,6 +5,7 @@ import gerenciador_musica_backend.dto.ArtistaResponseDTO;
 import gerenciador_musica_backend.dto.BuscaResultadoDTO;
 import gerenciador_musica_backend.dto.MusicaFiltroDTO;
 import gerenciador_musica_backend.dto.MusicaListagemDTO;
+import gerenciador_musica_backend.dto.UsuarioBuscaDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,21 +19,24 @@ public class BuscaService {
     private final MusicaService musicaService;
     private final AlbumService albumService;
     private final ArtistaService artistaService;
+    private final UsuarioService usuarioService;
 
     public BuscaService(
             MusicaService musicaService,
             AlbumService albumService,
-            ArtistaService artistaService
+            ArtistaService artistaService,
+            UsuarioService usuarioService
     ) {
         this.musicaService = musicaService;
         this.albumService = albumService;
         this.artistaService = artistaService;
+        this.usuarioService = usuarioService;
     }
 
     @Transactional(readOnly = true)
     public BuscaResultadoDTO buscar(String termo) {
         if (termo == null || termo.isBlank()) {
-            return new BuscaResultadoDTO(List.of(), List.of(), List.of());
+            return new BuscaResultadoDTO(List.of(), List.of(), List.of(), List.of());
         }
 
         String termoNormalizado = termo.strip();
@@ -54,6 +58,11 @@ public class BuscaService {
                 LIMITE_POR_TIPO
         );
 
-        return new BuscaResultadoDTO(musicas, albuns, artistas);
+        List<UsuarioBuscaDTO> usuarios = usuarioService.buscarPorNomeOuUsername(
+                termoNormalizado,
+                LIMITE_POR_TIPO
+        );
+
+        return new BuscaResultadoDTO(musicas, albuns, artistas, usuarios);
     }
 }
