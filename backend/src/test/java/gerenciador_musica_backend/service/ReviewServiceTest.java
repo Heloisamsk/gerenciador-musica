@@ -36,6 +36,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,11 +121,11 @@ class ReviewServiceTest {
                 });
 
         ReviewResponseDTO resposta = reviewService.criarReview(
-                new ReviewRequestDTO(20L, null, (short) 5, "  Obra-prima!  ")
+                new ReviewRequestDTO(20L, null, BigDecimal.valueOf(5), "  Obra-prima!  ")
         );
 
         assertThat(resposta.idReview()).isEqualTo(100L);
-        assertThat(resposta.nota()).isEqualTo((short) 5);
+        assertThat(resposta.nota()).isEqualByComparingTo(BigDecimal.valueOf(5));
         assertThat(resposta.texto()).isEqualTo("Obra-prima!");
         assertThat(resposta.minhaReview()).isTrue();
         assertThat(resposta.alvo().tipo()).isEqualTo(TipoAlvoReview.MUSICA);
@@ -147,7 +148,7 @@ class ReviewServiceTest {
                 });
 
         ReviewResponseDTO resposta = reviewService.criarReview(
-                new ReviewRequestDTO(null, 10L, (short) 4, null)
+                new ReviewRequestDTO(null, 10L, BigDecimal.valueOf(4), null)
         );
 
         assertThat(resposta.alvo().tipo()).isEqualTo(TipoAlvoReview.ALBUM);
@@ -158,25 +159,48 @@ class ReviewServiceTest {
     @Test
     void deveRejeitarReviewSemAlvo() {
         assertThatThrownBy(() -> reviewService.criarReview(
-                new ReviewRequestDTO(null, null, (short) 5, null)
+                new ReviewRequestDTO(null, null, BigDecimal.valueOf(5), null)
         )).isInstanceOf(DadosReviewInvalidosException.class);
     }
 
     @Test
     void deveRejeitarReviewComDoisAlvos() {
         assertThatThrownBy(() -> reviewService.criarReview(
-                new ReviewRequestDTO(20L, 10L, (short) 5, null)
+                new ReviewRequestDTO(20L, 10L, BigDecimal.valueOf(5), null)
         )).isInstanceOf(DadosReviewInvalidosException.class);
     }
 
     @Test
     void deveRejeitarNotaForaDoIntervalo() {
         assertThatThrownBy(() -> reviewService.criarReview(
-                new ReviewRequestDTO(20L, null, (short) 6, null)
+                new ReviewRequestDTO(20L, null, BigDecimal.valueOf(6), null)
         )).isInstanceOf(DadosReviewInvalidosException.class);
 
         assertThatThrownBy(() -> reviewService.criarReview(
-                new ReviewRequestDTO(20L, null, (short) 0, null)
+                new ReviewRequestDTO(20L, null, BigDecimal.valueOf(0), null)
+        )).isInstanceOf(DadosReviewInvalidosException.class);
+    }
+
+    @Test
+    void deveAceitarNotaComMeiaEstrelaERejeitarPassoInvalido() {
+        when(musicaRepository.findById(20L)).thenReturn(Optional.of(musica));
+        when(reviewRepository.existsByUsuario_IdAndMusica_IdMusica(1L, 20L))
+                .thenReturn(false);
+        when(reviewRepository.save(any(Review.class)))
+                .thenAnswer(invocation -> {
+                    Review review = invocation.getArgument(0);
+                    ReflectionTestUtils.setField(review, "idReview", 102L);
+                    return review;
+                });
+
+        ReviewResponseDTO resposta = reviewService.criarReview(
+                new ReviewRequestDTO(20L, null, new BigDecimal("3.5"), null)
+        );
+
+        assertThat(resposta.nota()).isEqualByComparingTo(new BigDecimal("3.5"));
+
+        assertThatThrownBy(() -> reviewService.criarReview(
+                new ReviewRequestDTO(20L, null, new BigDecimal("3.3"), null)
         )).isInstanceOf(DadosReviewInvalidosException.class);
     }
 
@@ -187,7 +211,7 @@ class ReviewServiceTest {
                 .thenReturn(true);
 
         assertThatThrownBy(() -> reviewService.criarReview(
-                new ReviewRequestDTO(20L, null, (short) 5, null)
+                new ReviewRequestDTO(20L, null, BigDecimal.valueOf(5), null)
         )).isInstanceOf(ReviewJaExisteException.class);
 
         verify(reviewRepository, never()).save(any());
@@ -198,7 +222,7 @@ class ReviewServiceTest {
         when(musicaRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> reviewService.criarReview(
-                new ReviewRequestDTO(999L, null, (short) 5, null)
+                new ReviewRequestDTO(999L, null, BigDecimal.valueOf(5), null)
         )).isInstanceOf(MusicaNaoEncontradaException.class);
     }
 
@@ -207,7 +231,7 @@ class ReviewServiceTest {
         when(albumRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> reviewService.criarReview(
-                new ReviewRequestDTO(null, 999L, (short) 5, null)
+                new ReviewRequestDTO(null, 999L, BigDecimal.valueOf(5), null)
         )).isInstanceOf(AlbumNaoEncontradoException.class);
     }
 
@@ -216,7 +240,7 @@ class ReviewServiceTest {
         Usuario outroUsuario = new Usuario("João", "joao@email.com", "hash", Role.USER);
         ReflectionTestUtils.setField(outroUsuario, "id", 2L);
 
-        Review review = new Review(outroUsuario, musica, null, (short) 4, "Muito bom");
+        Review review = new Review(outroUsuario, musica, null, BigDecimal.valueOf(4), "Muito bom");
         ReflectionTestUtils.setField(review, "idReview", 70L);
 
         when(reviewRepository.findById(70L)).thenReturn(Optional.of(review));
@@ -238,17 +262,17 @@ class ReviewServiceTest {
 
     @Test
     void deveAtualizarReviewDoProprioUsuario() {
-        Review review = new Review(usuarioLogado, musica, null, (short) 3, "Ok");
+        Review review = new Review(usuarioLogado, musica, null, BigDecimal.valueOf(3), "Ok");
         ReflectionTestUtils.setField(review, "idReview", 50L);
 
         when(reviewRepository.findById(50L)).thenReturn(Optional.of(review));
 
         ReviewResponseDTO resposta = reviewService.atualizarReview(
                 50L,
-                new ReviewAtualizacaoRequestDTO((short) 5, "Mudei de ideia")
+                new ReviewAtualizacaoRequestDTO(BigDecimal.valueOf(5), "Mudei de ideia")
         );
 
-        assertThat(resposta.nota()).isEqualTo((short) 5);
+        assertThat(resposta.nota()).isEqualByComparingTo(BigDecimal.valueOf(5));
         assertThat(resposta.texto()).isEqualTo("Mudei de ideia");
     }
 
@@ -257,20 +281,20 @@ class ReviewServiceTest {
         Usuario outroUsuario = new Usuario("João", "joao@email.com", "hash", Role.USER);
         ReflectionTestUtils.setField(outroUsuario, "id", 2L);
 
-        Review review = new Review(outroUsuario, musica, null, (short) 3, null);
+        Review review = new Review(outroUsuario, musica, null, BigDecimal.valueOf(3), null);
         ReflectionTestUtils.setField(review, "idReview", 50L);
 
         when(reviewRepository.findById(50L)).thenReturn(Optional.of(review));
 
         assertThatThrownBy(() -> reviewService.atualizarReview(
                 50L,
-                new ReviewAtualizacaoRequestDTO((short) 5, null)
+                new ReviewAtualizacaoRequestDTO(BigDecimal.valueOf(5), null)
         )).isInstanceOf(ReviewAcessoNegadoException.class);
     }
 
     @Test
     void deveExcluirReviewDoProprioUsuario() {
-        Review review = new Review(usuarioLogado, musica, null, (short) 3, null);
+        Review review = new Review(usuarioLogado, musica, null, BigDecimal.valueOf(3), null);
         ReflectionTestUtils.setField(review, "idReview", 50L);
 
         when(reviewRepository.findById(50L)).thenReturn(Optional.of(review));
@@ -285,7 +309,7 @@ class ReviewServiceTest {
         Usuario outroUsuario = new Usuario("João", "joao@email.com", "hash", Role.USER);
         ReflectionTestUtils.setField(outroUsuario, "id", 2L);
 
-        Review review = new Review(outroUsuario, null, album, (short) 3, null);
+        Review review = new Review(outroUsuario, null, album, BigDecimal.valueOf(3), null);
         ReflectionTestUtils.setField(review, "idReview", 60L);
 
         when(reviewRepository.findById(60L)).thenReturn(Optional.of(review));
@@ -309,10 +333,10 @@ class ReviewServiceTest {
         Usuario outroUsuario = new Usuario("João", "joao@email.com", "hash", Role.USER);
         ReflectionTestUtils.setField(outroUsuario, "id", 2L);
 
-        Review reviewPropria = new Review(usuarioLogado, musica, null, (short) 5, null);
+        Review reviewPropria = new Review(usuarioLogado, musica, null, BigDecimal.valueOf(5), null);
         ReflectionTestUtils.setField(reviewPropria, "idReview", 1L);
 
-        Review reviewAlheia = new Review(outroUsuario, null, album, (short) 3, null);
+        Review reviewAlheia = new Review(outroUsuario, null, album, BigDecimal.valueOf(3), null);
         ReflectionTestUtils.setField(reviewAlheia, "idReview", 2L);
 
         Page<Review> pagina = new PageImpl<>(List.of(reviewPropria, reviewAlheia));

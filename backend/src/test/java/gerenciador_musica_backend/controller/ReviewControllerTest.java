@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -59,7 +60,7 @@ class ReviewControllerTest {
                         "Queen",
                         "capa.jpg"
                 ),
-                (short) 5,
+                BigDecimal.valueOf(5),
                 "Obra-prima",
                 OffsetDateTime.now(),
                 OffsetDateTime.now(),
@@ -116,7 +117,7 @@ class ReviewControllerTest {
 
         verify(reviewService).atualizarReview(
                 1L,
-                new ReviewAtualizacaoRequestDTO((short) 5, "Obra-prima")
+                new ReviewAtualizacaoRequestDTO(BigDecimal.valueOf(5), "Obra-prima")
         );
     }
 
