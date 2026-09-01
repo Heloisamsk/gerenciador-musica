@@ -1,5 +1,6 @@
 package gerenciador_musica_backend.service;
 
+import gerenciador_musica_backend.dto.UsuarioBuscaDTO;
 import gerenciador_musica_backend.dto.UsuarioListagemDTO;
 import gerenciador_musica_backend.dto.UsuarioRequestDTO;
 import gerenciador_musica_backend.dto.UsuarioResponseDTO;
@@ -13,7 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -98,5 +102,38 @@ class UsuarioServiceTest {
         assertThat(listagem)
                 .extracting(UsuarioListagemDTO::getEmail)
                 .containsExactly("ana@email.com", "bruno@email.com");
+    }
+
+    @Test
+    void deveBuscarPorNomeOuUsername() {
+        Usuario usuario = new Usuario("Ana Liz", "analiz@email.com", "hash", Role.USER);
+        ReflectionTestUtils.setField(usuario, "id", 1L);
+        usuario.setUsername("analiz");
+
+        when(usuarioRepository
+                .findByUsernameContainingIgnoreCaseOrNomeContainingIgnoreCase(
+                        eq("ana"), eq("ana"), any(Pageable.class)
+                ))
+                .thenReturn(List.of(usuario));
+
+        List<UsuarioBuscaDTO> resultado =
+                usuarioService.buscarPorNomeOuUsername("ana", 5);
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.get(0).idUsuario()).isEqualTo(1L);
+        assertThat(resultado.get(0).nome()).isEqualTo("Ana Liz");
+        assertThat(resultado.get(0).username()).isEqualTo("analiz");
+    }
+
+    @Test
+    void deveRetornarListaVaziaAoBuscarComTermoEmBranco() {
+        List<UsuarioBuscaDTO> resultado =
+                usuarioService.buscarPorNomeOuUsername("  ", 5);
+
+        assertThat(resultado).isEmpty();
+        verify(usuarioRepository, never())
+                .findByUsernameContainingIgnoreCaseOrNomeContainingIgnoreCase(
+                        any(), any(), any()
+                );
     }
 }
