@@ -23,6 +23,7 @@ export class Home implements OnInit {
   nomeUsuario = signal('Usuário');
   fotoPerfil = signal('/avatar-padrao.png');
   termoBusca = signal('');
+  bibliotecaExpandida = signal(false);
 
   artistas = signal<ArtistaResponse[]>([]);
   albuns = signal<AlbumResponse[]>([]);
@@ -53,6 +54,10 @@ export class Home implements OnInit {
 
   isAdmin(): boolean {
     return this.authService.getRole() === 'ADMIN';
+  }
+
+  alternarBiblioteca(): void {
+    this.bibliotecaExpandida.update(valor => !valor);
   }
 
   atualizarBusca(evento: Event): void {
