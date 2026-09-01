@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -35,8 +36,8 @@ public class Review {
     @JoinColumn(name = "id_album")
     private Album album;
 
-    @Column(name = "nota", nullable = false)
-    private Short nota;
+    @Column(name = "nota", nullable = false, precision = 2, scale = 1)
+    private BigDecimal nota;
 
     @Column(name = "texto")
     private String texto;
@@ -56,7 +57,7 @@ public class Review {
             Usuario usuario,
             Musica musica,
             Album album,
-            Short nota,
+            BigDecimal nota,
             String texto
     ) {
         this.usuario = usuario;
@@ -82,11 +83,11 @@ public class Review {
         return album;
     }
 
-    public Short getNota() {
+    public BigDecimal getNota() {
         return nota;
     }
 
-    public void setNota(Short nota) {
+    public void setNota(BigDecimal nota) {
         this.nota = nota;
     }
 
