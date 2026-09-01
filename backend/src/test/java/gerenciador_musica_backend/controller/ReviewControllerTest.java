@@ -7,7 +7,9 @@ import gerenciador_musica_backend.dto.ReviewAtualizacaoRequestDTO;
 import gerenciador_musica_backend.dto.ReviewAutorDTO;
 import gerenciador_musica_backend.dto.ReviewRequestDTO;
 import gerenciador_musica_backend.dto.ReviewResponseDTO;
+import gerenciador_musica_backend.exception.DadosReviewInvalidosException;
 import gerenciador_musica_backend.exception.ReviewAcessoNegadoException;
+import gerenciador_musica_backend.exception.ReviewJaExisteException;
 import gerenciador_musica_backend.exception.ReviewNaoEncontradaException;
 import gerenciador_musica_backend.model.TipoAlvoReview;
 import gerenciador_musica_backend.service.ReviewService;
@@ -184,6 +186,34 @@ class ReviewControllerTest {
         mockMvc.perform(get("/api/reviews/musicas/20"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.itens[0].alvo.id").value(20));
+    }
+
+    @Test
+    void deveRetornar400AoCriarReviewComDadosInvalidos() throws Exception {
+        when(reviewService.criarReview(any()))
+                .thenThrow(new DadosReviewInvalidosException(
+                        "Informe exatamente um alvo para a review."
+                ));
+
+        mockMvc.perform(post("/api/reviews")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nota":5,"texto":"Obra-prima"}
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveRetornar409AoCriarReviewJaExistente() throws Exception {
+        when(reviewService.criarReview(any()))
+                .thenThrow(new ReviewJaExisteException("Você já avaliou esta música."));
+
+        mockMvc.perform(post("/api/reviews")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"idMusica":20,"nota":5,"texto":"Obra-prima"}
+                                """))
+                .andExpect(status().isConflict());
     }
 
     @Test
