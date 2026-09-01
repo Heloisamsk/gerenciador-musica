@@ -2,6 +2,7 @@ package gerenciador_musica_backend.repository;
 
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +13,11 @@ import java.util.Optional;
 public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     boolean existsByArtista_IdArtista(Long idArtista);
+
+    List<Album> findByTituloContainingIgnoreCaseOrderByTitulo(
+            String termo,
+            Pageable pageable
+    );
 
     List<Album> findByArtistaIdArtistaOrderByTituloAscAnoLancamentoAsc(
             Long idArtista

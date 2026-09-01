@@ -18,6 +18,7 @@ import gerenciador_musica_backend.repository.CurtidaAlbumRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
 import gerenciador_musica_backend.repository.projection.ArtistaCatalogoResumoProjection;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -123,6 +124,25 @@ public class ArtistaService {
     public List<ArtistaResponseDTO> listarArtistas() {
         return artistaRepository
                 .findAll(Sort.by(Sort.Direction.ASC, "nome"))
+                .stream()
+                .map(this::converterParaResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ArtistaResponseDTO> buscarPorNome(String termo, int limite) {
+        if (termo == null || termo.isBlank()) {
+            return List.of();
+        }
+
+        String termoNormalizado = termo.strip();
+
+        return artistaRepository
+                .findByNomeContainingIgnoreCaseOrNomeCompletoContainingIgnoreCase(
+                        termoNormalizado,
+                        termoNormalizado,
+                        PageRequest.of(0, limite, Sort.by(Sort.Direction.ASC, "nome"))
+                )
                 .stream()
                 .map(this::converterParaResponse)
                 .toList();

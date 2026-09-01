@@ -2,10 +2,12 @@ package gerenciador_musica_backend.repository;
 
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.repository.projection.ArtistaCatalogoResumoProjection;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ArtistaRepository extends JpaRepository<Artista, Long> {
@@ -13,6 +15,12 @@ public interface ArtistaRepository extends JpaRepository<Artista, Long> {
     Optional<Artista> findByNomeIgnoreCase(String nome);
 
     Optional<Artista> findById(Long idArtista);
+
+    List<Artista> findByNomeContainingIgnoreCaseOrNomeCompletoContainingIgnoreCase(
+            String nome,
+            String nomeCompleto,
+            Pageable pageable
+    );
 
     boolean existsByNomeIgnoreCase(String nome);
 

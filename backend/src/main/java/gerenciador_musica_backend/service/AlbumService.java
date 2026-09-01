@@ -19,6 +19,7 @@ import gerenciador_musica_backend.repository.CurtidaAlbumRepository;
 import gerenciador_musica_backend.repository.CurtidaMusicaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -161,6 +162,21 @@ public class AlbumService {
         List<Album> albuns = albumRepository
                 .findByArtistaIdArtistaOrderByTituloAscAnoLancamentoAsc(
                         idArtista
+                );
+
+        return converterParaResponseComCurtidas(albuns);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AlbumResponseDTO> buscarPorTitulo(String termo, int limite) {
+        if (termo == null || termo.isBlank()) {
+            return List.of();
+        }
+
+        List<Album> albuns = albumRepository
+                .findByTituloContainingIgnoreCaseOrderByTitulo(
+                        termo.strip(),
+                        PageRequest.of(0, limite)
                 );
 
         return converterParaResponseComCurtidas(albuns);

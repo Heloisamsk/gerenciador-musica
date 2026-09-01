@@ -33,9 +33,9 @@
         </div>
 
         <div class="identidade">
-          <img class="foto-perfil" [src]="perfil()!.fotoUrl || '/avatar-padrao.png'"
+          <img class="foto-perfil" [src]="perfil()!.fotoUrl || '/avatar-padrao.svg'"
             [alt]="'Foto de perfil de ' + perfil()!.nome"
-            (error)="corrigirImagem($event, '/avatar-padrao.png')">
+            (error)="corrigirImagem($event, '/avatar-padrao.svg')">
           <div class="identidade-texto">
             <h1>{{ perfil()!.nome }}</h1>
             @if (perfil()!.username) { <p class="username">&#64;{{ perfil()!.username }}</p> }
