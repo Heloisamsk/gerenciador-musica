@@ -35,8 +35,7 @@
         <span>Reviews</span>
       </a>
 
-      <p class="menu-titulo">Sua coleção</p>
-      <a class="menu-link" routerLink="/playlists">
+      <a class="menu-link menu-link--somente-mobile" routerLink="/playlists">
         <svg class="menu-nota" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M8 6v11M18 4v11M8 6l10-2v4L8 10"></path>
           <ellipse class="nota-preenchida" cx="5" cy="17.5" rx="4" ry="2.8" transform="rotate(-18 5 17.5)"></ellipse>
@@ -44,7 +43,7 @@
         </svg>
         <span>Minhas playlists</span>
       </a>
-      <a class="menu-link" routerLink="/playlists/nova">
+      <a class="menu-link menu-link--somente-mobile" routerLink="/playlists/nova">
         <svg class="menu-nota" viewBox="0 0 24 24" aria-hidden="true">
           <ellipse class="nota-preenchida" cx="12" cy="13" rx="7" ry="4.5" transform="rotate(-12 12 13)"></ellipse>
           <ellipse class="nota-vazia" cx="12" cy="13" rx="3" ry="1.7" transform="rotate(-12 12 13)"></ellipse>
@@ -84,41 +83,56 @@
         </a>
       </div>
 
-      <div class="biblioteca-itens">
-        <a class="biblioteca-item" routerLink="/playlists" title="Minhas playlists" [attr.aria-label]="bibliotecaExpandida() ? null : 'Minhas playlists'">
-          <span class="biblioteca-item-icone" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M8 6v11M18 4v11M8 6l10-2v4L8 10"></path>
-              <ellipse class="nota-preenchida" cx="5" cy="17.5" rx="4" ry="2.8" transform="rotate(-18 5 17.5)"></ellipse>
-              <ellipse class="nota-preenchida" cx="15" cy="15.5" rx="4" ry="2.8" transform="rotate(-18 15 15.5)"></ellipse>
-            </svg>
-          </span>
-          @if (bibliotecaExpandida()) {
-            <span class="biblioteca-item-texto">
-              <strong>Minhas playlists</strong>
-              <small>Tudo o que você criou</small>
+      @if (bibliotecaExpandida()) {
+        <nav class="biblioteca-atalhos" aria-label="Atalhos da biblioteca">
+          <a routerLink="/playlists">
+            <span class="biblioteca-atalho-icone" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 6v11M18 4v11M8 6l10-2v4L8 10"></path>
+                <ellipse class="nota-preenchida" cx="5" cy="17.5" rx="4" ry="2.8" transform="rotate(-18 5 17.5)"></ellipse>
+                <ellipse class="nota-preenchida" cx="15" cy="15.5" rx="4" ry="2.8" transform="rotate(-18 15 15.5)"></ellipse>
+              </svg>
             </span>
-          }
-        </a>
+            Minhas playlists
+          </a>
+          <a [routerLink]="['/reviews']" [queryParams]="{ escopo: 'MINHAS' }">
+            <span class="biblioteca-atalho-icone" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3.5 14.4 8.4l5.4.6-4 3.6 1.1 5.3L12 15.1l-4.9 2.8 1.1-5.3-4-3.6 5.4-.6z"></path></svg>
+            </span>
+            Minhas reviews
+          </a>
+        </nav>
+      }
 
-        <a class="biblioteca-item" [routerLink]="['/reviews']" [queryParams]="{ escopo: 'MINHAS' }" title="Minhas reviews" [attr.aria-label]="bibliotecaExpandida() ? null : 'Minhas reviews'">
-          <span class="biblioteca-item-icone" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M12 3.5 14.4 8.4l5.4.6-4 3.6 1.1 5.3L12 15.1l-4.9 2.8 1.1-5.3-4-3.6 5.4-.6z"></path></svg>
-          </span>
+      <div class="biblioteca-lista">
+        @if (carregandoPlaylists()) {
+          <p class="biblioteca-estado" aria-live="polite">Carregando...</p>
+        } @else if (playlists().length === 0) {
           @if (bibliotecaExpandida()) {
-            <span class="biblioteca-item-texto">
-              <strong>Minhas reviews</strong>
-              <small>Suas avaliações de músicas e álbuns</small>
-            </span>
+            <p class="biblioteca-estado">Você ainda não criou nenhuma playlist.</p>
           }
-        </a>
+        } @else {
+          @for (playlist of playlists(); track playlist.id) {
+            <a class="biblioteca-playlist" [routerLink]="['/playlists', playlist.id]"
+              [attr.aria-label]="bibliotecaExpandida() ? null : playlist.nome" [title]="playlist.nome">
+              <span class="biblioteca-playlist-capa" aria-hidden="true">
+                @if (playlist.capaUrl) {
+                  <img [src]="playlist.capaUrl" [alt]="''" loading="lazy" referrerpolicy="no-referrer"
+                    (error)="substituirImagem($event, '/capa-padrao.png')">
+                } @else {
+                  <span class="biblioteca-playlist-nota">♪</span>
+                }
+              </span>
+              @if (bibliotecaExpandida()) {
+                <span class="biblioteca-playlist-texto">
+                  <strong>{{ playlist.nome }}</strong>
+                  <small>Playlist &bull; {{ nomeUsuario() }}</small>
+                </span>
+              }
+            </a>
+          }
+        }
       </div>
-    </div>
-
-    <div class="playlist-convite">
-      <span class="playlist-convite-icone" aria-hidden="true">+</span>
-      <p>Uma seleção com a sua cara.</p>
-      <a routerLink="/playlists/nova">Começar agora</a>
     </div>
 
   </aside>

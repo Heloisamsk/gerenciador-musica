@@ -9,6 +9,7 @@ import { vi } from 'vitest';
 
 import type { AlbumResponse } from '../../models/AlbumResponse';
 import type { PerfilResponse } from '../../models/Perfil';
+import type { PlaylistResponse } from '../../models/PlaylistResponse';
 import { Home } from './home';
 
 describe('Home', () => {
@@ -18,6 +19,7 @@ describe('Home', () => {
 
   const apiUrl = 'http://localhost:8080/api';
   const perfilUrl = `${apiUrl}/user/perfil`;
+  const playlistsUrl = `${apiUrl}/playlists`;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -114,6 +116,7 @@ describe('Home', () => {
       {},
       { status: 500, statusText: 'Internal Server Error' }
     );
+    httpMock.expectOne(playlistsUrl).flush([]);
     fixture.detectChanges();
 
     expect(component.albuns()).toEqual([]);
@@ -125,20 +128,21 @@ describe('Home', () => {
     );
   });
 
-  it('deve exibir a biblioteca recolhida por padrão, sem os textos dos itens', () => {
-    carregarCatalogo([]);
+  it('deve exibir a biblioteca recolhida por padrão, listando só as capas das playlists', () => {
+    carregarCatalogo([], perfilDeExemplo(), [playlistDeExemplo()]);
 
     const biblioteca = fixture.nativeElement.querySelector('.biblioteca');
-    const itens = fixture.nativeElement.querySelectorAll('.biblioteca-item');
+    const playlists = fixture.nativeElement.querySelectorAll('.biblioteca-playlist');
 
     expect(component.bibliotecaExpandida()).toBe(false);
     expect(biblioteca.classList.contains('biblioteca--expandida')).toBe(false);
-    expect(itens).toHaveLength(2);
-    expect(fixture.nativeElement.querySelector('.biblioteca-item-texto')).toBeNull();
+    expect(playlists).toHaveLength(1);
+    expect(fixture.nativeElement.querySelector('.biblioteca-playlist-texto')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.biblioteca-atalhos')).toBeNull();
   });
 
-  it('deve expandir a biblioteca ao clicar no alternador e mostrar os atalhos', () => {
-    carregarCatalogo([]);
+  it('deve expandir a biblioteca ao clicar no alternador e mostrar atalhos e playlists', () => {
+    carregarCatalogo([], perfilDeExemplo(), [playlistDeExemplo()]);
 
     const alternador = fixture.nativeElement.querySelector(
       '.biblioteca-alternar'
@@ -147,28 +151,45 @@ describe('Home', () => {
     fixture.detectChanges();
 
     const biblioteca = fixture.nativeElement.querySelector('.biblioteca');
-    const itens = fixture.nativeElement.querySelectorAll(
-      '.biblioteca-item'
+    const atalhos = fixture.nativeElement.querySelectorAll(
+      '.biblioteca-atalhos a'
     ) as NodeListOf<HTMLAnchorElement>;
+    const playlist = fixture.nativeElement.querySelector(
+      '.biblioteca-playlist'
+    ) as HTMLAnchorElement;
 
     expect(component.bibliotecaExpandida()).toBe(true);
     expect(biblioteca.classList.contains('biblioteca--expandida')).toBe(true);
     expect(fixture.nativeElement.textContent).toContain('Sua Biblioteca');
-    expect(itens[0].textContent).toContain('Minhas playlists');
-    expect(itens[0].getAttribute('href')).toBe('/playlists');
-    expect(itens[1].textContent).toContain('Minhas reviews');
-    expect(itens[1].getAttribute('href')).toBe('/reviews?escopo=MINHAS');
+    expect(atalhos[0].textContent).toContain('Minhas playlists');
+    expect(atalhos[0].getAttribute('href')).toBe('/playlists');
+    expect(atalhos[1].textContent).toContain('Minhas reviews');
+    expect(atalhos[1].getAttribute('href')).toBe('/reviews?escopo=MINHAS');
+    expect(playlist.textContent).toContain('Foco no trabalho');
+    expect(playlist.getAttribute('href')).toBe('/playlists/7');
   });
+
+  function playlistDeExemplo(): PlaylistResponse {
+    return {
+      id: 7,
+      nome: 'Foco no trabalho',
+      descricao: '',
+      capaUrl: 'https://exemplo.com/capa-playlist.jpg',
+      musicas: []
+    };
+  }
 
   function carregarCatalogo(
     albuns: AlbumResponse[],
-    perfil: PerfilResponse = perfilDeExemplo()
+    perfil: PerfilResponse = perfilDeExemplo(),
+    playlists: PlaylistResponse[] = []
   ): void {
     fixture.detectChanges();
 
     httpMock.expectOne(perfilUrl).flush(perfil);
     httpMock.expectOne(`${apiUrl}/artistas`).flush([]);
     httpMock.expectOne(`${apiUrl}/albuns`).flush(albuns);
+    httpMock.expectOne(playlistsUrl).flush(playlists);
     fixture.detectChanges();
   }
 
