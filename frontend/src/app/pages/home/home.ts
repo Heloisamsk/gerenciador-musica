@@ -9,8 +9,10 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth';
 import { CatalogoService } from '../../services/catalogo';
 import { PerfilService } from '../../services/perfil';
+import { PlaylistService } from '../../services/playlist';
 import type { AlbumResponse } from '../../models/AlbumResponse';
 import type { ArtistaResponse } from '../../models/ArtistaResponse';
+import type { PlaylistResponse } from '../../models/PlaylistResponse';
 
 @Component({
   selector: 'app-home',
@@ -28,9 +30,11 @@ export class Home implements OnInit {
   artistas = signal<ArtistaResponse[]>([]);
   albuns = signal<AlbumResponse[]>([]);
   albumDestaque = signal<AlbumResponse | null>(null);
+  playlists = signal<PlaylistResponse[]>([]);
 
   carregandoArtistas = signal(false);
   carregandoAlbuns = signal(false);
+  carregandoPlaylists = signal(false);
 
   erroArtistas = signal('');
   erroAlbuns = signal('');
@@ -39,6 +43,7 @@ export class Home implements OnInit {
     private readonly authService: AuthService,
     private readonly catalogoService: CatalogoService,
     private readonly perfilService: PerfilService,
+    private readonly playlistService: PlaylistService,
     private readonly router: Router
   ) {}
 
@@ -50,6 +55,7 @@ export class Home implements OnInit {
     this.carregarPerfil();
     this.carregarArtistas();
     this.carregarAlbuns();
+    this.carregarPlaylists();
   }
 
   isAdmin(): boolean {
@@ -157,6 +163,26 @@ export class Home implements OnInit {
           this.erroAlbuns.set(
             'Não foi possível carregar os álbuns.'
           );
+        }
+      });
+  }
+
+  private carregarPlaylists(): void {
+    this.carregandoPlaylists.set(true);
+
+    this.playlistService
+      .listarMinhas()
+      .pipe(
+        finalize(() =>
+          this.carregandoPlaylists.set(false)
+        )
+      )
+      .subscribe({
+        next: playlists => {
+          this.playlists.set(playlists);
+        },
+        error: () => {
+          this.playlists.set([]);
         }
       });
   }
