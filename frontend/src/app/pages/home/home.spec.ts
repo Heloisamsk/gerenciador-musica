@@ -132,10 +132,12 @@ describe('Home', () => {
     carregarCatalogo([], perfilDeExemplo(), [playlistDeExemplo()]);
 
     const biblioteca = fixture.nativeElement.querySelector('.biblioteca');
+    const homeShell = fixture.nativeElement.querySelector('.home-shell');
     const playlists = fixture.nativeElement.querySelectorAll('.biblioteca-playlist');
 
     expect(component.bibliotecaExpandida()).toBe(false);
     expect(biblioteca.classList.contains('biblioteca--expandida')).toBe(false);
+    expect(homeShell.classList.contains('home-shell--reduzido')).toBe(true);
     expect(playlists).toHaveLength(1);
     expect(fixture.nativeElement.querySelector('.biblioteca-playlist-texto')).toBeNull();
     expect(fixture.nativeElement.querySelector('.biblioteca-atalhos')).toBeNull();
@@ -151,6 +153,7 @@ describe('Home', () => {
     fixture.detectChanges();
 
     const biblioteca = fixture.nativeElement.querySelector('.biblioteca');
+    const homeShell = fixture.nativeElement.querySelector('.home-shell');
     const atalhos = fixture.nativeElement.querySelectorAll(
       '.biblioteca-atalhos a'
     ) as NodeListOf<HTMLAnchorElement>;
@@ -160,6 +163,7 @@ describe('Home', () => {
 
     expect(component.bibliotecaExpandida()).toBe(true);
     expect(biblioteca.classList.contains('biblioteca--expandida')).toBe(true);
+    expect(homeShell.classList.contains('home-shell--reduzido')).toBe(false);
     expect(fixture.nativeElement.textContent).toContain('Sua Biblioteca');
     expect(atalhos[0].textContent).toContain('Minhas playlists');
     expect(atalhos[0].getAttribute('href')).toBe('/playlists');
