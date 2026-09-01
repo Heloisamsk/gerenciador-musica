@@ -6,4 +6,5 @@ export interface AlbumResponse {
   anoLancamento: number;
   capaUrl: string | null;
   artista: ArtistaResumo;
+  curtida: boolean;
 }

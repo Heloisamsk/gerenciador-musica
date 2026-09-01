@@ -8,6 +8,7 @@ public record AlbumCatalogoDTO(
         Short anoLancamento,
         String capaUrl,
         Long totalMusicas,
-        Long duracaoTotalSegundos
+        Long duracaoTotalSegundos,
+        boolean curtida
 ) {
 }

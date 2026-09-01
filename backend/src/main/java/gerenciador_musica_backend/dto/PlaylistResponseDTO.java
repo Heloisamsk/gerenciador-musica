@@ -10,6 +10,7 @@ public class PlaylistResponseDTO {
     private String descricao;
     private String capaUrl;
     private List<MusicaResumoDTO> musicas;
+    private boolean especial;
 
     public PlaylistResponseDTO() {
     }
@@ -74,5 +75,13 @@ public class PlaylistResponseDTO {
 
     public void setMusicas(List<MusicaResumoDTO> musicas) {
         this.musicas = musicas;
+    }
+
+    public boolean isEspecial() {
+        return especial;
+    }
+
+    public void setEspecial(boolean especial) {
+        this.especial = especial;
     }
 }

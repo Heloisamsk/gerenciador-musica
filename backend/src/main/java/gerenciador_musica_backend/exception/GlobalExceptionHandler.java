@@ -453,4 +453,21 @@ public class GlobalExceptionHandler {
                 Map.of()
         );
     }
+
+    /*
+     * 409 - Tentativa de renomear, trocar a capa, excluir ou
+     * mexer diretamente na playlist especial "Favoritos".
+     */
+    @ExceptionHandler(PlaylistEspecialException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarPlaylistEspecial(
+            PlaylistEspecialException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
 }

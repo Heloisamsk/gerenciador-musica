@@ -4,19 +4,34 @@ import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Genero;
 import gerenciador_musica_backend.model.Musica;
+import gerenciador_musica_backend.model.Role;
+import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.service.AlbumService;
 import gerenciador_musica_backend.service.ArtistaService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/*
+ * ArtistaService.buscarDetalhesCatalogo descobre o usuário logado através
+ * do SecurityContextHolder (para enriquecer os álbuns com "curtida"), então
+ * simulamos a autenticação antes de cada teste, igual ao PlaylistServiceTest.
+ */
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -39,6 +54,26 @@ class ArtistaViewsIntegrationTest {
 
     @Autowired
     private AlbumService albumService;
+
+    @BeforeEach
+    void autenticar() {
+        Usuario usuarioLogado =
+                new Usuario("Maria", "maria@email.com", "hash", Role.USER);
+        ReflectionTestUtils.setField(usuarioLogado, "id", 1L);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                usuarioLogado, null, List.of()
+        );
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+    }
+
+    @AfterEach
+    void limparContexto() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void deveReunirDadosDasTresViewsNaPaginaDoArtista() {

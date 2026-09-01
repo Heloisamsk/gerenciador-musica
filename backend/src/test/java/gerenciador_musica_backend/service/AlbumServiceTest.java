@@ -10,28 +10,46 @@ import gerenciador_musica_backend.exception.AlbumNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosAlbumInvalidosException;
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
+import gerenciador_musica_backend.model.Role;
+import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.AlbumRepository;
+import gerenciador_musica_backend.repository.CurtidaAlbumRepository;
+import gerenciador_musica_backend.repository.CurtidaMusicaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
 import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/*
+ * Como converterParaResponse descobre o usuário logado através do
+ * SecurityContextHolder (para enriquecer o resultado com "curtida"),
+ * simulamos a autenticação antes de cada teste, igual ao PlaylistServiceTest.
+ */
 @ExtendWith(MockitoExtension.class)
 class AlbumServiceTest {
 
@@ -44,8 +62,50 @@ class AlbumServiceTest {
     @Mock
     private MusicaRepository musicaRepository;
 
+    @Mock
+    private CurtidaAlbumRepository curtidaAlbumRepository;
+
+    @Mock
+    private CurtidaMusicaRepository curtidaMusicaRepository;
+
     @InjectMocks
     private AlbumService albumService;
+
+    @BeforeEach
+    void autenticar() {
+        Usuario usuarioLogado =
+                new Usuario("Maria", "maria@email.com", "hash", Role.USER);
+        ReflectionTestUtils.setField(usuarioLogado, "id", 1L);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                usuarioLogado, null, List.of()
+        );
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        lenient()
+                .when(curtidaAlbumRepository.existsByUsuario_IdAndAlbum_IdAlbum(
+                        any(), any()
+                ))
+                .thenReturn(false);
+        lenient()
+                .when(curtidaAlbumRepository.buscarIdsCurtidosPeloUsuario(
+                        any(), any()
+                ))
+                .thenReturn(java.util.Collections.emptySet());
+        lenient()
+                .when(curtidaMusicaRepository.buscarIdsCurtidosPeloUsuario(
+                        any(), any()
+                ))
+                .thenReturn(java.util.Collections.emptySet());
+    }
+
+    @AfterEach
+    void limparContexto() {
+        SecurityContextHolder.clearContext();
+    }
 
     private Artista montarArtista(Long idArtista, String nome) {
         Artista artista = new Artista(

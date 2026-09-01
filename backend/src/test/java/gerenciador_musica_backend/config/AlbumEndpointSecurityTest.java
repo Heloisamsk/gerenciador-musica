@@ -65,7 +65,8 @@ class AlbumEndpointSecurityTest {
                                 (short) 1975,
                                 null,
                                 0L,
-                                0L
+                                0L,
+                                false
                         ),
                         List.of(),
                         List.of()

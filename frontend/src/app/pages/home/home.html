@@ -40,11 +40,11 @@
       }
 
       <div class="biblioteca-lista">
-        @if (carregandoPlaylists()) {
+        @if (carregandoPlaylists() || carregandoAlbunsCurtidos()) {
           <p class="biblioteca-estado" aria-live="polite">Carregando...</p>
-        } @else if (playlists().length === 0) {
+        } @else if (playlists().length === 0 && albunsCurtidos().length === 0) {
           @if (bibliotecaExpandida()) {
-            <p class="biblioteca-estado">Você ainda não criou nenhuma playlist.</p>
+            <p class="biblioteca-estado">Você ainda não criou nenhuma playlist nem curtiu álbuns.</p>
           }
         } @else {
           @for (playlist of playlists(); track playlist.id) {
@@ -66,6 +66,21 @@
               }
             </a>
           }
+          @for (album of albunsCurtidos(); track album.idAlbum) {
+            <a class="biblioteca-playlist" [routerLink]="['/albuns', album.idAlbum]"
+              [attr.aria-label]="bibliotecaExpandida() ? null : album.titulo" [title]="album.titulo">
+              <span class="biblioteca-playlist-capa" aria-hidden="true">
+                <img [src]="album.capaUrl || '/capa-padrao.png'" [alt]="''" loading="lazy" referrerpolicy="no-referrer"
+                  (error)="substituirImagem($event, '/capa-padrao.png')">
+              </span>
+              @if (bibliotecaExpandida()) {
+                <span class="biblioteca-playlist-texto">
+                  <strong>{{ album.titulo }}</strong>
+                  <small>Álbum &bull; {{ album.artista.nome }}</small>
+                </span>
+              }
+            </a>
+          }
         }
       </div>
     </div>
@@ -80,6 +95,15 @@
         <button type="submit" class="busca-botao">Buscar</button>
       </form>
       <div class="topo-conta">
+        @if (isAdmin()) {
+          <a class="topo-painel" routerLink="/admin/painel" aria-label="Abrir painel administrativo">
+            <span class="topo-painel-dica" aria-hidden="true">Painel administrativo</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14.5 3.5v13M14.5 3.5c3.5.8 5.5 2.3 5.5 5M14.5 7c3.2.7 5 2.2 5 4.7"></path>
+              <ellipse class="nota-preenchida" cx="10.5" cy="17" rx="4.5" ry="3.25" transform="rotate(-18 10.5 17)"></ellipse>
+            </svg>
+          </a>
+        }
         <a class="topo-perfil" routerLink="/perfil" aria-label="Abrir meu perfil">
           <img [src]="fotoPerfil()" alt="" referrerpolicy="no-referrer"
             (error)="substituirImagem($event, '/avatar-padrao.png')">
@@ -155,6 +179,12 @@
               <span class="album-imagem">
                 <img class="album-capa" [src]="album.capaUrl || '/capa-padrao.png'" [alt]="'Capa do álbum ' + album.titulo" loading="lazy" referrerpolicy="no-referrer" (error)="substituirImagem($event, '/capa-padrao.png')">
                 <span class="album-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 7 8 5-8 5z"></path></svg></span>
+                <app-curtir-botao
+                  class="album-curtir"
+                  [tipo]="'album'"
+                  [id]="album.idAlbum"
+                  [curtidoInicial]="album.curtida"
+                />
               </span>
               <strong>{{ album.titulo }}</strong><span>{{ album.anoLancamento }} · {{ album.artista.nome }}</span>
             </a>

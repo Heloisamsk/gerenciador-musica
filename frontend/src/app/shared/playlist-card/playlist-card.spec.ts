@@ -14,7 +14,8 @@ describe('PlaylistCard', () => {
     capaUrl: 'https://exemplo.com/capa.jpg',
     musicas: [
       { id: 1, titulo: 'Bohemian Rhapsody', artista: 'Queen', capaUrl: null }
-    ]
+    ],
+    especial: false
   };
 
   beforeEach(async () => {

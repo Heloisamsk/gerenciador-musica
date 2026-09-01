@@ -72,7 +72,8 @@ class MusicaControllerTest {
                         null,
                         null
                 )),
-                Set.of()
+                Set.of(),
+                false
         );
 
         when(musicaService.pesquisarMusicas(any(MusicaFiltroDTO.class), isNull(), isNull(), isNull()))

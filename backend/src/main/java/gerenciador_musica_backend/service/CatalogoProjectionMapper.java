@@ -14,7 +14,8 @@ final class CatalogoProjectionMapper {
     }
 
     static AlbumCatalogoDTO converterAlbum(
-            AlbumCatalogoProjection album
+            AlbumCatalogoProjection album,
+            boolean curtida
     ) {
         return new AlbumCatalogoDTO(
                 album.getIdAlbum(),
@@ -24,7 +25,8 @@ final class CatalogoProjectionMapper {
                 album.getAnoLancamento(),
                 album.getCapaUrl(),
                 album.getTotalMusicas(),
-                album.getDuracaoTotalSegundos()
+                album.getDuracaoTotalSegundos(),
+                curtida
         );
     }
 

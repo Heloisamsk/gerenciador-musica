@@ -196,7 +196,8 @@ class AdminAlbumEndpointSecurityTest {
                         "Queen",
                         "Banda britânica de rock.",
                         null
-                )
+                ),
+                false
         );
     }
 }

@@ -53,6 +53,7 @@ describe('PlaylistDetalhe', () => {
         id: 5, titulo: 'Bohemian Rhapsody', artista: 'Queen',
         capaUrl: 'https://exemplo.com/capa-musica.jpg'
       }],
+      especial: false,
     };
   }
 

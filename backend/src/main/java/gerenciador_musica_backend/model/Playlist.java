@@ -34,6 +34,9 @@ public class Playlist {
     @Column(name = "data_criacao", nullable = false, updatable = false)
     private OffsetDateTime dataCriacao;
 
+    @Column(name = "especial", nullable = false)
+    private boolean especial;
+
     @OneToMany(
             mappedBy = "playlist",
             cascade = CascadeType.ALL,
@@ -112,5 +115,13 @@ public class Playlist {
 
     public List<PlaylistMusica> getMusicas() {
         return musicas;
+    }
+
+    public boolean isEspecial() {
+        return especial;
+    }
+
+    public void setEspecial(boolean especial) {
+        this.especial = especial;
     }
 }

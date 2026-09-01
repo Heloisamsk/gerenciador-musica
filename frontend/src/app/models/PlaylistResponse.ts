@@ -6,4 +6,5 @@ export interface PlaylistResponse {
   descricao: string;
   capaUrl: string | null;
   musicas: MusicaResumo[];
+  especial: boolean;
 }

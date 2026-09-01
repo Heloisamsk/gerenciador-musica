@@ -40,4 +40,58 @@
       }
     </div>
   }
+
+  <div class="secao-albuns-curtidos">
+    <h2>Álbuns curtidos</h2>
+
+    @if (carregandoAlbuns) {
+      <p class="mensagem-estado">Carregando álbuns curtidos...</p>
+    } @else if (mensagemErroAlbuns) {
+      <div class="status-message error-message" role="alert">
+        <p>{{ mensagemErroAlbuns }}</p>
+
+        <button
+          class="botao-secundario"
+          type="button"
+          (click)="carregarAlbunsCurtidos()"
+        >
+          Tentar novamente
+        </button>
+      </div>
+    } @else if (albunsCurtidos.length === 0) {
+      <p class="mensagem-estado">
+        Você ainda não curtiu nenhum álbum. Curta álbuns pelo catálogo para vê-los aqui.
+      </p>
+    } @else {
+      <div class="grade-albuns-curtidos">
+        @for (album of albunsCurtidos; track album.idAlbum) {
+          <div class="album-curtido-card">
+            <a
+              class="album-curtido-link"
+              [routerLink]="['/albuns', album.idAlbum]"
+              [attr.aria-label]="'Ver detalhes do álbum ' + album.titulo"
+            >
+              <img
+                class="album-curtido-capa"
+                [src]="album.capaUrl || '/capa-padrao.png'"
+                [alt]="'Capa do álbum ' + album.titulo"
+                loading="lazy"
+                (error)="aoFalharCapaAlbum($event)"
+              />
+              <strong>{{ album.titulo }}</strong>
+              <span>{{ album.artista.nome }}</span>
+            </a>
+
+            <app-curtir-botao
+              class="album-curtido-curtir"
+              [tipo]="'album'"
+              [id]="album.idAlbum"
+              [curtidoInicial]="true"
+              (curtidoChange)="aoDescurtirAlbum(album.idAlbum, $event)"
+            />
+          </div>
+        }
+      </div>
+    }
+  </div>
 </div>

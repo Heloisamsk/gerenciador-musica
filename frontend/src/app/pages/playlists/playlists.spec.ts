@@ -20,6 +20,7 @@ describe('Playlists', () => {
   let httpMock: HttpTestingController;
 
   const apiUrl = 'http://localhost:8080/api/playlists';
+  const albunsCurtidosUrl = 'http://localhost:8080/api/albuns/curtidos';
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -46,8 +47,9 @@ describe('Playlists', () => {
     fixture.detectChanges();
 
     httpMock.expectOne(apiUrl).flush([
-      { id: 1, nome: 'Favoritas', descricao: '', capaUrl: null, musicas: [] },
+      { id: 1, nome: 'Favoritas', descricao: '', capaUrl: null, musicas: [], especial: false },
     ] as PlaylistResponse[]);
+    httpMock.expectOne(albunsCurtidosUrl).flush([]);
 
     expect(component.playlists).toHaveLength(1);
     expect(component.playlists[0].nome).toBe('Favoritas');
@@ -63,9 +65,11 @@ describe('Playlists', () => {
         nome: 'Favoritas',
         descricao: '',
         capaUrl: 'https://exemplo.com/capa.jpg',
-        musicas: []
+        musicas: [],
+        especial: false
       },
     ] as PlaylistResponse[]);
+    httpMock.expectOne(albunsCurtidosUrl).flush([]);
     fixture.detectChanges();
 
     const imagem = fixture.nativeElement.querySelector(
@@ -83,6 +87,7 @@ describe('Playlists', () => {
     httpMock
       .expectOne(apiUrl)
       .flush({ message: 'erro' }, { status: 500, statusText: 'Internal Server Error' });
+    httpMock.expectOne(albunsCurtidosUrl).flush([]);
 
     expect(component.mensagemErro).toBeTruthy();
     expect(component.carregando).toBe(false);
@@ -120,6 +125,7 @@ describe('Playlists', () => {
       fixture.detectChanges();
 
       httpMock.expectNone(apiUrl);
+      httpMock.expectOne(albunsCurtidosUrl).flush([]);
 
       expect(component.mensagemErro).toBe(
         cenario.mensagemEsperada

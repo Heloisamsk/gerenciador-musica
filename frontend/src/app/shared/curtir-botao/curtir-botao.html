@@ -1,0 +1,13 @@
+<button
+  type="button"
+  class="curtir-botao"
+  [class.curtir-botao--ativo]="curtido()"
+  [disabled]="carregando()"
+  [attr.aria-pressed]="curtido()"
+  [attr.aria-label]="curtido() ? 'Remover dos curtidos' : 'Curtir'"
+  (click)="alternar($event)"
+>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 20.7s-6.9-4.3-9.6-8.4C.7 9.6 1.3 6 4.1 4.4c2.2-1.3 4.9-.8 6.5 1.1L12 7.1l1.4-1.6c1.6-1.9 4.3-2.4 6.5-1.1 2.8 1.6 3.4 5.2 1.7 7.9-2.7 4.1-9.6 8.4-9.6 8.4z"></path>
+  </svg>
+</button>

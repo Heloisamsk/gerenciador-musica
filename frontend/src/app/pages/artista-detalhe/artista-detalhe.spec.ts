@@ -156,7 +156,8 @@ describe('ArtistaDetalhePage', () => {
           anoLancamento: 1975,
           capaUrl: null,
           totalMusicas: 1,
-          duracaoTotalSegundos: 354
+          duracaoTotalSegundos: 354,
+          curtida: false
         }
       ],
       musicas: [

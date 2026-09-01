@@ -46,7 +46,8 @@ describe('PerfilAtividade', () => {
     nome: 'Favoritas',
     descricao: '',
     capaUrl: null,
-    musicas: []
+    musicas: [],
+    especial: false
   };
 
   async function configurar(

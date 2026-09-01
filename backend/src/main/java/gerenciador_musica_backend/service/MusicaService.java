@@ -8,6 +8,8 @@ import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Genero;
 import gerenciador_musica_backend.model.Musica;
+import gerenciador_musica_backend.model.Usuario;
+import gerenciador_musica_backend.repository.CurtidaMusicaRepository;
 import gerenciador_musica_backend.repository.GeneroRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.specification.MusicaSpecification;
@@ -15,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,17 +46,20 @@ public class MusicaService {
     private final AlbumService albumService;
     private final ArtistaService artistaService;
     private final GeneroRepository generoRepository;
+    private final CurtidaMusicaRepository curtidaMusicaRepository;
 
     public MusicaService(
             MusicaRepository musicaRepository,
             AlbumService albumService,
             ArtistaService artistaService,
-            GeneroRepository generoRepository
+            GeneroRepository generoRepository,
+            CurtidaMusicaRepository curtidaMusicaRepository
     ) {
         this.musicaRepository = musicaRepository;
         this.albumService = albumService;
         this.artistaService = artistaService;
         this.generoRepository = generoRepository;
+        this.curtidaMusicaRepository = curtidaMusicaRepository;
     }
 
     @Transactional
@@ -575,10 +582,25 @@ public class MusicaService {
                 pageable
         );
 
+        List<Long> idsDaPagina = resultado.getContent()
+                .stream()
+                .map(Musica::getIdMusica)
+                .toList();
+
+        Set<Long> idsCurtidos = idsDaPagina.isEmpty()
+                ? Set.of()
+                : curtidaMusicaRepository.buscarIdsCurtidosPeloUsuario(
+                        obterUsuarioAutenticado().getId(),
+                        idsDaPagina
+                );
+
         List<MusicaListagemDTO> itens = resultado
                 .getContent()
                 .stream()
-                .map(this::converterParaListagem)
+                .map(musica -> converterParaListagem(
+                        musica,
+                        idsCurtidos.contains(musica.getIdMusica())
+                ))
                 .toList();
 
         return new PaginaResponseDTO<>(
@@ -670,7 +692,10 @@ public class MusicaService {
         return Math.min(tamanhoPagina, TAMANHO_PAGINA_MAXIMO);
     }
 
-    private MusicaListagemDTO converterParaListagem(Musica musica) {
+    private MusicaListagemDTO converterParaListagem(
+            Musica musica,
+            boolean curtida
+    ) {
         ArtistaResumoDTO artistaPrincipal = converterArtistaParaResumo(
                 musica.getArtistaPrincipal()
         );
@@ -697,7 +722,24 @@ public class MusicaService {
                 artistaPrincipal,
                 album,
                 participantes,
-                generos
+                generos,
+                curtida
+        );
+    }
+
+    private Usuario obterUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && authentication.getPrincipal() instanceof Usuario usuario) {
+            return usuario;
+        }
+
+        throw new IllegalStateException(
+                "Usuário autenticado não encontrado."
         );
     }
 }

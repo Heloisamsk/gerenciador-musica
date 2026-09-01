@@ -13,6 +13,9 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     // Listagem leve: sem carregar músicas (evita join desnecessário)
     List<Playlist> findByUsuarioIdOrderByDataCriacaoDesc(Long usuarioId);
 
+    // A playlist "Favoritos" auto-criada do usuário, se já existir.
+    Optional<Playlist> findByUsuarioIdAndEspecialTrue(Long usuarioId);
+
     /*
      * Busca por id SEM filtrar por usuário — a checagem de dono
      * é feita no service, pra diferenciar 404 (não existe)

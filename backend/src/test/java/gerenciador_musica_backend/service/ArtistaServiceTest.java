@@ -7,25 +7,37 @@ import gerenciador_musica_backend.exception.ArtistaEmUsoException;
 import gerenciador_musica_backend.exception.ArtistaNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosArtistaInvalidosException;
 import gerenciador_musica_backend.model.Artista;
+import gerenciador_musica_backend.model.Role;
+import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
+import gerenciador_musica_backend.repository.CurtidaAlbumRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
 import gerenciador_musica_backend.repository.projection.ArtistaCatalogoResumoProjection;
 import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -33,7 +45,10 @@ import static org.mockito.Mockito.when;
 
 /*
  * Teste de unidade do ArtistaService. O ArtistaRepository é mockado,
- * portanto os testes não acessam um banco de dados real.
+ * portanto os testes não acessam um banco de dados real. Como
+ * buscarDetalhesCatalogo descobre o usuário logado através do
+ * SecurityContextHolder (para enriquecer os álbuns com "curtida"),
+ * simulamos a autenticação antes de cada teste, igual ao PlaylistServiceTest.
  */
 @ExtendWith(MockitoExtension.class)
 class ArtistaServiceTest {
@@ -47,8 +62,37 @@ class ArtistaServiceTest {
     @Mock
     private MusicaRepository musicaRepository;
 
+    @Mock
+    private CurtidaAlbumRepository curtidaAlbumRepository;
+
     @InjectMocks
     private ArtistaService artistaService;
+
+    @BeforeEach
+    void autenticar() {
+        Usuario usuarioLogado =
+                new Usuario("Maria", "maria@email.com", "hash", Role.USER);
+        ReflectionTestUtils.setField(usuarioLogado, "id", 1L);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                usuarioLogado, null, List.of()
+        );
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        lenient()
+                .when(curtidaAlbumRepository.buscarIdsCurtidosPeloUsuario(
+                        any(), any()
+                ))
+                .thenReturn(Collections.emptySet());
+    }
+
+    @AfterEach
+    void limparContexto() {
+        SecurityContextHolder.clearContext();
+    }
 
     private ArtistaRequestDTO montarRequestValida() {
         return new ArtistaRequestDTO(

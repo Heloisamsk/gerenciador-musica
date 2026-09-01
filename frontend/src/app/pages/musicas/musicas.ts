@@ -12,10 +12,11 @@ import { ArtistaResponse } from '../../models/ArtistaResponse';
 import { AlbumResponse } from '../../models/AlbumResponse';
 import { GeneroResumo } from '../../models/MusicaResponse';
 import { formatarDuracao } from '../../shared/formatar-duracao';
+import { CurtirBotao } from '../../shared/curtir-botao/curtir-botao';
 
 @Component({
   selector: 'app-musicas',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, CurtirBotao],
   templateUrl: './musicas.html',
   styleUrls: ['./musicas.css']
 })

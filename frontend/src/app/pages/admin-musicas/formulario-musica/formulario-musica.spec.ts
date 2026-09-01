@@ -51,7 +51,8 @@ describe('FormularioMusica', () => {
       nomeCompleto: artistaPrincipal.nomeCompleto,
       descricao: artistaPrincipal.descricao,
       fotoPerfilUrl: null
-    }
+    },
+    curtida: false
   };
 
   const musica: MusicaResponse = {

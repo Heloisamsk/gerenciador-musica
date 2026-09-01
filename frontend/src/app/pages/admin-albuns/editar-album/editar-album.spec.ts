@@ -41,7 +41,8 @@ describe('EditarAlbum', () => {
       nomeCompleto: 'Queen',
       descricao: 'Banda britânica de rock.',
       fotoPerfilUrl: null
-    }
+    },
+    curtida: false
   };
 
   const requestAtualizado: AlbumAtualizacaoRequest = {

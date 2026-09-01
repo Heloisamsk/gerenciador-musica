@@ -9,4 +9,5 @@ export interface MusicaListagem {
   album: AlbumResumo | null;
   artistasParticipantes: ArtistaResumo[];
   generos: GeneroResumo[];
+  curtida: boolean;
 }
