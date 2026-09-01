@@ -21,6 +21,7 @@ import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.ReviewRepository;
+import gerenciador_musica_backend.repository.SeguidorUsuarioRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.function.Function;
 
 @Service
@@ -44,15 +46,18 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MusicaRepository musicaRepository;
     private final AlbumRepository albumRepository;
+    private final SeguidorUsuarioRepository seguidorUsuarioRepository;
 
     public ReviewService(
             ReviewRepository reviewRepository,
             MusicaRepository musicaRepository,
-            AlbumRepository albumRepository
+            AlbumRepository albumRepository,
+            SeguidorUsuarioRepository seguidorUsuarioRepository
     ) {
         this.reviewRepository = reviewRepository;
         this.musicaRepository = musicaRepository;
         this.albumRepository = albumRepository;
+        this.seguidorUsuarioRepository = seguidorUsuarioRepository;
     }
 
     @Transactional
@@ -64,17 +69,17 @@ public class ReviewService {
 
         Review review = request.idMusica() != null
                 ? criarReviewDeMusica(
-                        usuario,
-                        request.idMusica(),
-                        request.nota(),
-                        textoNormalizado
-                )
+                usuario,
+                request.idMusica(),
+                request.nota(),
+                textoNormalizado
+        )
                 : criarReviewDeAlbum(
-                        usuario,
-                        request.idAlbum(),
-                        request.nota(),
-                        textoNormalizado
-                );
+                usuario,
+                request.idAlbum(),
+                request.nota(),
+                textoNormalizado
+        );
 
         Review reviewSalva = reviewRepository.save(review);
 
@@ -147,6 +152,42 @@ public class ReviewService {
                 tamanhoPagina,
                 paginacao -> reviewRepository.findByUsuario_IdOrderByCriadaEmDesc(
                         usuario.getId(),
+                        paginacao
+                )
+        );
+    }
+
+    /*
+     * GET /api/reviews/seguindo — feed das reviews mais recentes
+     * apenas dos usuários que o autenticado segue. Se ele não segue
+     * ninguém ainda, devolve uma página vazia em vez de disparar uma
+     * consulta "IN ()" (inválida em SQL).
+     */
+    @Transactional(readOnly = true)
+    public PaginaResponseDTO<ReviewResponseDTO> listarSeguindo(
+            Integer pagina,
+            Integer tamanhoPagina
+    ) {
+        Usuario usuario = obterUsuarioAutenticado();
+
+        List<Long> idsSeguidos = seguidorUsuarioRepository
+                .buscarIdsSeguidosPeloUsuario(usuario.getId());
+
+        if (idsSeguidos.isEmpty()) {
+            return new PaginaResponseDTO<>(
+                    List.of(),
+                    validarPagina(pagina),
+                    validarTamanhoPagina(tamanhoPagina),
+                    0,
+                    0
+            );
+        }
+
+        return montarPagina(
+                pagina,
+                tamanhoPagina,
+                paginacao -> reviewRepository.findByUsuario_IdInOrderByCriadaEmDesc(
+                        idsSeguidos,
                         paginacao
                 )
         );

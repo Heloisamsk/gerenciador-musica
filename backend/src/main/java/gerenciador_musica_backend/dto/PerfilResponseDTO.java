@@ -24,6 +24,10 @@ public record PerfilResponseDTO(
         List<PerfilItemResponseDTO> albunsFavoritos,
         List<PerfilItemResponseDTO> musicasFavoritas,
         long totalMusicasAvaliadas,
-        long totalAlbunsAvaliadas
+        long totalAlbunsAvaliadas,
+        long totalSeguidores,
+        long totalSeguindo,
+        boolean perfilDoUsuarioAutenticado,
+        boolean seguindoPorUsuarioAutenticado
 ) {
 }
