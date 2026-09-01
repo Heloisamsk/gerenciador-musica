@@ -7,53 +7,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.time.ZoneOffset;
 
 @RestControllerAdvice
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    @ExceptionHandler(DadosPerfilInvalidosException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarDadosPerfilInvalidos(
-            DadosPerfilInvalidosException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.BAD_REQUEST,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    /*
-     * 400 - Dados da música inválidos segundo
-     * as regras de negócio do MusicaService.
-     */
-    @ExceptionHandler(DadosMusicaInvalidosException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarDadosMusicaInvalidos(
-            DadosMusicaInvalidosException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.BAD_REQUEST,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
 
     /*
      * 400 - Erros encontrados pelas anotações
@@ -76,7 +47,7 @@ public class GlobalExceptionHandler {
                         )
                 );
 
-        return criarResposta(
+        return ErrorResponseFactory.criar(
                 HttpStatus.BAD_REQUEST,
                 "Existem dados inválidos na requisição.",
                 request.getRequestURI(),
@@ -93,11 +64,10 @@ public class GlobalExceptionHandler {
             HttpMessageNotReadableException exception,
             HttpServletRequest request
     ) {
-        return criarResposta(
+        return ErrorResponseFactory.criar(
                 HttpStatus.BAD_REQUEST,
                 "O corpo da requisição está ausente ou possui formato inválido.",
-                request.getRequestURI(),
-                Map.of()
+                request.getRequestURI()
         );
     }
 
@@ -110,11 +80,10 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException exception,
             HttpServletRequest request
     ) {
-        return criarResposta(
+        return ErrorResponseFactory.criar(
                 HttpStatus.BAD_REQUEST,
                 "O parâmetro '" + exception.getName() + "' possui um valor inválido.",
-                request.getRequestURI(),
-                Map.of()
+                request.getRequestURI()
         );
     }
 
@@ -126,11 +95,10 @@ public class GlobalExceptionHandler {
             CredenciaisInvalidasException exception,
             HttpServletRequest request
     ) {
-        return criarResposta(
+        return ErrorResponseFactory.criar(
                 HttpStatus.UNAUTHORIZED,
                 exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
+                request.getRequestURI()
         );
     }
 
@@ -142,91 +110,27 @@ public class GlobalExceptionHandler {
             AccessDeniedException exception,
             HttpServletRequest request
     ) {
-        return criarResposta(
+        return ErrorResponseFactory.criar(
                 HttpStatus.FORBIDDEN,
                 "Você não possui permissão para realizar esta operação.",
-                request.getRequestURI(),
-                Map.of()
+                request.getRequestURI()
         );
     }
 
     /*
-     * 404 - Música não encontrada.
+     * 409 - Violação de restrição de integridade do banco
+     * (chave única, chave estrangeira etc.) não tratada por
+     * uma exceção de negócio mais específica.
      */
-    @ExceptionHandler(MusicaNaoEncontradaException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarMusicaNaoEncontrada(
-            MusicaNaoEncontradaException exception,
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarConflitoBanco(
+            DataIntegrityViolationException exception,
             HttpServletRequest request
     ) {
-        return criarResposta(
-                HttpStatus.NOT_FOUND,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-    /*
-     * 403 - Usuário autenticado tentando acessar
-     * playlist que não é dele.
-     */
-    @ExceptionHandler(PlaylistAcessoNegadoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarPlaylistAcessoNegado(
-            PlaylistAcessoNegadoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.FORBIDDEN,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    /*
-     * 404 - Playlist não encontrada.
-     */
-    @ExceptionHandler(PlaylistNaoEncontradaException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarPlaylistNaoEncontrada(
-            PlaylistNaoEncontradaException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.NOT_FOUND,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    /*
-     * 409 - Tentativa de cadastrar ou atualizar uma música duplicada.
-     */
-    @ExceptionHandler(MusicaDuplicadaException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarMusicaDuplicada(
-            MusicaDuplicadaException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
+        return ErrorResponseFactory.criar(
                 HttpStatus.CONFLICT,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    /*
-     * 409 - Tentativa de cadastrar e-mail já existente.
-     */
-    @ExceptionHandler(EmailJaCadastradoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarEmailJaCadastrado(
-            EmailJaCadastradoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.CONFLICT,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
+                "A operação viola uma restrição de integridade dos dados.",
+                request.getRequestURI()
         );
     }
 
@@ -245,259 +149,10 @@ public class GlobalExceptionHandler {
                 exception
         );
 
-        return criarResposta(
+        return ErrorResponseFactory.criar(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Ocorreu um erro interno no servidor.",
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    /*
-     * 404 - Artista não encontrado.
-     */
-    @ExceptionHandler(ArtistaNaoEncontradoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarArtistaNaoEncontrado(
-            ArtistaNaoEncontradoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.NOT_FOUND,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    /*
-     * 409 - Tentativa de cadastrar Artista já existente.
-     */
-    @ExceptionHandler(ArtistaDuplicadoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarArtistaDuplicado(
-            ArtistaDuplicadoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.CONFLICT,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    /*
-     * 409 - Artista possui álbuns ou músicas associados.
-     */
-    @ExceptionHandler(ArtistaEmUsoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarArtistaEmUso(
-            ArtistaEmUsoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.CONFLICT,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    /*
-     * 400 - Dados da artista inválidos segundo
-     * as regras de negócio do ArtistaService.
-     */
-    @ExceptionHandler(DadosArtistaInvalidosException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarDadosArtistaInvalidos(
-            DadosArtistaInvalidosException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.BAD_REQUEST,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    /*
-     * 404 - Usuário não encontrado (perfil público).
-     */
-    @ExceptionHandler(UsuarioNaoEncontradoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarUsuarioNaoEncontrado(
-            UsuarioNaoEncontradoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.NOT_FOUND,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    private ResponseEntity<ErrorResponseDTO> criarResposta(
-            HttpStatus status,
-            String message,
-            String path,
-            Map<String, String> fieldErrors
-    ) {
-        ErrorResponseDTO resposta = new ErrorResponseDTO(
-                OffsetDateTime.now(ZoneOffset.UTC),
-                status.value(),
-                status.getReasonPhrase(),
-                message,
-                path,
-                fieldErrors
-        );
-
-        return ResponseEntity
-                .status(status)
-                .body(resposta);
-    }
-    @ExceptionHandler(AlbumDuplicadoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarAlbumDuplicado(
-            AlbumDuplicadoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.CONFLICT,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    @ExceptionHandler(AlbumNaoEncontradoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarAlbumNaoEncontrado(
-            AlbumNaoEncontradoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.NOT_FOUND,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    @ExceptionHandler(AlbumEmUsoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarAlbumEmUso(
-            AlbumEmUsoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.CONFLICT,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    @ExceptionHandler(DadosAlbumInvalidosException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarDadosAlbumInvalidos(
-            DadosAlbumInvalidosException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.BAD_REQUEST,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarConflitoBanco(
-            DataIntegrityViolationException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.CONFLICT,
-                "A operação viola uma restrição de integridade dos dados.",
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    @ExceptionHandler(ReviewNaoEncontradaException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarReviewNaoEncontrada(
-            ReviewNaoEncontradaException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.NOT_FOUND,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    @ExceptionHandler(DadosReviewInvalidosException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarDadosReviewInvalidos(
-            DadosReviewInvalidosException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.BAD_REQUEST,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    @ExceptionHandler(ReviewJaExisteException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarReviewJaExiste(
-            ReviewJaExisteException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.CONFLICT,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-
-    @ExceptionHandler(ReviewAcessoNegadoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarReviewAcessoNegado(
-            ReviewAcessoNegadoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.FORBIDDEN,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-    /*
-     * 400 - Tentativa de seguir a si mesmo.
-     */
-    @ExceptionHandler(gerenciador_musica_backend.exception.SeguirUsuarioInvalidoException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarSeguirUsuarioInvalido(
-            gerenciador_musica_backend.exception.SeguirUsuarioInvalidoException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.BAD_REQUEST,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
-        );
-    }
-    /*
-     * 409 - Tentativa de renomear, trocar a capa, excluir ou
-     * mexer diretamente na playlist especial "Favoritos".
-     */
-    @ExceptionHandler(PlaylistEspecialException.class)
-    public ResponseEntity<ErrorResponseDTO> tratarPlaylistEspecial(
-            PlaylistEspecialException exception,
-            HttpServletRequest request
-    ) {
-        return criarResposta(
-                HttpStatus.CONFLICT,
-                exception.getMessage(),
-                request.getRequestURI(),
-                Map.of()
+                request.getRequestURI()
         );
     }
 }
