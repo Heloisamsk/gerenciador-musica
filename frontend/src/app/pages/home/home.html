@@ -40,11 +40,11 @@
       }
 
       <div class="biblioteca-lista">
-        @if (carregandoPlaylists() || carregandoAlbunsCurtidos()) {
+        @if (carregandoPlaylists() || carregandoAlbunsCurtidos() || carregandoArtistasSeguidos()) {
           <p class="biblioteca-estado" aria-live="polite">Carregando...</p>
-        } @else if (playlists().length === 0 && albunsCurtidos().length === 0) {
+        } @else if (playlists().length === 0 && albunsCurtidos().length === 0 && artistasSeguidos().length === 0) {
           @if (bibliotecaExpandida()) {
-            <p class="biblioteca-estado">Você ainda não criou nenhuma playlist nem curtiu álbuns.</p>
+            <p class="biblioteca-estado">Você ainda não criou nenhuma playlist, curtiu álbuns nem seguiu artistas.</p>
           }
         } @else {
           @for (playlist of playlists(); track playlist.id) {
@@ -77,6 +77,21 @@
                 <span class="biblioteca-playlist-texto">
                   <strong>{{ album.titulo }}</strong>
                   <small>Álbum &bull; {{ album.artista.nome }}</small>
+                </span>
+              }
+            </a>
+          }
+          @for (artista of artistasSeguidos(); track artista.idArtista) {
+            <a class="biblioteca-playlist" [routerLink]="['/artistas', artista.idArtista]"
+              [attr.aria-label]="bibliotecaExpandida() ? null : artista.nome" [title]="artista.nome">
+              <span class="biblioteca-playlist-capa biblioteca-playlist-capa--redonda" aria-hidden="true">
+                <img [src]="artista.fotoPerfilUrl || '/avatar-artista.png'" [alt]="''" loading="lazy" referrerpolicy="no-referrer"
+                  (error)="substituirFotoArtista($event)">
+              </span>
+              @if (bibliotecaExpandida()) {
+                <span class="biblioteca-playlist-texto">
+                  <strong>{{ artista.nome }}</strong>
+                  <small>Artista</small>
                 </span>
               }
             </a>

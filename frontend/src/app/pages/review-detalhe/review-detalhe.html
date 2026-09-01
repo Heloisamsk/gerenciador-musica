@@ -44,7 +44,10 @@
               @if (review.minhaReview) {
                 Avaliado por <strong>você</strong>
               } @else {
-                Avaliado por <strong>{{ review.autor.nome }}</strong>
+                Avaliado por
+                <a class="review-detalhe__autor-link" [routerLink]="['/perfil', review.autor.id]">
+                  <strong>{{ review.autor.nome }}</strong>
+                </a>
               }
               em {{ formatarData(review.criadaEm) }}
             </span>

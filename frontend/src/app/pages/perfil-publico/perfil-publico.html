@@ -1,0 +1,107 @@
+<main class="perfil-page">
+  <nav class="perfil-nav" aria-label="Navegação do perfil">
+    <a class="voltar-link" routerLink="/home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+      Voltar para a Home
+    </a>
+    <a class="marca" routerLink="/home" aria-label="Crotchet - Music Hub">
+      <img src="/favicon.svg" alt="">
+      <span>Crotchet <small>Music Hub</small></span>
+    </a>
+  </nav>
+
+  @if (carregando()) {
+    <section class="estado estado--carregando" aria-live="polite">
+      <span></span><p>Preparando o perfil musical...</p>
+    </section>
+  } @else if (!perfil()) {
+    <section class="estado estado--erro" role="alert">
+      <h1>Não foi possível abrir o perfil</h1>
+      <p>{{ mensagemErro() }}</p>
+      <a routerLink="/home">Voltar para a Home</a>
+    </section>
+  } @else {
+    <article class="perfil-shell">
+      <header class="perfil-cabecalho">
+        <div class="banner" [class.banner--vazio]="!perfil()!.bannerUrl">
+          @if (perfil()!.bannerUrl) {
+            <img [src]="perfil()!.bannerUrl" alt="Banner escolhido para o perfil"
+              (error)="corrigirImagem($event, '/capa-padrao.png')">
+          } @else {
+            <span class="banner-nota" aria-hidden="true">♪</span>
+          }
+        </div>
+
+        <div class="identidade">
+          <img class="foto-perfil" [src]="perfil()!.fotoUrl || '/avatar-padrao.svg'"
+            [alt]="'Foto de perfil de ' + perfil()!.nome"
+            (error)="corrigirImagem($event, '/avatar-padrao.svg')">
+          <div class="identidade-texto">
+            <h1>{{ perfil()!.nome }}</h1>
+            @if (perfil()!.username) { <p class="username">&#64;{{ perfil()!.username }}</p> }
+            @if (perfil()!.fraseDestaque) { <p class="frase">{{ perfil()!.fraseDestaque }}</p> }
+          </div>
+        </div>
+      </header>
+
+      <div class="perfil-conteudo">
+        <section class="destaque-area" aria-labelledby="titulo-destaque">
+          <div class="secao-cabecalho"><div><span>Escolha da semana</span><h2 id="titulo-destaque">Em destaque</h2></div></div>
+          @if (destaquePrincipal(); as destaque) {
+            <a class="destaque-card" [routerLink]="rotaItem(destaque)">
+              <div class="destaque-imagem">
+                <img [src]="destaque.imagemUrl || imagemAlternativa(destaque.tipo)"
+                  [alt]="'Capa de ' + destaque.titulo"
+                  (error)="corrigirImagem($event, imagemAlternativa(destaque.tipo))">
+                <span class="nota-card" aria-hidden="true">♪</span>
+              </div>
+              <span class="item-tipo">{{ rotuloTipo(destaque.tipo) }}</span>
+              <strong>{{ destaque.titulo }}</strong>
+              <small>{{ destaque.subtitulo }}</small>
+              <span class="abrir-item">Abrir no catálogo
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+              </span>
+            </a>
+          } @else {
+            <div class="destaque-vazio">
+              <span class="nota-vazia" aria-hidden="true">♪</span>
+              <strong>Nenhum destaque escolhido</strong>
+              <small>Esta pessoa ainda não escolheu um destaque para o perfil.</small>
+            </div>
+          }
+        </section>
+
+        <section class="curadoria-area" aria-labelledby="titulo-curadoria">
+          <div class="secao-cabecalho secao-cabecalho--curadoria">
+            <div><span>Seleção pessoal</span><h2 id="titulo-curadoria">Favoritos no perfil</h2></div>
+          </div>
+          <div class="favoritos-grupos">
+            @for (grupo of gruposFavoritos(); track grupo.tipo) {
+              <section class="favoritos-grupo" [attr.aria-labelledby]="'grupo-' + grupo.tipo">
+                <header>
+                  <span aria-hidden="true">♪</span>
+                  <h3 [id]="'grupo-' + grupo.tipo">{{ grupo.titulo }}</h3>
+                </header>
+                <div class="favoritos-lista">
+                  @for (item of grupo.itens; track item.id) {
+                    <a class="favorito-card" [routerLink]="rotaItem(item)">
+                      <img [src]="item.imagemUrl || imagemAlternativa(item.tipo)" [alt]="'Capa de ' + item.titulo"
+                        (error)="corrigirImagem($event, imagemAlternativa(item.tipo))">
+                      <span class="favorito-texto">
+                        <strong>{{ item.titulo }}</strong><span>{{ item.subtitulo }}</span>
+                      </span>
+                      <svg class="seta" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+                    </a>
+                  }
+                  @if (grupo.itens.length === 0) {
+                    <p class="busca-sem-resultado">Nenhum item adicionado nesta estante.</p>
+                  }
+                </div>
+              </section>
+            }
+          </div>
+        </section>
+      </div>
+    </article>
+  }
+</main>

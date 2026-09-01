@@ -7,6 +7,7 @@ import gerenciador_musica_backend.exception.AlbumNaoEncontradoException;
 import gerenciador_musica_backend.exception.ArtistaNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosPerfilInvalidosException;
 import gerenciador_musica_backend.exception.MusicaNaoEncontradaException;
+import gerenciador_musica_backend.exception.UsuarioNaoEncontradoException;
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Musica;
@@ -55,6 +56,21 @@ public class PerfilService {
     @Transactional
     public PerfilResponseDTO obterPerfil(Usuario usuarioAutenticado) {
         Usuario usuario = buscarUsuario(usuarioAutenticado);
+        Perfil perfil = buscarOuCriarPerfil(usuario);
+        return converterResposta(perfil);
+    }
+
+    /*
+     * Perfil público de qualquer usuário (ex.: ao clicar no nome do
+     * autor de uma review). Reaproveita o mesmo DTO de resposta do
+     * perfil autenticado, que já não expõe dados sensíveis como
+     * e-mail ou senha.
+     */
+    @Transactional
+    public PerfilResponseDTO obterPerfilPublico(Long idUsuario) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException(idUsuario));
+
         Perfil perfil = buscarOuCriarPerfil(usuario);
         return converterResposta(perfil);
     }

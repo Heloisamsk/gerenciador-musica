@@ -122,6 +122,14 @@
   color: var(--app-text);
 }
 
+.review-detalhe__autor-link {
+  text-decoration: none;
+}
+
+.review-detalhe__autor-link:hover strong {
+  text-decoration: underline;
+}
+
 .review-detalhe__texto {
   margin: 4px 0 0;
   color: var(--app-text);

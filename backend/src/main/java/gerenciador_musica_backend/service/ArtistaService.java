@@ -134,6 +134,17 @@ public class ArtistaService {
     }
 
     @Transactional(readOnly = true)
+    public List<ArtistaResponseDTO> listarArtistasSeguidos() {
+        Long usuarioId = obterUsuarioAutenticado().getId();
+
+        return seguidorArtistaRepository
+                .buscarArtistasSeguidosPeloUsuario(usuarioId)
+                .stream()
+                .map(this::converterParaResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<ArtistaResponseDTO> buscarPorNome(String termo, int limite) {
         if (termo == null || termo.isBlank()) {
             return List.of();

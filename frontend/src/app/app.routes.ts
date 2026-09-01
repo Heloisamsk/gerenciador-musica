@@ -229,6 +229,14 @@ export const routes: Routes = [
   },
 
 {
+  path: 'perfil/:id',
+  loadComponent: () =>
+    import('./pages/perfil-publico/perfil-publico')
+      .then(modulo => modulo.PerfilPublico),
+  canActivate: [authGuard]
+},
+
+{
   path: 'reviews',
   loadComponent: () =>
     import('./pages/reviews/reviews').then(modulo => modulo.Reviews),

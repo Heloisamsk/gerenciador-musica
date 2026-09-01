@@ -96,6 +96,20 @@
   white-space: nowrap;
 }
 
+.review-card__autor--link {
+  padding: 0;
+  color: var(--app-muted);
+  background: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.review-card__autor--link:hover {
+  color: var(--app-text);
+  text-decoration: underline;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .review-card {
     transition: none;

@@ -42,11 +42,13 @@ export class Home implements OnInit {
   albumDestaque = signal<AlbumResponse | null>(null);
   playlists = signal<PlaylistResponse[]>([]);
   albunsCurtidos = signal<AlbumResponse[]>([]);
+  artistasSeguidos = signal<ArtistaResponse[]>([]);
 
   carregandoArtistas = signal(false);
   carregandoAlbuns = signal(false);
   carregandoPlaylists = signal(false);
   carregandoAlbunsCurtidos = signal(false);
+  carregandoArtistasSeguidos = signal(false);
 
   erroArtistas = signal('');
   erroAlbuns = signal('');
@@ -99,6 +101,7 @@ export class Home implements OnInit {
     this.carregarAlbuns();
     this.carregarPlaylists();
     this.carregarAlbunsCurtidos();
+    this.carregarArtistasSeguidos();
   }
 
   isAdmin(): boolean {
@@ -276,6 +279,26 @@ export class Home implements OnInit {
         },
         error: () => {
           this.albunsCurtidos.set([]);
+        }
+      });
+  }
+
+  private carregarArtistasSeguidos(): void {
+    this.carregandoArtistasSeguidos.set(true);
+
+    this.catalogoService
+      .listarArtistasSeguidos()
+      .pipe(
+        finalize(() =>
+          this.carregandoArtistasSeguidos.set(false)
+        )
+      )
+      .subscribe({
+        next: artistas => {
+          this.artistasSeguidos.set(artistas);
+        },
+        error: () => {
+          this.artistasSeguidos.set([]);
         }
       });
   }
