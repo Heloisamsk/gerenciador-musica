@@ -92,7 +92,7 @@ app-home a { color: inherit; text-decoration: none; }
 
 .biblioteca-alternar:focus-visible, .biblioteca-criar:focus-visible, .biblioteca-atalhos a:focus-visible, .biblioteca-playlist:focus-visible { outline: 3px solid var(--apricot-cream); outline-offset: 2px; }
 
-.topo-sair svg, .busca svg, .acao svg, .artista-seta svg, .album-play svg, .hero-play svg {
+.topo-sair svg, .topo-painel svg, .busca svg, .acao svg, .artista-seta svg, .album-play svg, .hero-play svg {
   width: 20px;
   height: 20px;
   fill: none;
@@ -100,6 +100,37 @@ app-home a { color: inherit; text-decoration: none; }
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.8;
+}
+
+.topo-painel { position: relative; display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; padding: 0; color: var(--suave); background: var(--painel); border: 1px solid var(--borda); border-radius: 50%; }
+.topo-painel:hover { color: var(--apricot-cream); background: #f6ca831a; }
+.topo-painel .nota-preenchida { fill: currentColor; stroke: currentColor; }
+
+.topo-painel-dica {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 10px);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  max-width: 0;
+  height: 34px;
+  padding: 0 16px;
+  overflow: hidden;
+  color: var(--preto);
+  white-space: nowrap;
+  background: var(--apricot-cream);
+  border-radius: 99px;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: max-width .22s ease, opacity .18s ease;
+  pointer-events: none;
+  font-size: .74rem;
+  font-weight: 700;
+}
+.topo-painel:hover .topo-painel-dica, .topo-painel:focus-visible .topo-painel-dica {
+  max-width: 220px;
+  opacity: 1;
 }
 
 .menu-mobile { display: none; }
@@ -203,7 +234,7 @@ app-home a { color: inherit; text-decoration: none; }
 .carregando span { min-height: 185px; background: var(--painel); border-radius: 17px; animation: pulso 1.4s infinite alternate; }
 @keyframes pulso { to { opacity: .55; } }
 
-.topo-sair:focus-visible, .busca-botao:focus-visible, .topo-perfil:focus-visible, .acao:focus-visible, .ver-tudo:focus-visible, .artista-card:focus-visible, .album-card:focus-visible { outline: 3px solid var(--apricot-cream); outline-offset: 3px; }
+.topo-sair:focus-visible, .topo-painel:focus-visible, .busca-botao:focus-visible, .topo-perfil:focus-visible, .acao:focus-visible, .ver-tudo:focus-visible, .artista-card:focus-visible, .album-card:focus-visible { outline: 3px solid var(--apricot-cream); outline-offset: 3px; }
 
 @media (max-width: 1050px) {
   .home-shell { grid-template-columns: 218px 1fr; }

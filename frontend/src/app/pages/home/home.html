@@ -80,6 +80,15 @@
         <button type="submit" class="busca-botao">Buscar</button>
       </form>
       <div class="topo-conta">
+        @if (isAdmin()) {
+          <a class="topo-painel" routerLink="/admin/painel" aria-label="Abrir painel administrativo">
+            <span class="topo-painel-dica" aria-hidden="true">Painel administrativo</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14.5 3.5v13M14.5 3.5c3.5.8 5.5 2.3 5.5 5M14.5 7c3.2.7 5 2.2 5 4.7"></path>
+              <ellipse class="nota-preenchida" cx="10.5" cy="17" rx="4.5" ry="3.25" transform="rotate(-18 10.5 17)"></ellipse>
+            </svg>
+          </a>
+        }
         <a class="topo-perfil" routerLink="/perfil" aria-label="Abrir meu perfil">
           <img [src]="fotoPerfil()" alt="" referrerpolicy="no-referrer"
             (error)="substituirImagem($event, '/avatar-padrao.png')">
