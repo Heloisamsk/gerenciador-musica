@@ -13,11 +13,12 @@ import { PlaylistService } from '../../services/playlist';
 import type { AlbumResponse } from '../../models/AlbumResponse';
 import type { ArtistaResponse } from '../../models/ArtistaResponse';
 import type { PlaylistResponse } from '../../models/PlaylistResponse';
+import { CurtirBotao } from '../../shared/curtir-botao/curtir-botao';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, CurtirBotao],
   templateUrl: './home.html'
 })
 export class Home implements OnInit {
@@ -31,10 +32,12 @@ export class Home implements OnInit {
   albuns = signal<AlbumResponse[]>([]);
   albumDestaque = signal<AlbumResponse | null>(null);
   playlists = signal<PlaylistResponse[]>([]);
+  albunsCurtidos = signal<AlbumResponse[]>([]);
 
   carregandoArtistas = signal(false);
   carregandoAlbuns = signal(false);
   carregandoPlaylists = signal(false);
+  carregandoAlbunsCurtidos = signal(false);
 
   erroArtistas = signal('');
   erroAlbuns = signal('');
@@ -56,6 +59,7 @@ export class Home implements OnInit {
     this.carregarArtistas();
     this.carregarAlbuns();
     this.carregarPlaylists();
+    this.carregarAlbunsCurtidos();
   }
 
   isAdmin(): boolean {
@@ -183,6 +187,26 @@ export class Home implements OnInit {
         },
         error: () => {
           this.playlists.set([]);
+        }
+      });
+  }
+
+  private carregarAlbunsCurtidos(): void {
+    this.carregandoAlbunsCurtidos.set(true);
+
+    this.catalogoService
+      .listarAlbunsCurtidos()
+      .pipe(
+        finalize(() =>
+          this.carregandoAlbunsCurtidos.set(false)
+        )
+      )
+      .subscribe({
+        next: albuns => {
+          this.albunsCurtidos.set(albuns);
+        },
+        error: () => {
+          this.albunsCurtidos.set([]);
         }
       });
   }

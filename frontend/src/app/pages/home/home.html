@@ -40,11 +40,11 @@
       }
 
       <div class="biblioteca-lista">
-        @if (carregandoPlaylists()) {
+        @if (carregandoPlaylists() || carregandoAlbunsCurtidos()) {
           <p class="biblioteca-estado" aria-live="polite">Carregando...</p>
-        } @else if (playlists().length === 0) {
+        } @else if (playlists().length === 0 && albunsCurtidos().length === 0) {
           @if (bibliotecaExpandida()) {
-            <p class="biblioteca-estado">Você ainda não criou nenhuma playlist.</p>
+            <p class="biblioteca-estado">Você ainda não criou nenhuma playlist nem curtiu álbuns.</p>
           }
         } @else {
           @for (playlist of playlists(); track playlist.id) {
@@ -62,6 +62,21 @@
                 <span class="biblioteca-playlist-texto">
                   <strong>{{ playlist.nome }}</strong>
                   <small>Playlist &bull; {{ nomeUsuario() }}</small>
+                </span>
+              }
+            </a>
+          }
+          @for (album of albunsCurtidos(); track album.idAlbum) {
+            <a class="biblioteca-playlist" [routerLink]="['/albuns', album.idAlbum]"
+              [attr.aria-label]="bibliotecaExpandida() ? null : album.titulo" [title]="album.titulo">
+              <span class="biblioteca-playlist-capa" aria-hidden="true">
+                <img [src]="album.capaUrl || '/capa-padrao.png'" [alt]="''" loading="lazy" referrerpolicy="no-referrer"
+                  (error)="substituirImagem($event, '/capa-padrao.png')">
+              </span>
+              @if (bibliotecaExpandida()) {
+                <span class="biblioteca-playlist-texto">
+                  <strong>{{ album.titulo }}</strong>
+                  <small>Álbum &bull; {{ album.artista.nome }}</small>
                 </span>
               }
             </a>
@@ -164,6 +179,12 @@
               <span class="album-imagem">
                 <img class="album-capa" [src]="album.capaUrl || '/capa-padrao.png'" [alt]="'Capa do álbum ' + album.titulo" loading="lazy" referrerpolicy="no-referrer" (error)="substituirImagem($event, '/capa-padrao.png')">
                 <span class="album-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 7 8 5-8 5z"></path></svg></span>
+                <app-curtir-botao
+                  class="album-curtir"
+                  [tipo]="'album'"
+                  [id]="album.idAlbum"
+                  [curtidoInicial]="album.curtida"
+                />
               </span>
               <strong>{{ album.titulo }}</strong><span>{{ album.anoLancamento }} · {{ album.artista.nome }}</span>
             </a>

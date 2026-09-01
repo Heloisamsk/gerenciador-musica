@@ -48,7 +48,8 @@ class AlbumControllerTest {
                         "Queen",
                         "Banda britânica de rock.",
                         null
-                )
+                ),
+                false
         );
     }
 
@@ -104,14 +105,16 @@ class AlbumControllerTest {
                         (short) 1975,
                         null,
                         1L,
-                        354L
+                        354L,
+                        false
                 ),
                 List.of("Rock"),
                 List.of(new MusicaAlbumDTO(
                         20L,
                         "Bohemian Rhapsody",
                         354,
-                        List.of("Rock")
+                        List.of("Rock"),
+                        false
                 ))
         );
 

@@ -45,7 +45,8 @@ describe('AdminAlbumService', () => {
       nomeCompleto: 'Queen',
       descricao: 'Banda britânica de rock.',
       fotoPerfilUrl: null
-    }
+    },
+    curtida: false
   };
 
   beforeEach(() => {

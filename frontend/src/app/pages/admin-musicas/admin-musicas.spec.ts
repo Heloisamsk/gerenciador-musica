@@ -41,7 +41,8 @@ describe('AdminMusicas', () => {
       generos: [
         { id: 1, nome: 'Gênero Um' },
         { id: 2, nome: 'Gênero Dois' }
-      ]
+      ],
+      curtida: false
     },
     {
       id: 32,
@@ -54,7 +55,8 @@ describe('AdminMusicas', () => {
       },
       album: null,
       artistasParticipantes: [],
-      generos: []
+      generos: [],
+      curtida: false
     }
   ];
 

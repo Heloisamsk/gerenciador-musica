@@ -55,7 +55,8 @@ class AdminAlbumControllerTest {
                         "Queen",
                         "Banda britânica de rock.",
                         null
-                )
+                ),
+                false
         );
     }
 

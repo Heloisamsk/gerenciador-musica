@@ -117,6 +117,7 @@ describe('Home', () => {
       { status: 500, statusText: 'Internal Server Error' }
     );
     httpMock.expectOne(playlistsUrl).flush([]);
+    httpMock.expectOne(`${apiUrl}/albuns/curtidos`).flush([]);
     fixture.detectChanges();
 
     expect(component.albuns()).toEqual([]);
@@ -179,14 +180,16 @@ describe('Home', () => {
       nome: 'Foco no trabalho',
       descricao: '',
       capaUrl: 'https://exemplo.com/capa-playlist.jpg',
-      musicas: []
+      musicas: [],
+      especial: false
     };
   }
 
   function carregarCatalogo(
     albuns: AlbumResponse[],
     perfil: PerfilResponse = perfilDeExemplo(),
-    playlists: PlaylistResponse[] = []
+    playlists: PlaylistResponse[] = [],
+    albunsCurtidos: AlbumResponse[] = []
   ): void {
     fixture.detectChanges();
 
@@ -194,6 +197,7 @@ describe('Home', () => {
     httpMock.expectOne(`${apiUrl}/artistas`).flush([]);
     httpMock.expectOne(`${apiUrl}/albuns`).flush(albuns);
     httpMock.expectOne(playlistsUrl).flush(playlists);
+    httpMock.expectOne(`${apiUrl}/albuns/curtidos`).flush(albunsCurtidos);
     fixture.detectChanges();
   }
 
@@ -209,7 +213,8 @@ describe('Home', () => {
         nomeCompleto: 'Queen',
         descricao: 'Banda britânica de rock.',
         fotoPerfilUrl: null
-      }
+      },
+      curtida: false
     };
   }
 

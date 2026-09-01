@@ -32,6 +32,13 @@ public class AlbumController {
         return ResponseEntity.ok(albuns);
     }
 
+    @GetMapping("/curtidos")
+    public ResponseEntity<List<AlbumResponseDTO>> listarAlbunsCurtidos() {
+        return ResponseEntity.ok(
+                albumService.listarAlbunsCurtidos()
+        );
+    }
+
     @GetMapping("/{idAlbum}")
     public ResponseEntity<AlbumResponseDTO> buscarPorId(
             @PathVariable("idAlbum") Long idAlbum

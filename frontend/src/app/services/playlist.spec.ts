@@ -61,6 +61,7 @@ describe('PlaylistService', () => {
       descricao: 'Minhas músicas favoritas',
       capaUrl: null,
       musicas: [],
+      especial: false,
     } as PlaylistResponse);
   });
 
@@ -75,7 +76,7 @@ describe('PlaylistService', () => {
     expect(requisicao.request.method).toBe('GET');
 
     requisicao.flush([
-      { id: 1, nome: 'Favoritas', descricao: '', capaUrl: null, musicas: [] },
+      { id: 1, nome: 'Favoritas', descricao: '', capaUrl: null, musicas: [], especial: false },
     ] as PlaylistResponse[]);
   });
 
@@ -92,6 +93,7 @@ describe('PlaylistService', () => {
       descricao: '',
       capaUrl: null,
       musicas: [],
+      especial: false,
     } as PlaylistResponse);
   });
 
@@ -113,6 +115,7 @@ describe('PlaylistService', () => {
       id: 1,
       ...dados,
       musicas: [],
+      especial: false,
     } as PlaylistResponse);
   });
 

@@ -15,6 +15,7 @@ import java.util.Set;
  * @param album               resumo do álbum (nulo quando a música não pertence a um álbum)
  * @param artistasParticipantes resumos dos artistas participantes
  * @param generos             resumo dos gêneros associados à música
+ * @param curtida             se o usuário autenticado curtiu esta música
  */
 public record MusicaListagemDTO(
         Long id,
@@ -24,6 +25,7 @@ public record MusicaListagemDTO(
         ArtistaResumoDTO artistaPrincipal,
         AlbumResumoDTO album,
         Set<ArtistaResumoDTO> artistasParticipantes,
-        Set<GeneroResumoDTO> generos
+        Set<GeneroResumoDTO> generos,
+        boolean curtida
 ) {
 }

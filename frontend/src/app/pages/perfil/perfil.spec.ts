@@ -313,7 +313,8 @@ describe('Perfil', () => {
       artistaPrincipal: { id: 5, nome: 'Marina Sena' },
       album: null,
       artistasParticipantes: [],
-      generos: []
+      generos: [],
+      curtida: false
     };
   }
 
@@ -348,7 +349,8 @@ describe('Perfil', () => {
       nome: 'Favoritas',
       descricao: '',
       capaUrl: null,
-      musicas: [{ id: 10, titulo: 'Por Supuesto', artista: 'Marina Sena', capaUrl: null }]
+      musicas: [{ id: 10, titulo: 'Por Supuesto', artista: 'Marina Sena', capaUrl: null }],
+      especial: false
     };
   }
 

@@ -75,24 +75,33 @@
             </ul>
           }
 
-          @if (minhaReview(); as review) {
-            <a class="botao-secundario acao-avaliar" [routerLink]="['/reviews', review.idReview]">
-              ★ Ver minha review
-            </a>
-          } @else {
-            <a
-              class="botao-secundario acao-avaliar"
-              routerLink="/reviews/nova"
-              [queryParams]="{
-                tipo: 'ALBUM',
-                id: detalhesAlbum.album.idAlbum,
-                titulo: detalhesAlbum.album.titulo,
-                artista: detalhesAlbum.album.nomeArtista
-              }"
-            >
-              ★ Avaliar
-            </a>
-          }
+          <div class="acoes-album">
+            @if (minhaReview(); as review) {
+              <a class="botao-secundario acao-avaliar" [routerLink]="['/reviews', review.idReview]">
+                ★ Ver minha review
+              </a>
+            } @else {
+              <a
+                class="botao-secundario acao-avaliar"
+                routerLink="/reviews/nova"
+                [queryParams]="{
+                  tipo: 'ALBUM',
+                  id: detalhesAlbum.album.idAlbum,
+                  titulo: detalhesAlbum.album.titulo,
+                  artista: detalhesAlbum.album.nomeArtista
+                }"
+              >
+                ★ Avaliar
+              </a>
+            }
+
+            <app-curtir-botao
+              class="curtir-album"
+              [tipo]="'album'"
+              [id]="detalhesAlbum.album.idAlbum"
+              [curtidoInicial]="detalhesAlbum.album.curtida"
+            />
+          </div>
         </div>
       </header>
 
@@ -126,6 +135,13 @@
                     {{ formatarDuracao(musica.duracaoSegundos) }}
                   </span>
                 </a>
+
+                <app-curtir-botao
+                  class="curtir-faixa"
+                  [tipo]="'musica'"
+                  [id]="musica.idMusica"
+                  [curtidoInicial]="musica.curtida"
+                />
               </li>
             }
           </ul>

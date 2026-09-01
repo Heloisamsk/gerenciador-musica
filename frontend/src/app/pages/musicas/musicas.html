@@ -126,6 +126,13 @@
                 }
               </div>
             </a>
+
+            <app-curtir-botao
+              class="musica-curtir"
+              [tipo]="'musica'"
+              [id]="musica.id"
+              [curtidoInicial]="musica.curtida"
+            />
           </li>
         }
       </ul>

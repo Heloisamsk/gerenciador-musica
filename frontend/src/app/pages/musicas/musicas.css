@@ -161,6 +161,7 @@
 }
 
 .musica-card {
+  position: relative;
   background: var(--panel);
   border: 1px solid var(--line);
   border-left: 4px solid transparent;
@@ -177,9 +178,16 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 10px 16px;
+  padding: 10px 52px 10px 16px;
   color: inherit;
   text-decoration: none;
+}
+
+.musica-curtir {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
 }
 
 .musica-link:focus-visible {

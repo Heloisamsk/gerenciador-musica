@@ -8,10 +8,11 @@ import { CatalogoService } from '../../services/catalogo';
 import { ReviewService } from '../../services/review';
 import { DetalheCatalogoBase } from '../../shared/detalhe-catalogo';
 import { formatarDuracao } from '../../shared/formatar-duracao';
+import { CurtirBotao } from '../../shared/curtir-botao/curtir-botao';
 
 @Component({
   selector: 'app-album-detalhe',
-  imports: [RouterLink],
+  imports: [RouterLink, CurtirBotao],
   templateUrl: './album-detalhe.html',
   styleUrls: [
     '../../shared/detalhe-catalogo.css',

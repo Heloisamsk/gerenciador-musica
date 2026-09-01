@@ -27,7 +27,8 @@ describe('AdminAlbuns', () => {
         nomeCompleto: 'Queen',
         descricao: 'Banda britânica de rock.',
         fotoPerfilUrl: null
-      }
+      },
+      curtida: false
     },
     {
       idAlbum: 2,
@@ -40,7 +41,8 @@ describe('AdminAlbuns', () => {
         nomeCompleto: 'Elis Regina Carvalho Costa',
         descricao: 'Cantora brasileira.',
         fotoPerfilUrl: null
-      }
+      },
+      curtida: false
     }
   ];
 

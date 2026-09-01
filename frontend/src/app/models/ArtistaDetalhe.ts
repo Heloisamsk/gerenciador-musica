@@ -25,6 +25,7 @@ export interface AlbumCatalogo {
   capaUrl: string | null;
   totalMusicas: number;
   duracaoTotalSegundos: number;
+  curtida: boolean;
 }
 
 export interface MusicaCatalogo {

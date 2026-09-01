@@ -5,6 +5,7 @@ public record AlbumResponseDTO(
         String titulo,
         Short anoLancamento,
         String capaUrl,
-        ArtistaResumoDTO artista
+        ArtistaResumoDTO artista,
+        boolean curtida
 ) {
 }

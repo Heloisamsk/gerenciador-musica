@@ -6,6 +6,7 @@ public record MusicaAlbumDTO(
         Long idMusica,
         String titulo,
         Integer duracaoSegundos,
-        List<String> generos
+        List<String> generos,
+        boolean curtida
 ) {
 }

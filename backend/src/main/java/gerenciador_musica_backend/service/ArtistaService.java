@@ -11,15 +11,21 @@ import gerenciador_musica_backend.exception.ArtistaEmUsoException;
 import gerenciador_musica_backend.exception.ArtistaNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosArtistaInvalidosException;
 import gerenciador_musica_backend.model.Artista;
+import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.ArtistaRepository;
+import gerenciador_musica_backend.repository.CurtidaAlbumRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
+import gerenciador_musica_backend.repository.projection.AlbumCatalogoProjection;
 import gerenciador_musica_backend.repository.projection.ArtistaCatalogoResumoProjection;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ArtistaService {
@@ -27,15 +33,18 @@ public class ArtistaService {
     private final ArtistaRepository artistaRepository;
     private final AlbumRepository albumRepository;
     private final MusicaRepository musicaRepository;
+    private final CurtidaAlbumRepository curtidaAlbumRepository;
 
     public ArtistaService(
             ArtistaRepository artistaRepository,
             AlbumRepository albumRepository,
-            MusicaRepository musicaRepository
+            MusicaRepository musicaRepository,
+            CurtidaAlbumRepository curtidaAlbumRepository
     ) {
         this.artistaRepository = artistaRepository;
         this.albumRepository = albumRepository;
         this.musicaRepository = musicaRepository;
+        this.curtidaAlbumRepository = curtidaAlbumRepository;
     }
 
     @Transactional
@@ -136,10 +145,27 @@ public class ArtistaService {
                         () -> new ArtistaNaoEncontradoException(idArtista)
                 );
 
-        List<AlbumCatalogoDTO> albuns = albumRepository
-                .buscarCatalogoPorArtista(idArtista)
-                .stream()
-                .map(CatalogoProjectionMapper::converterAlbum)
+        List<AlbumCatalogoProjection> albunsProjecao = albumRepository
+                .buscarCatalogoPorArtista(idArtista);
+
+        List<Long> idsAlbuns = albunsProjecao.stream()
+                .map(AlbumCatalogoProjection::getIdAlbum)
+                .toList();
+
+        Long usuarioId = obterUsuarioAutenticado().getId();
+
+        Set<Long> idsAlbunsCurtidos = idsAlbuns.isEmpty()
+                ? Set.of()
+                : curtidaAlbumRepository.buscarIdsCurtidosPeloUsuario(
+                        usuarioId,
+                        idsAlbuns
+                );
+
+        List<AlbumCatalogoDTO> albuns = albunsProjecao.stream()
+                .map(album -> CatalogoProjectionMapper.converterAlbum(
+                        album,
+                        idsAlbunsCurtidos.contains(album.getIdAlbum())
+                ))
                 .toList();
 
         List<MusicaCatalogoDTO> musicas = musicaRepository
@@ -152,6 +178,22 @@ public class ArtistaService {
                 converterResumoCatalogo(resumo),
                 albuns,
                 musicas
+        );
+    }
+
+    private Usuario obterUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && authentication.getPrincipal() instanceof Usuario usuario) {
+            return usuario;
+        }
+
+        throw new IllegalStateException(
+                "Usuário autenticado não encontrado."
         );
     }
 

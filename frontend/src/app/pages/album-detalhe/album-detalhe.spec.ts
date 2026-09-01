@@ -233,7 +233,8 @@ describe('AlbumDetalhePage', () => {
         anoLancamento: 1975,
         capaUrl: null,
         totalMusicas: 1,
-        duracaoTotalSegundos: 354
+        duracaoTotalSegundos: 354,
+        curtida: false
       },
       generos: ['Rock'],
       musicas: [
@@ -241,7 +242,8 @@ describe('AlbumDetalhePage', () => {
           idMusica: 20,
           titulo: 'Bohemian Rhapsody',
           duracaoSegundos: 354,
-          generos: ['Rock']
+          generos: ['Rock'],
+          curtida: false
         }
       ]
     };

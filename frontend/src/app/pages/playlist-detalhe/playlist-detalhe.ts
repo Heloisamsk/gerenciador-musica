@@ -9,10 +9,11 @@ import { finalize } from 'rxjs';
 
 import { PlaylistResponse } from '../../models/PlaylistResponse';
 import { PlaylistService } from '../../services/playlist';
+import { CurtirBotao } from '../../shared/curtir-botao/curtir-botao';
 
 @Component({
   selector: 'app-playlist-detalhe',
-  imports: [RouterLink],
+  imports: [RouterLink, CurtirBotao],
   templateUrl: './playlist-detalhe.html',
   styleUrls: ['./playlist-detalhe.css']
 })
@@ -149,6 +150,19 @@ export class PlaylistDetalhe implements OnInit {
             'Não foi possível excluir a playlist. Tente novamente.';
         }
       });
+  }
+
+  aoAlternarCurtidaNaFavoritos(musicaId: number, curtido: boolean): void {
+    if (curtido || !this.playlist) {
+      return;
+    }
+
+    this.playlist = {
+      ...this.playlist,
+      musicas: this.playlist.musicas.filter(
+        musica => musica.id !== musicaId
+      )
+    };
   }
 
   aoFalharCapa(evento: Event): void {

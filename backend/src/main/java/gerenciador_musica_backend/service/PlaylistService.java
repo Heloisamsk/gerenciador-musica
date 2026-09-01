@@ -6,6 +6,7 @@ import gerenciador_musica_backend.dto.PlaylistResponseDTO;
 import gerenciador_musica_backend.exception.MusicaDuplicadaException;
 import gerenciador_musica_backend.exception.MusicaNaoEncontradaException;
 import gerenciador_musica_backend.exception.PlaylistAcessoNegadoException;
+import gerenciador_musica_backend.exception.PlaylistEspecialException;
 import gerenciador_musica_backend.exception.PlaylistNaoEncontradaException;
 import gerenciador_musica_backend.model.Musica;
 import gerenciador_musica_backend.model.Playlist;
@@ -68,6 +69,7 @@ public class PlaylistService {
                 );
 
         verificarProprietario(playlist, usuario);
+        verificarNaoEspecial(playlist);
 
         playlist.setNome(dto.getNome());
         playlist.setDescricao(dto.getDescricao());
@@ -90,6 +92,7 @@ public class PlaylistService {
                 );
 
         verificarProprietario(playlist, usuario);
+        verificarNaoEspecial(playlist);
 
         playlistRepository.delete(playlist);
     }
@@ -134,6 +137,7 @@ public class PlaylistService {
                 );
 
         verificarProprietario(playlist, usuario);
+        verificarNaoEspecial(playlist);
 
         Musica musica = musicaRepository.findById(musicaId)
                 .orElseThrow(() ->
@@ -170,6 +174,7 @@ public class PlaylistService {
                 );
 
         verificarProprietario(playlist, usuario);
+        verificarNaoEspecial(playlist);
 
         boolean removida = playlist.removerMusica(musicaId);
 
@@ -207,6 +212,22 @@ public class PlaylistService {
         }
     }
 
+    /*
+     * A playlist "Favoritos" é gerenciada automaticamente a partir das
+     * curtidas (ver CurtidaService) — nome, capa e as músicas dela não
+     * podem ser alteradas por aqui, nem ela pode ser excluída.
+     */
+    private void verificarNaoEspecial(Playlist playlist) {
+        if (playlist.isEspecial()) {
+            throw new PlaylistEspecialException(
+                    "A playlist Favoritos é gerenciada automaticamente "
+                            + "pelas curtidas e não pode ser editada, "
+                            + "excluída ou ter músicas adicionadas/"
+                            + "removidas diretamente."
+            );
+        }
+    }
+
     private PlaylistResponseDTO converterParaResponseDTO(
             Playlist playlist
     ) {
@@ -231,6 +252,7 @@ public class PlaylistService {
         response.setDescricao(playlist.getDescricao());
         response.setCapaUrl(playlist.getCapaUrl());
         response.setMusicas(musicas);
+        response.setEspecial(playlist.isEspecial());
 
         return response;
     }

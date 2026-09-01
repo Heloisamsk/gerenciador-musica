@@ -50,6 +50,12 @@ export class CatalogoService {
     );
   }
 
+  listarAlbunsCurtidos(): Observable<AlbumResponse[]> {
+    return this.http.get<AlbumResponse[]>(
+      `${this.apiUrl}/albuns/curtidos`
+    );
+  }
+
   // Não exige autenticação: usado no fundo decorativo de login/cadastro.
   listarCapasPublicas(): Observable<AlbumCapaPublica[]> {
     return this.http.get<AlbumCapaPublica[]>(

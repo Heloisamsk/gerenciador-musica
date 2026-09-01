@@ -108,7 +108,8 @@ class AlbumCrudIntegrationTest {
                 "Álbum atualizado " + sufixo,
                 (short) 2026,
                 null,
-                cadastrado.artista()
+                cadastrado.artista(),
+                false
         ));
         assertThat(buscarAlbum(cadastrado.idAlbum()))
                 .isEqualTo(atualizado);

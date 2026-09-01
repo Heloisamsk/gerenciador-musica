@@ -13,15 +13,21 @@ import gerenciador_musica_backend.exception.AlbumNaoEncontradoException;
 import gerenciador_musica_backend.exception.DadosAlbumInvalidosException;
 import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
+import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.AlbumRepository;
+import gerenciador_musica_backend.repository.CurtidaAlbumRepository;
+import gerenciador_musica_backend.repository.CurtidaMusicaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.projection.MusicaCatalogoProjection;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class AlbumService {
@@ -32,15 +38,21 @@ public class AlbumService {
     private final AlbumRepository albumRepository;
     private final ArtistaService artistaService;
     private final MusicaRepository musicaRepository;
+    private final CurtidaAlbumRepository curtidaAlbumRepository;
+    private final CurtidaMusicaRepository curtidaMusicaRepository;
 
     public AlbumService(
             AlbumRepository albumRepository,
             ArtistaService artistaService,
-            MusicaRepository musicaRepository
+            MusicaRepository musicaRepository,
+            CurtidaAlbumRepository curtidaAlbumRepository,
+            CurtidaMusicaRepository curtidaMusicaRepository
     ) {
         this.albumRepository = albumRepository;
         this.artistaService = artistaService;
         this.musicaRepository = musicaRepository;
+        this.curtidaAlbumRepository = curtidaAlbumRepository;
+        this.curtidaMusicaRepository = curtidaMusicaRepository;
     }
 
     @Transactional
@@ -77,7 +89,7 @@ public class AlbumService {
 
         Album albumSalvo = albumRepository.save(album);
 
-        return converterParaResponse(albumSalvo);
+        return converterParaResponse(albumSalvo, false);
     }
 
     @Transactional
@@ -108,20 +120,30 @@ public class AlbumService {
         album.setAnoLancamento(request.anoLancamento());
         album.setCapaUrl(capaUrlNormalizada);
 
-        return converterParaResponse(album);
+        return converterParaResponse(album, false);
     }
 
     @Transactional(readOnly = true)
     public List<AlbumResponseDTO> listarAlbuns() {
-        return albumRepository
+        List<Album> albuns = albumRepository
                 .findAll(
                         Sort.by(
                                 Sort.Order.asc("titulo"),
                                 Sort.Order.asc("anoLancamento")
                         )
-                )
+                );
+
+        return converterParaResponseComCurtidas(albuns);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AlbumResponseDTO> listarAlbunsCurtidos() {
+        Long usuarioId = obterUsuarioAutenticado().getId();
+
+        return curtidaAlbumRepository
+                .buscarAlbunsCurtidosPeloUsuario(usuarioId)
                 .stream()
-                .map(this::converterParaResponse)
+                .map(album -> converterParaResponse(album, true))
                 .toList();
     }
 
@@ -136,12 +158,33 @@ public class AlbumService {
 
         artistaService.buscarEntidadePorId(idArtista);
 
-        return albumRepository
+        List<Album> albuns = albumRepository
                 .findByArtistaIdArtistaOrderByTituloAscAnoLancamentoAsc(
                         idArtista
-                )
-                .stream()
-                .map(this::converterParaResponse)
+                );
+
+        return converterParaResponseComCurtidas(albuns);
+    }
+
+    private List<AlbumResponseDTO> converterParaResponseComCurtidas(
+            List<Album> albuns
+    ) {
+        List<Long> ids = albuns.stream()
+                .map(Album::getIdAlbum)
+                .toList();
+
+        Set<Long> idsCurtidos = ids.isEmpty()
+                ? Set.of()
+                : curtidaAlbumRepository.buscarIdsCurtidosPeloUsuario(
+                        obterUsuarioAutenticado().getId(),
+                        ids
+                );
+
+        return albuns.stream()
+                .map(album -> converterParaResponse(
+                        album,
+                        idsCurtidos.contains(album.getIdAlbum())
+                ))
                 .toList();
     }
 
@@ -183,14 +226,34 @@ public class AlbumService {
                         () -> new AlbumNaoEncontradoException(idAlbum)
                 );
 
-        List<MusicaAlbumDTO> musicas = musicaRepository
-                .buscarCatalogoPorAlbum(idAlbum)
-                .stream()
-                .map(this::converterMusicaAlbum)
+        Long usuarioId = obterUsuarioAutenticado().getId();
+
+        List<MusicaCatalogoProjection> musicasProjecao = musicaRepository
+                .buscarCatalogoPorAlbum(idAlbum);
+
+        List<Long> idsMusicas = musicasProjecao.stream()
+                .map(MusicaCatalogoProjection::getIdMusica)
                 .toList();
 
+        Set<Long> idsMusicasCurtidas = idsMusicas.isEmpty()
+                ? Set.of()
+                : curtidaMusicaRepository.buscarIdsCurtidosPeloUsuario(
+                        usuarioId,
+                        idsMusicas
+                );
+
+        List<MusicaAlbumDTO> musicas = musicasProjecao.stream()
+                .map(musica -> converterMusicaAlbum(
+                        musica,
+                        idsMusicasCurtidas.contains(musica.getIdMusica())
+                ))
+                .toList();
+
+        boolean curtidaAlbum = curtidaAlbumRepository
+                .existsByUsuario_IdAndAlbum_IdAlbum(usuarioId, idAlbum);
+
         return new AlbumDetalheDTO(
-                CatalogoProjectionMapper.converterAlbum(album),
+                CatalogoProjectionMapper.converterAlbum(album, curtidaAlbum),
                 reunirGeneros(musicas),
                 musicas
         );
@@ -405,6 +468,19 @@ public class AlbumService {
     private AlbumResponseDTO converterParaResponse(
             Album album
     ) {
+        boolean curtida = curtidaAlbumRepository
+                .existsByUsuario_IdAndAlbum_IdAlbum(
+                        obterUsuarioAutenticado().getId(),
+                        album.getIdAlbum()
+                );
+
+        return converterParaResponse(album, curtida);
+    }
+
+    private AlbumResponseDTO converterParaResponse(
+            Album album,
+            boolean curtida
+    ) {
         Artista artista = album.getArtista();
 
         ArtistaResumoDTO artistaResumo = new ArtistaResumoDTO(
@@ -420,12 +496,30 @@ public class AlbumService {
                 album.getTitulo(),
                 album.getAnoLancamento(),
                 album.getCapaUrl(),
-                artistaResumo
+                artistaResumo,
+                curtida
+        );
+    }
+
+    private Usuario obterUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && authentication.getPrincipal() instanceof Usuario usuario) {
+            return usuario;
+        }
+
+        throw new IllegalStateException(
+                "Usuário autenticado não encontrado."
         );
     }
 
     private MusicaAlbumDTO converterMusicaAlbum(
-            MusicaCatalogoProjection musica
+            MusicaCatalogoProjection musica,
+            boolean curtida
     ) {
         return new MusicaAlbumDTO(
                 musica.getIdMusica(),
@@ -433,7 +527,8 @@ public class AlbumService {
                 musica.getDuracaoSegundos(),
                 CatalogoProjectionMapper.separarGeneros(
                         musica.getGeneros()
-                )
+                ),
+                curtida
         );
     }
 

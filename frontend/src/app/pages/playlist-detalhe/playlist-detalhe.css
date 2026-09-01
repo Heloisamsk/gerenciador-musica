@@ -134,6 +134,12 @@
   margin-top: 6px;
 }
 
+.dica-especial {
+  margin: 6px 0 0;
+  color: var(--app-muted);
+  font-size: 0.82rem;
+}
+
 .acao {
   display: inline-flex;
   align-items: center;
@@ -328,7 +334,8 @@
     grid-template-columns: 24px 40px minmax(0, 1fr);
   }
 
-  .remover-button {
+  .remover-button,
+  .favoritos-curtir {
     grid-column: 1 / -1;
     justify-self: start;
   }

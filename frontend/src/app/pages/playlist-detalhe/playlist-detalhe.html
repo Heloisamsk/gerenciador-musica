@@ -42,31 +42,37 @@
           {{ playlist.musicas.length === 1 ? 'música' : 'músicas' }}
         </p>
 
-        <div class="acoes-cabecalho">
-          <a
-            class="acao acao--principal"
-            [routerLink]="['/playlists', playlist.id, 'catalogo']"
-          >
-            + Adicionar música
-          </a>
+        @if (playlist.especial) {
+          <p class="dica-especial">
+            ♥ Playlist automática — curta músicas para adicioná-las aqui.
+          </p>
+        } @else {
+          <div class="acoes-cabecalho">
+            <a
+              class="acao acao--principal"
+              [routerLink]="['/playlists', playlist.id, 'catalogo']"
+            >
+              + Adicionar música
+            </a>
 
-          <a class="botao-secundario" [routerLink]="['/playlists', playlist.id, 'editar']">
-            Editar
-          </a>
+            <a class="botao-secundario" [routerLink]="['/playlists', playlist.id, 'editar']">
+              Editar
+            </a>
 
-          <button
-            class="botao-perigo"
-            type="button"
-            [disabled]="excluindo"
-            (click)="excluirPlaylist()"
-          >
-            @if (excluindo) {
-              Excluindo...
-            } @else {
-              Excluir
-            }
-          </button>
-        </div>
+            <button
+              class="botao-perigo"
+              type="button"
+              [disabled]="excluindo"
+              (click)="excluirPlaylist()"
+            >
+              @if (excluindo) {
+                Excluindo...
+              } @else {
+                Excluir
+              }
+            </button>
+          </div>
+        }
       </div>
     </header>
 
@@ -99,18 +105,28 @@
               </span>
             </a>
 
-            <button
-              class="remover-button"
-              type="button"
-              [disabled]="removendoMusicaId === musica.id"
-              (click)="removerMusica(musica.id)"
-            >
-              @if (removendoMusicaId === musica.id) {
-                Removendo...
-              } @else {
-                Remover
-              }
-            </button>
+            @if (playlist.especial) {
+              <app-curtir-botao
+                class="favoritos-curtir"
+                [tipo]="'musica'"
+                [id]="musica.id"
+                [curtidoInicial]="true"
+                (curtidoChange)="aoAlternarCurtidaNaFavoritos(musica.id, $event)"
+              />
+            } @else {
+              <button
+                class="remover-button"
+                type="button"
+                [disabled]="removendoMusicaId === musica.id"
+                (click)="removerMusica(musica.id)"
+              >
+                @if (removendoMusicaId === musica.id) {
+                  Removendo...
+                } @else {
+                  Remover
+                }
+              </button>
+            }
           </li>
         }
       </ul>

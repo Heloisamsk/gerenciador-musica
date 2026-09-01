@@ -1,0 +1,55 @@
+:host {
+  display: inline-block;
+}
+
+.curtir-botao {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: var(--app-text);
+  background: #0000004d;
+  border: 1px solid #ffffff26;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.curtir-botao svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: fill 0.15s ease;
+}
+
+.curtir-botao:hover:not(:disabled) {
+  color: #e35a72;
+  background: #0000006e;
+}
+
+.curtir-botao:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.curtir-botao:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.curtir-botao--ativo {
+  color: #e35a72;
+}
+
+.curtir-botao--ativo svg {
+  fill: #e35a72;
+}
+
+.curtir-botao:focus-visible {
+  outline: 2px solid var(--app-apricot-cream);
+  outline-offset: 2px;
+}

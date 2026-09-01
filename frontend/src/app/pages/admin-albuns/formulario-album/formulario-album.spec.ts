@@ -28,7 +28,8 @@ describe('FormularioAlbum', () => {
       nomeCompleto: artista.nomeCompleto,
       descricao: artista.descricao,
       fotoPerfilUrl: artista.fotoPerfilUrl
-    }
+    },
+    curtida: false
   };
 
   beforeEach(async () => {

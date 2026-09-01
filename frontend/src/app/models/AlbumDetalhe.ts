@@ -11,4 +11,5 @@ export interface MusicaAlbum {
   titulo: string;
   duracaoSegundos: number;
   generos: string[];
+  curtida: boolean;
 }

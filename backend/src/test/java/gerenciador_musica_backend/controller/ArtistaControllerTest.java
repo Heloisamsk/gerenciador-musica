@@ -105,7 +105,8 @@ class ArtistaControllerTest {
                         (short) 1975,
                         null,
                         1L,
-                        354L
+                        354L,
+                        false
                 )),
                 List.of(new MusicaCatalogoDTO(
                         20L,

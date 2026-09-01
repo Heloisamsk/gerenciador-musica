@@ -53,6 +53,7 @@ describe('Catalogo', () => {
       album: { id: 1, titulo: 'A Night at the Opera', anoLancamento: 1975, capaUrl: null },
       artistasParticipantes: [],
       generos: [{ id: 1, nome: 'Rock' }],
+      curtida: false,
     };
   }
 

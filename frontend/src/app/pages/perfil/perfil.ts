@@ -437,7 +437,10 @@ export class Perfil implements OnInit {
       : forkJoin(idsAusentes.map(id => this.musicaService.buscarPorId(id).pipe(
           catchError(() => of(null))
         ))).pipe(
-          map(itens => itens.filter(item => item !== null))
+          map(itens => itens
+            .filter(item => item !== null)
+            .map((item): MusicaListagem => ({ ...item, curtida: false }))
+          )
         );
 
     this.musicasCarregando.set(true);
