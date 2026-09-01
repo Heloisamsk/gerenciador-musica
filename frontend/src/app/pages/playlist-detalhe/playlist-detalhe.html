@@ -80,18 +80,24 @@
           <li class="linha-musica">
             <span class="marcador">{{ i + 1 }}</span>
 
-            <span class="musica-capa">
-              <img
-                [src]="musica.capaUrl || '/capa-padrao.png'"
-                [alt]="'Capa de ' + musica.titulo"
-                loading="lazy"
-              />
-            </span>
+            <a
+              class="musica-link"
+              [routerLink]="['/musicas', musica.id]"
+              [attr.aria-label]="'Ver detalhes da música ' + musica.titulo"
+            >
+              <span class="musica-capa">
+                <img
+                  [src]="musica.capaUrl || '/capa-padrao.png'"
+                  [alt]="'Capa de ' + musica.titulo"
+                  loading="lazy"
+                />
+              </span>
 
-            <span class="musica-info">
-              <strong>{{ musica.titulo }}</strong>
-              <span>{{ musica.artista }}</span>
-            </span>
+              <span class="musica-info">
+                <strong>{{ musica.titulo }}</strong>
+                <span>{{ musica.artista }}</span>
+              </span>
+            </a>
 
             <button
               class="remover-button"

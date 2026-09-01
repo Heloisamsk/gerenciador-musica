@@ -256,6 +256,17 @@
   object-fit: cover;
 }
 
+.musica-link {
+  display: contents;
+  color: inherit;
+  text-decoration: none;
+}
+
+.musica-link:focus-visible .musica-capa {
+  outline: 2px solid var(--app-apricot-cream);
+  outline-offset: 2px;
+}
+
 .musica-info {
   display: flex;
   min-width: 0;
