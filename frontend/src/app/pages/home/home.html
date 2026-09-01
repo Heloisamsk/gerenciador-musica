@@ -115,7 +115,7 @@
         </form>
 
         @if (mostrarResultadosBusca()) {
-          <div class="busca-resultados" role="region" aria-label="Resultados da busca">
+          <section class="busca-resultados" aria-label="Resultados da busca">
             @if (buscandoInstantaneo()) {
               <p class="busca-resultados-estado">Buscando...</p>
             } @else if (resultadoBusca(); as resultado) {
@@ -179,7 +179,7 @@
                 }
               }
             }
-          </div>
+          </section>
         }
       </div>
       <div class="topo-conta">

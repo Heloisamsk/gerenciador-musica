@@ -38,7 +38,7 @@ import {
   extrairYoutubeVideoId
 } from '../../../shared/youtube-video';
 import { SeletorParticipantes } from './seletor-participantes/seletor-participantes';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 export type ModoFormularioMusica = 'cadastro' | 'edicao';
 
