@@ -381,7 +381,7 @@ describe('Perfil', () => {
     const cartoes = fixture.nativeElement.querySelectorAll(
       '.reviews-lista-horizontal .review-card'
     );
-    expect(cartoes.length).toBe(1);
+    expect(cartoes).toHaveLength(1);
   });
 
   it('deve exibir mensagem de estado vazio quando não há reviews', () => {
@@ -396,7 +396,7 @@ describe('Perfil', () => {
     fixture.detectChanges();
 
     const cartoes = fixture.nativeElement.querySelectorAll('.playlist-card');
-    expect(cartoes.length).toBe(1);
+    expect(cartoes).toHaveLength(1);
     expect(cartoes[0].textContent).toContain('Favoritas');
   });
 

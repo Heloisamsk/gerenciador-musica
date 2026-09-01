@@ -115,7 +115,7 @@
         </form>
 
         @if (mostrarResultadosBusca()) {
-          <div class="busca-resultados" role="listbox" aria-label="Resultados da busca">
+          <div class="busca-resultados" role="region" aria-label="Resultados da busca">
             @if (buscandoInstantaneo()) {
               <p class="busca-resultados-estado">Buscando...</p>
             } @else if (resultadoBusca(); as resultado) {

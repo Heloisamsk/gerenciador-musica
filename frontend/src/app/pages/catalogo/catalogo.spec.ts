@@ -219,6 +219,8 @@ describe('Catalogo', () => {
 
     component.adicionarMusica(5);
     httpMock.expectNone(`${playlistsUrl}/1/musicas/5`);
+
+    expect(component.musicasAdicionadas()[5]).toBe(true);
   });
 
   it('não deve remover música que não esteja na playlist', () => {
@@ -228,6 +230,7 @@ describe('Catalogo', () => {
     component.removerMusica(5);
 
     httpMock.expectNone(`${playlistsUrl}/1/musicas/5`);
+    expect(component.musicasAdicionadas()[5]).toBeFalsy();
   });
 
   it('deve remover música e atualizar o estado local', () => {

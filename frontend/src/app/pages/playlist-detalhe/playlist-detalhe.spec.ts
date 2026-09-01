@@ -174,6 +174,7 @@ describe('PlaylistDetalhe', () => {
     component.excluirPlaylist();
 
     httpMock.expectNone(`${apiUrl}/10`);
+    expect(component.excluindo).toBe(false);
   });
 
   it('deve mostrar mensagem de erro quando a exclusão falha', () => {

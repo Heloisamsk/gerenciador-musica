@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
@@ -50,6 +51,7 @@ describe('CadastroAlbum', () => {
     await TestBed.configureTestingModule({
       imports: [CadastroAlbum],
       providers: [
+        provideRouter([]),
         {
           provide: AdminAlbumService,
           useValue: { cadastrarAlbum }

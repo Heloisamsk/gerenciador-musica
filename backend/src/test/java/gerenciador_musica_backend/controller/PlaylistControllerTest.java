@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /*
  * Teste de INTEGRAÇÃO da camada web de playlists. O PlaylistService é
  * mockado; aqui validamos os status HTTP e o JSON de cada endpoint,
- * incluindo os erros (404, 403, 409) mapeados pelo GlobalExceptionHandler.
+ * incluindo os erros (404, 403, 409) mapeados pelo PlaylistExceptionHandler.
  */
 @WebMvcTest(PlaylistController.class)
 @AutoConfigureMockMvc(addFilters = false)
