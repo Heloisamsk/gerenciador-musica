@@ -20,10 +20,12 @@ import gerenciador_musica_backend.model.Usuario;
 import gerenciador_musica_backend.repository.AlbumRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.ReviewRepository;
+import gerenciador_musica_backend.repository.SeguidorUsuarioRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,6 +45,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,6 +66,9 @@ class ReviewServiceTest {
 
     @Mock
     private AlbumRepository albumRepository;
+
+    @Mock
+    private SeguidorUsuarioRepository seguidorUsuarioRepository;
 
     @InjectMocks
     private ReviewService reviewService;
@@ -350,5 +356,136 @@ class ReviewServiceTest {
         assertThat(resultado.itens()).hasSize(2);
         assertThat(resultado.itens().get(0).minhaReview()).isTrue();
         assertThat(resultado.itens().get(1).minhaReview()).isFalse();
+    }
+
+    @Test
+    void deveListarReviewsDosUsuariosSeguidos() {
+        when(seguidorUsuarioRepository.buscarIdsSeguidosPeloUsuario(1L))
+                .thenReturn(List.of(2L, 3L));
+
+        Review review = new Review(usuarioLogado, musica, null, BigDecimal.valueOf(5), null);
+        ReflectionTestUtils.setField(review, "idReview", 80L);
+        Page<Review> pagina = new PageImpl<>(List.of(review));
+
+        when(reviewRepository.findByUsuario_IdInOrderByCriadaEmDesc(
+                eq(List.of(2L, 3L)), any(Pageable.class)
+        )).thenReturn(pagina);
+
+        PaginaResponseDTO<ReviewResponseDTO> resultado =
+                reviewService.listarSeguindo(null, null);
+
+        assertThat(resultado.itens()).hasSize(1);
+    }
+
+    @Test
+    void deveRetornarPaginaVaziaQuandoNaoSegueNinguem() {
+        when(seguidorUsuarioRepository.buscarIdsSeguidosPeloUsuario(1L))
+                .thenReturn(List.of());
+
+        PaginaResponseDTO<ReviewResponseDTO> resultado =
+                reviewService.listarSeguindo(null, null);
+
+        assertThat(resultado.itens()).isEmpty();
+        assertThat(resultado.totalItens()).isEqualTo(0);
+        verify(reviewRepository, never())
+                .findByUsuario_IdInOrderByCriadaEmDesc(any(), any());
+    }
+
+    @Test
+    void deveListarMinhasReviews() {
+        Review review = new Review(usuarioLogado, musica, null, BigDecimal.valueOf(5), null);
+        ReflectionTestUtils.setField(review, "idReview", 81L);
+        Page<Review> pagina = new PageImpl<>(List.of(review));
+
+        when(reviewRepository.findByUsuario_IdOrderByCriadaEmDesc(eq(1L), any(Pageable.class)))
+                .thenReturn(pagina);
+
+        PaginaResponseDTO<ReviewResponseDTO> resultado =
+                reviewService.listarMinhas(null, null);
+
+        assertThat(resultado.itens()).hasSize(1);
+        assertThat(resultado.itens().getFirst().minhaReview()).isTrue();
+    }
+
+    @Test
+    void deveListarReviewsPorMusica() {
+        Page<Review> pagina = new PageImpl<>(List.of());
+        when(reviewRepository.findByMusica_IdMusicaOrderByCriadaEmDesc(
+                eq(20L), any(Pageable.class)
+        )).thenReturn(pagina);
+
+        PaginaResponseDTO<ReviewResponseDTO> resultado =
+                reviewService.listarPorMusica(20L, null, null);
+
+        assertThat(resultado.itens()).isEmpty();
+    }
+
+    @Test
+    void deveListarReviewsPorAlbum() {
+        Page<Review> pagina = new PageImpl<>(List.of());
+        when(reviewRepository.findByAlbum_IdAlbumOrderByCriadaEmDesc(
+                eq(10L), any(Pageable.class)
+        )).thenReturn(pagina);
+
+        PaginaResponseDTO<ReviewResponseDTO> resultado =
+                reviewService.listarPorAlbum(10L, null, null);
+
+        assertThat(resultado.itens()).isEmpty();
+    }
+
+    @Test
+    void deveRejeitarPaginaNegativa() {
+        assertThatThrownBy(() -> reviewService.listarFeed(-1, null))
+                .isInstanceOf(DadosReviewInvalidosException.class);
+    }
+
+    @Test
+    void deveRejeitarTamanhoDePaginaZeroOuNegativo() {
+        assertThatThrownBy(() -> reviewService.listarFeed(0, 0))
+                .isInstanceOf(DadosReviewInvalidosException.class);
+    }
+
+    @Test
+    void deveLimitarTamanhoDaPaginaAoMaximo() {
+        Page<Review> paginaVazia = new PageImpl<>(List.of());
+        when(reviewRepository.findAllByOrderByCriadaEmDesc(any(Pageable.class)))
+                .thenReturn(paginaVazia);
+
+        reviewService.listarFeed(0, 500);
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(reviewRepository).findAllByOrderByCriadaEmDesc(captor.capture());
+        assertThat(captor.getValue().getPageSize()).isEqualTo(100);
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoUsuarioNaoAutenticado() {
+        SecurityContextHolder.clearContext();
+
+        assertThatThrownBy(() -> reviewService.buscarPorId(1L))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void deveConverterAlvoDeMusicaSemAlbum() {
+        Artista artistaSemAlbum = new Artista("Solo", "Solo", "Artista solo.", null);
+        ReflectionTestUtils.setField(artistaSemAlbum, "idArtista", 6L);
+
+        Musica musicaSemAlbum = new Musica(
+                "Instrumental", null, 120, (short) 2020, artistaSemAlbum, null
+        );
+        musicaSemAlbum.setIdMusica(30L);
+
+        Review review = new Review(
+                usuarioLogado, musicaSemAlbum, null, BigDecimal.valueOf(4), null
+        );
+        ReflectionTestUtils.setField(review, "idReview", 90L);
+
+        when(reviewRepository.findById(90L)).thenReturn(Optional.of(review));
+
+        ReviewResponseDTO resposta = reviewService.buscarPorId(90L);
+
+        assertThat(resposta.alvo().artista()).isEqualTo("Solo");
+        assertThat(resposta.alvo().capaUrl()).isNull();
     }
 }
