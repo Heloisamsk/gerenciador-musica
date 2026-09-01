@@ -19,6 +19,7 @@ import gerenciador_musica_backend.repository.ArtistaRepository;
 import gerenciador_musica_backend.repository.MusicaRepository;
 import gerenciador_musica_backend.repository.PerfilRepository;
 import gerenciador_musica_backend.repository.ReviewRepository;
+import gerenciador_musica_backend.repository.SeguidorUsuarioRepository;
 import gerenciador_musica_backend.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class PerfilService {
     private final MusicaRepository musicaRepository;
     private final AlbumRepository albumRepository;
     private final ReviewRepository reviewRepository;
+    private final SeguidorUsuarioRepository seguidorUsuarioRepository;
 
     public PerfilService(
             PerfilRepository perfilRepository,
@@ -43,7 +45,8 @@ public class PerfilService {
             ArtistaRepository artistaRepository,
             MusicaRepository musicaRepository,
             AlbumRepository albumRepository,
-            ReviewRepository reviewRepository
+            ReviewRepository reviewRepository,
+            SeguidorUsuarioRepository seguidorUsuarioRepository
     ) {
         this.perfilRepository = perfilRepository;
         this.usuarioRepository = usuarioRepository;
@@ -51,28 +54,33 @@ public class PerfilService {
         this.musicaRepository = musicaRepository;
         this.albumRepository = albumRepository;
         this.reviewRepository = reviewRepository;
+        this.seguidorUsuarioRepository = seguidorUsuarioRepository;
     }
 
     @Transactional
     public PerfilResponseDTO obterPerfil(Usuario usuarioAutenticado) {
         Usuario usuario = buscarUsuario(usuarioAutenticado);
         Perfil perfil = buscarOuCriarPerfil(usuario);
-        return converterResposta(perfil);
+        return converterResposta(perfil, usuarioAutenticado);
     }
 
     /*
      * Perfil público de qualquer usuário (ex.: ao clicar no nome do
      * autor de uma review). Reaproveita o mesmo DTO de resposta do
      * perfil autenticado, que já não expõe dados sensíveis como
-     * e-mail ou senha.
+     * e-mail ou senha. Também informa se o usuário autenticado já
+     * segue esse perfil, para o botão de seguir no frontend.
      */
     @Transactional
-    public PerfilResponseDTO obterPerfilPublico(Long idUsuario) {
+    public PerfilResponseDTO obterPerfilPublico(
+            Long idUsuario,
+            Usuario usuarioAutenticado
+    ) {
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new UsuarioNaoEncontradoException(idUsuario));
 
         Perfil perfil = buscarOuCriarPerfil(usuario);
-        return converterResposta(perfil);
+        return converterResposta(perfil, usuarioAutenticado);
     }
 
     @Transactional
@@ -130,7 +138,7 @@ public class PerfilService {
         perfil.setMusicasFavoritas(buscarMusicas(idsMusicas));
 
         perfilRepository.save(perfil);
-        return converterResposta(perfil);
+        return converterResposta(perfil, usuarioAutenticado);
     }
 
     private Usuario buscarUsuario(Usuario usuarioAutenticado) {
@@ -314,13 +322,27 @@ public class PerfilService {
         return ids.stream().map(this::buscarMusica).toList();
     }
 
-    private PerfilResponseDTO converterResposta(Perfil perfil) {
+    private PerfilResponseDTO converterResposta(
+            Perfil perfil,
+            Usuario usuarioAutenticado
+    ) {
         Usuario usuario = perfil.getUsuario();
         TipoDestaquePerfil tipoPrincipal = perfil.getTipoDestaquePrincipal();
 
         if (!tipoEstaSelecionado(tipoPrincipal, perfil)) {
             tipoPrincipal = primeiroTipoDisponivel(perfil);
         }
+
+        boolean perfilProprio = usuarioAutenticado != null
+                && usuarioAutenticado.getId() != null
+                && usuarioAutenticado.getId().equals(usuario.getId());
+
+        boolean seguindo = !perfilProprio
+                && usuarioAutenticado != null
+                && seguidorUsuarioRepository.existsBySeguidor_IdAndSeguido_Id(
+                usuarioAutenticado.getId(),
+                usuario.getId()
+        );
 
         return new PerfilResponseDTO(
                 usuario.getId(),
@@ -346,7 +368,11 @@ public class PerfilService {
                         .map(this::converterMusica)
                         .toList(),
                 reviewRepository.countByUsuario_IdAndMusicaIsNotNull(usuario.getId()),
-                reviewRepository.countByUsuario_IdAndAlbumIsNotNull(usuario.getId())
+                reviewRepository.countByUsuario_IdAndAlbumIsNotNull(usuario.getId()),
+                seguidorUsuarioRepository.countBySeguido_Id(usuario.getId()),
+                seguidorUsuarioRepository.countBySeguidor_Id(usuario.getId()),
+                perfilProprio,
+                seguindo
         );
     }
 

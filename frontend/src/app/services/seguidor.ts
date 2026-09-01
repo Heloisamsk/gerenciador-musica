@@ -31,6 +31,18 @@ export class SeguidorService {
       .pipe(catchError(this.handleError));
   }
 
+  seguirUsuario(usuarioId: number): Observable<void> {
+    return this.http
+      .post<void>(`${this.apiUrl}/usuarios/${usuarioId}/seguidor`, {})
+      .pipe(catchError(this.handleError));
+  }
+
+  deixarDeSeguirUsuario(usuarioId: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiUrl}/usuarios/${usuarioId}/seguidor`)
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError(
     error: HttpErrorResponse
   ) {

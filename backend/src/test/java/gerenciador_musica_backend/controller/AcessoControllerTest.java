@@ -54,7 +54,11 @@ class AcessoControllerTest {
                 List.of(),
                 List.of(),
                 0L,
-                0L
+                0L,
+                0L,
+                0L,
+                false,
+                false
         ));
 
         mockMvc.perform(get("/api/user/perfil"))

@@ -85,6 +85,20 @@ public class ReviewController {
         );
     }
 
+    /**
+     * GET /api/reviews/seguindo — feed apenas com as reviews de
+     * usuários que o autenticado segue.
+     */
+    @GetMapping("/seguindo")
+    public ResponseEntity<PaginaResponseDTO<ReviewResponseDTO>> listarSeguindo(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size
+    ) {
+        return ResponseEntity.ok(
+                reviewService.listarSeguindo(page, size)
+        );
+    }
+
     @GetMapping("/musicas/{idMusica}")
     public ResponseEntity<PaginaResponseDTO<ReviewResponseDTO>> listarPorMusica(
             @PathVariable Long idMusica,

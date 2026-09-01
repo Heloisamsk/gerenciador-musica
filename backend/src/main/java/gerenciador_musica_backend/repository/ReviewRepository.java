@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     boolean existsByUsuario_IdAndMusica_IdMusica(
@@ -21,6 +23,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Page<Review> findByUsuario_IdOrderByCriadaEmDesc(
             Long idUsuario,
+            Pageable pageable
+    );
+
+    Page<Review> findByUsuario_IdInOrderByCriadaEmDesc(
+            List<Long> idsUsuarios,
             Pageable pageable
     );
 

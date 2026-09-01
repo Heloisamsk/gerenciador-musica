@@ -40,6 +40,11 @@
             <h1>{{ perfil()!.nome }}</h1>
             @if (perfil()!.username) { <p class="username">&#64;{{ perfil()!.username }}</p> }
             @if (perfil()!.fraseDestaque) { <p class="frase">{{ perfil()!.fraseDestaque }}</p> }
+            <p class="seguidores-contagem">
+              <strong>{{ perfil()!.totalSeguidores ?? 0 }}</strong> seguidores
+              <span aria-hidden="true">·</span>
+              <strong>{{ perfil()!.totalSeguindo ?? 0 }}</strong> seguindo
+            </p>
           </div>
           <button class="botao botao--editar" type="button" (click)="abrirEdicao()">
             <svg viewBox="0 0 24 24" aria-hidden="true">
