@@ -95,7 +95,8 @@ class ArtistaControllerTest {
                         1L,
                         1L,
                         0L,
-                        354L
+                        354L,
+                        false
                 ),
                 List.of(new AlbumCatalogoDTO(
                         10L,

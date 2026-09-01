@@ -5,10 +5,11 @@ import type { ArtistaDetalhe } from '../../models/ArtistaDetalhe';
 import { CatalogoService } from '../../services/catalogo';
 import { DetalheCatalogoBase } from '../../shared/detalhe-catalogo';
 import { formatarDuracao } from '../../shared/formatar-duracao';
+import { SeguirBotao } from '../../shared/seguir-botao/seguir-botao';
 
 @Component({
   selector: 'app-artista-detalhe',
-  imports: [RouterLink],
+  imports: [RouterLink, SeguirBotao],
   templateUrl: './artista-detalhe.html',
   styleUrls: [
     '../../shared/detalhe-catalogo.css',

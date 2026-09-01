@@ -48,6 +48,12 @@
           <p class="descricao">
             {{ detalhesArtista.artista.descricao }}
           </p>
+
+          <app-seguir-botao
+            class="acao-seguir"
+            [id]="detalhesArtista.artista.idArtista"
+            [seguindoInicial]="detalhesArtista.artista.seguindo"
+          />
         </div>
       </header>
 

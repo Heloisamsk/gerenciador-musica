@@ -1,0 +1,55 @@
+:host {
+  display: inline-block;
+}
+
+.seguir-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  color: var(--app-ink);
+  font: 700 .82rem "Trebuchet MS", sans-serif;
+  letter-spacing: .02em;
+  background: transparent;
+  border: 2px solid var(--app-ink);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.seguir-botao svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.seguir-botao:hover:not(:disabled) {
+  background: #1116111a;
+}
+
+.seguir-botao:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.seguir-botao:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.seguir-botao--ativo {
+  color: var(--app-apricot-cream);
+  background: var(--app-ink);
+}
+
+.seguir-botao--ativo:hover:not(:disabled) {
+  background: #111611cc;
+}
+
+.seguir-botao:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}

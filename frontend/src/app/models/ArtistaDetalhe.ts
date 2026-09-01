@@ -14,6 +14,7 @@ export interface ArtistaCatalogoResumo {
   totalMusicasPrincipais: number;
   totalParticipacoes: number;
   duracaoTotalSegundos: number;
+  seguindo: boolean;
 }
 
 export interface AlbumCatalogo {

@@ -22,6 +22,7 @@
 .identidade-artista h1 { margin: 10px 0 6px; overflow-wrap: anywhere; font-family: "Trebuchet MS", sans-serif; font-size: clamp(3rem, 8vw, 6.5rem); letter-spacing: -.07em; line-height: .88; }
 .nome-completo { margin: 0 0 22px; color: #384231; font-weight: 700; }
 .descricao { max-width: 720px; margin: 0; color: #20271d; line-height: 1.65; }
+.acao-seguir { margin-top: 18px; }
 
 .estatisticas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 0 0 64px; border: 1px solid var(--app-line); border-top: 0; }
 .estatistica { min-height: 108px; padding: 22px; background: var(--app-surface); border-right: 1px solid var(--app-line); }

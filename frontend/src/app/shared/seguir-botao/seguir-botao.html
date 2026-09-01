@@ -1,0 +1,15 @@
+<button
+  type="button"
+  class="seguir-botao"
+  [class.seguir-botao--ativo]="seguindo()"
+  [disabled]="carregando()"
+  [attr.aria-pressed]="seguindo()"
+  (click)="alternar()"
+>
+  @if (seguindo()) {
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+    Seguindo
+  } @else {
+    Seguir
+  }
+</button>
