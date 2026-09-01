@@ -63,17 +63,17 @@ describe('Home', () => {
     expect(fixture.nativeElement.querySelector('.musica-card')).toBeNull();
   });
 
-  it('deve exibir a identidade Crotchet sem subtítulos decorativos', () => {
+  it('deve substituir a sidebar inteira pela biblioteca, sem subtítulos decorativos', () => {
     carregarCatalogo([]);
 
-    const marca = fixture.nativeElement.querySelector('.marca');
-    const iconesMenu = fixture.nativeElement.querySelectorAll(
-      '.menu-link .menu-nota'
+    const iconesMenuMobile = fixture.nativeElement.querySelectorAll(
+      '.menu-mobile > a svg'
     );
 
-    expect(marca.textContent).toContain('Crotchet - Music Hub');
-    expect(marca.querySelector('svg')).not.toBeNull();
-    expect(iconesMenu.length).toBeGreaterThanOrEqual(5);
+    expect(fixture.nativeElement.querySelector('.sidebar .marca')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.sidebar nav.menu')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.sidebar .biblioteca')).not.toBeNull();
+    expect(iconesMenuMobile.length).toBeGreaterThanOrEqual(5);
     expect(fixture.nativeElement.querySelector('.hero-sobretitulo')).toBeNull();
     expect(fixture.nativeElement.querySelector('.secao-sobretitulo')).toBeNull();
   });
