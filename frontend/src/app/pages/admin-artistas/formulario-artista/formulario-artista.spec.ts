@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { vi } from 'vitest';
 
 import { ArtistaRequest } from '../../../models/ArtistaRequest';
@@ -17,7 +18,8 @@ describe('FormularioArtista', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormularioArtista]
+      imports: [FormularioArtista],
+      providers: [provideRouter([])]
     }).compileComponents();
 
     fixture = TestBed.createComponent(FormularioArtista);

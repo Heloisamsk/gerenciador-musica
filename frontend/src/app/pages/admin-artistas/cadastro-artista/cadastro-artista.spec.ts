@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
 
@@ -29,6 +30,7 @@ describe('CadastroArtista', () => {
     await TestBed.configureTestingModule({
       imports: [CadastroArtista],
       providers: [
+        provideRouter([]),
         {
           provide: AdminArtistaService,
           useValue: { cadastrar }
