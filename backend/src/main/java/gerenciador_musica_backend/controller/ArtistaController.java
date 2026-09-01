@@ -25,6 +25,13 @@ public class ArtistaController {
         );
     }
 
+    @GetMapping("/seguidos")
+    public ResponseEntity<List<ArtistaResponseDTO>> listarArtistasSeguidos() {
+        return ResponseEntity.ok(
+                artistaService.listarArtistasSeguidos()
+        );
+    }
+
     @GetMapping("/{idArtista}")
     public ResponseEntity<ArtistaResponseDTO> buscarPorId(
             @PathVariable("idArtista") Long idArtista

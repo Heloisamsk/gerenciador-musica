@@ -44,6 +44,12 @@ export class CatalogoService {
     );
   }
 
+  listarArtistasSeguidos(): Observable<ArtistaResponse[]> {
+    return this.http.get<ArtistaResponse[]>(
+      `${this.apiUrl}/artistas/seguidos`
+    );
+  }
+
   listarAlbuns(): Observable<AlbumResponse[]> {
     return this.http.get<AlbumResponse[]>(
       `${this.apiUrl}/albuns`
