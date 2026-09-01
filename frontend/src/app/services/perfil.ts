@@ -11,11 +11,18 @@ import type {
 @Injectable({ providedIn: 'root' })
 export class PerfilService {
   private readonly apiUrl = `${environment.apiUrl}/api/user/perfil`;
+  private readonly apiUrlUsuarios = `${environment.apiUrl}/api/usuarios`;
 
   constructor(private readonly http: HttpClient) {}
 
   obter(): Observable<PerfilResponse> {
     return this.http.get<PerfilResponse>(this.apiUrl);
+  }
+
+  obterPorId(idUsuario: number): Observable<PerfilResponse> {
+    return this.http.get<PerfilResponse>(
+      `${this.apiUrlUsuarios}/${idUsuario}/perfil`
+    );
   }
 
   atualizar(dados: AtualizarPerfilRequest): Observable<PerfilResponse> {

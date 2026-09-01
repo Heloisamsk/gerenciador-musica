@@ -2,6 +2,7 @@ package gerenciador_musica_backend.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,13 @@ public class AcessoController {
             @AuthenticationPrincipal Usuario usuario
     ) {
         return perfilService.obterPerfil(usuario);
+    }
+
+    @GetMapping("/usuarios/{idUsuario}/perfil")
+    public PerfilResponseDTO perfilPublico(
+            @PathVariable("idUsuario") Long idUsuario
+    ) {
+        return perfilService.obterPerfilPublico(idUsuario);
     }
 
     @PutMapping("/user/perfil")

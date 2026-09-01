@@ -318,6 +318,22 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /*
+     * 404 - Usuário não encontrado (perfil público).
+     */
+    @ExceptionHandler(UsuarioNaoEncontradoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarUsuarioNaoEncontrado(
+            UsuarioNaoEncontradoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
+
     private ResponseEntity<ErrorResponseDTO> criarResposta(
             HttpStatus status,
             String message,

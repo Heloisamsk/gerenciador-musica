@@ -20,8 +20,12 @@
 
   <span class="review-card__rodape">
     <app-star-rating [nota]="review().nota" />
-    <span class="review-card__autor">
-      {{ review().minhaReview ? 'Você' : review().autor.nome }}
-    </span>
+    @if (review().minhaReview) {
+      <span class="review-card__autor">Você</span>
+    } @else {
+      <button type="button" class="review-card__autor review-card__autor--link" (click)="irParaPerfilAutor($event)">
+        {{ review().autor.nome }}
+      </button>
+    }
   </span>
 </a>
