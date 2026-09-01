@@ -70,6 +70,51 @@
       }
     </nav>
 
+    <div class="biblioteca" [class.biblioteca--expandida]="bibliotecaExpandida()">
+      <div class="biblioteca-topo">
+        <button type="button" class="biblioteca-alternar"
+          [attr.aria-expanded]="bibliotecaExpandida()"
+          [attr.aria-label]="bibliotecaExpandida() ? 'Recolher biblioteca' : 'Expandir biblioteca'"
+          (click)="alternarBiblioteca()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+          @if (bibliotecaExpandida()) { <span>Sua Biblioteca</span> }
+        </button>
+        <a class="biblioteca-criar" routerLink="/playlists/nova" title="Criar playlist" aria-label="Criar playlist">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+        </a>
+      </div>
+
+      <div class="biblioteca-itens">
+        <a class="biblioteca-item" routerLink="/playlists" title="Minhas playlists" [attr.aria-label]="bibliotecaExpandida() ? null : 'Minhas playlists'">
+          <span class="biblioteca-item-icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M8 6v11M18 4v11M8 6l10-2v4L8 10"></path>
+              <ellipse class="nota-preenchida" cx="5" cy="17.5" rx="4" ry="2.8" transform="rotate(-18 5 17.5)"></ellipse>
+              <ellipse class="nota-preenchida" cx="15" cy="15.5" rx="4" ry="2.8" transform="rotate(-18 15 15.5)"></ellipse>
+            </svg>
+          </span>
+          @if (bibliotecaExpandida()) {
+            <span class="biblioteca-item-texto">
+              <strong>Minhas playlists</strong>
+              <small>Tudo o que você criou</small>
+            </span>
+          }
+        </a>
+
+        <a class="biblioteca-item" [routerLink]="['/reviews']" [queryParams]="{ escopo: 'MINHAS' }" title="Minhas reviews" [attr.aria-label]="bibliotecaExpandida() ? null : 'Minhas reviews'">
+          <span class="biblioteca-item-icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3.5 14.4 8.4l5.4.6-4 3.6 1.1 5.3L12 15.1l-4.9 2.8 1.1-5.3-4-3.6 5.4-.6z"></path></svg>
+          </span>
+          @if (bibliotecaExpandida()) {
+            <span class="biblioteca-item-texto">
+              <strong>Minhas reviews</strong>
+              <small>Suas avaliações de músicas e álbuns</small>
+            </span>
+          }
+        </a>
+      </div>
+    </div>
+
     <div class="playlist-convite">
       <span class="playlist-convite-icone" aria-hidden="true">+</span>
       <p>Uma seleção com a sua cara.</p>

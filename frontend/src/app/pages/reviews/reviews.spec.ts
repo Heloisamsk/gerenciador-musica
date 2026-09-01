@@ -4,7 +4,7 @@ import {
   provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 
 import type { Review } from '../../models/Review';
 import { Reviews } from './reviews';
@@ -104,6 +104,38 @@ describe('Reviews', () => {
     });
 
     expect(fixture.componentInstance['escopo']()).toBe('MINHAS');
+  });
+
+  it('deve abrir direto em "Minhas reviews" quando a URL tiver ?escopo=MINHAS', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [Reviews],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              queryParamMap: convertToParamMap({ escopo: 'MINHAS' })
+            }
+          }
+        }
+      ]
+    });
+
+    const httpMockLocal = TestBed.inject(HttpTestingController);
+    const fixtureLocal = TestBed.createComponent(Reviews);
+    fixtureLocal.detectChanges();
+
+    expect(fixtureLocal.componentInstance['escopo']()).toBe('MINHAS');
+
+    httpMockLocal.expectOne(`${apiUrl}/minhas?page=0&size=60`).flush({
+      itens: [], paginaAtual: 0, tamanhoPagina: 60, totalItens: 0, totalPaginas: 0
+    });
+
+    httpMockLocal.verify();
   });
 
   it('deve exibir mensagem de estado vazio por seção', () => {

@@ -1,5 +1,5 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import type { Review } from '../../models/Review';
 import { ReviewService } from '../../services/review';
@@ -28,9 +28,18 @@ export class Reviews implements OnInit {
     () => this.reviews().filter(review => review.alvo.tipo === 'MUSICA')
   );
 
-  constructor(private readonly reviewService: ReviewService) {}
+  constructor(
+    private readonly reviewService: ReviewService,
+    private readonly route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
+    // Permite abrir direto na aba "Minhas reviews" via /reviews?escopo=MINHAS
+    // (usado pelo atalho da biblioteca na sidebar da home).
+    if (this.route.snapshot.queryParamMap.get('escopo') === 'MINHAS') {
+      this.escopo.set('MINHAS');
+    }
+
     this.carregar();
   }
 

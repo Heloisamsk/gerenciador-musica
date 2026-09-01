@@ -125,6 +125,41 @@ describe('Home', () => {
     );
   });
 
+  it('deve exibir a biblioteca recolhida por padrão, sem os textos dos itens', () => {
+    carregarCatalogo([]);
+
+    const biblioteca = fixture.nativeElement.querySelector('.biblioteca');
+    const itens = fixture.nativeElement.querySelectorAll('.biblioteca-item');
+
+    expect(component.bibliotecaExpandida()).toBe(false);
+    expect(biblioteca.classList.contains('biblioteca--expandida')).toBe(false);
+    expect(itens).toHaveLength(2);
+    expect(fixture.nativeElement.querySelector('.biblioteca-item-texto')).toBeNull();
+  });
+
+  it('deve expandir a biblioteca ao clicar no alternador e mostrar os atalhos', () => {
+    carregarCatalogo([]);
+
+    const alternador = fixture.nativeElement.querySelector(
+      '.biblioteca-alternar'
+    ) as HTMLButtonElement;
+    alternador.click();
+    fixture.detectChanges();
+
+    const biblioteca = fixture.nativeElement.querySelector('.biblioteca');
+    const itens = fixture.nativeElement.querySelectorAll(
+      '.biblioteca-item'
+    ) as NodeListOf<HTMLAnchorElement>;
+
+    expect(component.bibliotecaExpandida()).toBe(true);
+    expect(biblioteca.classList.contains('biblioteca--expandida')).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('Sua Biblioteca');
+    expect(itens[0].textContent).toContain('Minhas playlists');
+    expect(itens[0].getAttribute('href')).toBe('/playlists');
+    expect(itens[1].textContent).toContain('Minhas reviews');
+    expect(itens[1].getAttribute('href')).toBe('/reviews?escopo=MINHAS');
+  });
+
   function carregarCatalogo(
     albuns: AlbumResponse[],
     perfil: PerfilResponse = perfilDeExemplo()
