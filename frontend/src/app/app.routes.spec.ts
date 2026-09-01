@@ -94,3 +94,34 @@ describe('rota de detalhes do álbum', () => {
     expect(rota?.canActivate).toContain(authGuard);
   });
 });
+
+describe('carregamento das rotas com loadComponent', () => {
+  it('deve resolver todos os componentes carregados sob demanda', async () => {
+    const rotasComLoadComponent = routes.filter(
+      rota => rota.loadComponent
+    );
+
+    expect(rotasComLoadComponent.length).toBeGreaterThan(0);
+
+    for (const rota of rotasComLoadComponent) {
+      const componente = await rota.loadComponent!();
+
+      expect(typeof componente).toBe('function');
+    }
+  });
+});
+
+describe('rota raiz e curinga', () => {
+  it('deve redirecionar a raiz para o login', () => {
+    const raiz = routes.find(item => item.path === '');
+
+    expect(raiz?.redirectTo).toBe('login');
+    expect(raiz?.pathMatch).toBe('full');
+  });
+
+  it('deve redirecionar rotas desconhecidas para o login', () => {
+    const coringa = routes.find(item => item.path === '**');
+
+    expect(coringa?.redirectTo).toBe('login');
+  });
+});

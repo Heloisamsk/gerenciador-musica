@@ -5,13 +5,16 @@ import gerenciador_musica_backend.dto.PlaylistResponseDTO;
 import gerenciador_musica_backend.exception.MusicaDuplicadaException;
 import gerenciador_musica_backend.exception.MusicaNaoEncontradaException;
 import gerenciador_musica_backend.exception.PlaylistAcessoNegadoException;
+import gerenciador_musica_backend.exception.PlaylistEspecialException;
 import gerenciador_musica_backend.exception.PlaylistNaoEncontradaException;
 import gerenciador_musica_backend.service.PlaylistService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -212,5 +215,56 @@ class PlaylistControllerTest {
 
         mockMvc.perform(delete("/api/playlists/999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveRetornar409AoAlterarPlaylistEspecial() throws Exception {
+        doThrow(new PlaylistEspecialException(
+                "A playlist Favoritos é gerenciada automaticamente."
+        )).when(playlistService).excluirPlaylist(1L);
+
+        mockMvc.perform(delete("/api/playlists/1"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void deveRetornar400ParaCorpoDeRequisicaoInvalido() throws Exception {
+        mockMvc.perform(post("/api/playlists")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ nome: sem aspas }"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveRetornar400ParaParametroDeCaminhoComTipoInvalido() throws Exception {
+        mockMvc.perform(get("/api/playlists/nao-e-um-numero"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveRetornar409ParaViolacaoDeIntegridadeDoBanco() throws Exception {
+        when(playlistService.buscarPlaylist(1L))
+                .thenThrow(new DataIntegrityViolationException("restrição violada"));
+
+        mockMvc.perform(get("/api/playlists/1"))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void deveRetornar403ParaAcessoNegadoPeloSpringSecurity() throws Exception {
+        when(playlistService.buscarPlaylist(1L))
+                .thenThrow(new AccessDeniedException("acesso negado"));
+
+        mockMvc.perform(get("/api/playlists/1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveRetornar500ParaErroInesperado() throws Exception {
+        when(playlistService.buscarPlaylist(1L))
+                .thenThrow(new RuntimeException("falha inesperada"));
+
+        mockMvc.perform(get("/api/playlists/1"))
+                .andExpect(status().isInternalServerError());
     }
 }

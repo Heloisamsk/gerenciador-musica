@@ -4,7 +4,7 @@ import {
   provideHttpClientTesting
 } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { vi } from 'vitest';
 
 import type { AlbumResponse } from '../../models/AlbumResponse';
@@ -36,6 +36,16 @@ describe('Home', () => {
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
   });
+
+  function ignorarCargaInicial(): void {
+    fixture.detectChanges();
+    httpMock.expectOne(perfilUrl).flush(perfilDeExemplo());
+    httpMock.expectOne(`${apiUrl}/artistas`).flush([]);
+    httpMock.expectOne(`${apiUrl}/albuns`).flush([]);
+    httpMock.expectOne(playlistsUrl).flush([]);
+    httpMock.expectOne(`${apiUrl}/albuns/curtidos`).flush([]);
+    httpMock.expectOne(`${apiUrl}/artistas/seguidos`).flush([]);
+  }
 
   afterEach(() => {
     httpMock.verify();
@@ -174,6 +184,230 @@ describe('Home', () => {
     expect(atalhos[1].getAttribute('href')).toBe('/reviews?escopo=MINHAS');
     expect(playlist.textContent).toContain('Foco no trabalho');
     expect(playlist.getAttribute('href')).toBe('/playlists/7');
+  });
+
+  it('deve tratar erro ao carregar perfil, artistas, playlists, álbuns curtidos e artistas seguidos', () => {
+    fixture.detectChanges();
+
+    httpMock.expectOne(perfilUrl).flush(
+      {}, { status: 500, statusText: 'Internal Server Error' }
+    );
+    httpMock.expectOne(`${apiUrl}/artistas`).flush(
+      {}, { status: 500, statusText: 'Internal Server Error' }
+    );
+    httpMock.expectOne(`${apiUrl}/albuns`).flush([]);
+    httpMock.expectOne(playlistsUrl).flush(
+      {}, { status: 500, statusText: 'Internal Server Error' }
+    );
+    httpMock.expectOne(`${apiUrl}/albuns/curtidos`).flush(
+      {}, { status: 500, statusText: 'Internal Server Error' }
+    );
+    httpMock.expectOne(`${apiUrl}/artistas/seguidos`).flush(
+      {}, { status: 500, statusText: 'Internal Server Error' }
+    );
+    fixture.detectChanges();
+
+    expect(component.fotoPerfil()).toBe('/avatar-padrao.svg');
+    expect(component.artistas()).toEqual([]);
+    expect(component.erroArtistas()).toBe(
+      'Não foi possível carregar os artistas.'
+    );
+    expect(component.playlists()).toEqual([]);
+    expect(component.albunsCurtidos()).toEqual([]);
+    expect(component.artistasSeguidos()).toEqual([]);
+  });
+
+  it('deve indicar administrador conforme o papel salvo', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(chave =>
+      chave === 'role' ? 'ADMIN' : null
+    );
+    expect(component.isAdmin()).toBe(true);
+
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(chave =>
+      chave === 'role' ? 'USER' : null
+    );
+    expect(component.isAdmin()).toBe(false);
+  });
+
+  it('deve buscar instantaneamente ao digitar um termo', () => {
+    ignorarCargaInicial();
+    vi.useFakeTimers();
+
+    component.atualizarBusca(
+      { target: { value: '  queen  ' } } as unknown as Event
+    );
+
+    expect(component.mostrarResultadosBusca()).toBe(true);
+    vi.advanceTimersByTime(300);
+    vi.useRealTimers();
+
+    const requisicao = httpMock.expectOne(
+      req => req.url === `${apiUrl}/busca`
+        && req.params.get('q') === 'queen'
+    );
+    requisicao.flush({ musicas: [], albuns: [], artistas: [], usuarios: [] });
+
+    expect(component.resultadoBusca()).toEqual({
+      musicas: [], albuns: [], artistas: [], usuarios: []
+    });
+    expect(component.buscandoInstantaneo()).toBe(false);
+  });
+
+  it('não deve buscar nem exibir o dropdown quando o termo está vazio', () => {
+    ignorarCargaInicial();
+    vi.useFakeTimers();
+
+    component.atualizarBusca(
+      { target: { value: '   ' } } as unknown as Event
+    );
+    vi.advanceTimersByTime(300);
+    vi.useRealTimers();
+
+    httpMock.expectNone(req => req.url === `${apiUrl}/busca`);
+    expect(component.mostrarResultadosBusca()).toBe(false);
+    expect(component.resultadoBusca()).toBeNull();
+  });
+
+  it('deve descartar o resultado quando a busca instantânea falhar', () => {
+    ignorarCargaInicial();
+    vi.useFakeTimers();
+
+    component.atualizarBusca(
+      { target: { value: 'queen' } } as unknown as Event
+    );
+    vi.advanceTimersByTime(300);
+    vi.useRealTimers();
+
+    httpMock.expectOne(req => req.url === `${apiUrl}/busca`).flush(
+      {}, { status: 500, statusText: 'Internal Server Error' }
+    );
+
+    expect(component.resultadoBusca()).toBeNull();
+    expect(component.buscandoInstantaneo()).toBe(false);
+  });
+
+  it('deve navegar para a busca completa informando o título digitado', () => {
+    ignorarCargaInicial();
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.termoBusca.set('queen');
+    component.mostrarResultadosBusca.set(true);
+    component.pesquisar();
+
+    expect(navigateSpy).toHaveBeenCalledWith(
+      ['/musicas'],
+      { queryParams: { titulo: 'queen' } }
+    );
+    expect(component.mostrarResultadosBusca()).toBe(false);
+  });
+
+  it('deve navegar para a busca completa sem título quando o campo está vazio', () => {
+    ignorarCargaInicial();
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.termoBusca.set('   ');
+    component.pesquisar();
+
+    expect(navigateSpy).toHaveBeenCalledWith(
+      ['/musicas'],
+      { queryParams: {} }
+    );
+  });
+
+  it('deve reabrir os resultados da busca somente quando há um termo digitado', () => {
+    ignorarCargaInicial();
+
+    component.termoBusca.set('');
+    component.reabrirResultadosBusca();
+    expect(component.mostrarResultadosBusca()).toBe(false);
+
+    component.termoBusca.set('queen');
+    component.reabrirResultadosBusca();
+    expect(component.mostrarResultadosBusca()).toBe(true);
+  });
+
+  it('deve fechar os resultados da busca ao pressionar Escape', () => {
+    ignorarCargaInicial();
+    component.mostrarResultadosBusca.set(true);
+
+    component.tratarTeclaBusca({ key: 'Escape' } as KeyboardEvent);
+    expect(component.mostrarResultadosBusca()).toBe(false);
+
+    component.mostrarResultadosBusca.set(true);
+    component.tratarTeclaBusca({ key: 'Enter' } as KeyboardEvent);
+    expect(component.mostrarResultadosBusca()).toBe(true);
+  });
+
+  it('deve fechar os resultados da busca ao clicar fora da área de busca', () => {
+    ignorarCargaInicial();
+    component.mostrarResultadosBusca.set(true);
+
+    const foraDaBusca = document.createElement('div');
+    component.aoClicarFora({ target: foraDaBusca } as unknown as MouseEvent);
+    expect(component.mostrarResultadosBusca()).toBe(false);
+  });
+
+  it('não deve fechar os resultados da busca ao clicar dentro dela', () => {
+    ignorarCargaInicial();
+    component.mostrarResultadosBusca.set(true);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'busca-wrapper';
+    const filho = document.createElement('span');
+    wrapper.appendChild(filho);
+
+    component.aoClicarFora({ target: filho } as unknown as MouseEvent);
+    expect(component.mostrarResultadosBusca()).toBe(true);
+  });
+
+  it('deve encerrar a sessão e navegar para o login', () => {
+    ignorarCargaInicial();
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.logout();
+
+    httpMock.expectOne(`${apiUrl}/auth/logout`).flush({ mensagem: 'ok' });
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('deve navegar para o login mesmo quando o logout falha no backend', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    ignorarCargaInicial();
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.logout();
+
+    httpMock.expectOne(`${apiUrl}/auth/logout`).flush(
+      {}, { status: 500, statusText: 'Internal Server Error' }
+    );
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('deve substituir a imagem do usuário e do artista por padrão em caso de erro', () => {
+    ignorarCargaInicial();
+
+    const imagemPerfil = document.createElement('img');
+    imagemPerfil.onerror = () => {};
+    component.substituirImagem(
+      { target: imagemPerfil } as unknown as Event,
+      '/avatar-padrao.svg'
+    );
+    expect(imagemPerfil.onerror).toBeNull();
+    expect(imagemPerfil.src).toContain('/avatar-padrao.svg');
+
+    const imagemArtista = document.createElement('img');
+    imagemArtista.onerror = () => {};
+    component.substituirFotoArtista(
+      { target: imagemArtista } as unknown as Event
+    );
+    expect(imagemArtista.onerror).toBeNull();
+    expect(imagemArtista.src).toContain('/avatar-artista.png');
   });
 
   function playlistDeExemplo(): PlaylistResponse {

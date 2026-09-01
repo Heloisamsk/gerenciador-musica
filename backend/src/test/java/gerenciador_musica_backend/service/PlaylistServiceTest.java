@@ -5,7 +5,9 @@ import gerenciador_musica_backend.dto.PlaylistResponseDTO;
 import gerenciador_musica_backend.exception.MusicaDuplicadaException;
 import gerenciador_musica_backend.exception.MusicaNaoEncontradaException;
 import gerenciador_musica_backend.exception.PlaylistAcessoNegadoException;
+import gerenciador_musica_backend.exception.PlaylistEspecialException;
 import gerenciador_musica_backend.exception.PlaylistNaoEncontradaException;
+import gerenciador_musica_backend.model.Album;
 import gerenciador_musica_backend.model.Artista;
 import gerenciador_musica_backend.model.Musica;
 import gerenciador_musica_backend.model.Playlist;
@@ -120,6 +122,37 @@ class PlaylistServiceTest {
         PlaylistResponseDTO resultado = playlistService.buscarPlaylist(10L);
 
         assertThat(resultado.getNome()).isEqualTo("Rock");
+    }
+
+    @Test
+    void deveConverterMusicasDaPlaylistComCapaDoAlbum() {
+        Playlist playlist = new Playlist("Rock", null, usuarioLogado);
+        Artista artista = new Artista(
+                "Queen", "Queen", "Banda britânica de rock.", null
+        );
+        Album album = new Album(
+                artista, "A Night at the Opera", (short) 1975,
+                "https://exemplo.com/capa.jpg"
+        );
+        Musica musica = new Musica(
+                "Bohemian Rhapsody", null, 354, (short) 1975, artista, album
+        );
+        ReflectionTestUtils.setField(musica, "idMusica", 5L);
+        playlist.adicionarMusica(musica);
+
+        when(playlistRepository.buscarComMusicasPorId(10L))
+                .thenReturn(Optional.of(playlist));
+
+        PlaylistResponseDTO resultado = playlistService.buscarPlaylist(10L);
+
+        assertThat(resultado.getMusicas()).hasSize(1);
+        assertThat(resultado.getMusicas().getFirst().getId()).isEqualTo(5L);
+        assertThat(resultado.getMusicas().getFirst().getTitulo())
+                .isEqualTo("Bohemian Rhapsody");
+        assertThat(resultado.getMusicas().getFirst().getArtista())
+                .isEqualTo("Queen");
+        assertThat(resultado.getMusicas().getFirst().getCapaUrl())
+                .isEqualTo("https://exemplo.com/capa.jpg");
     }
 
     @Test
@@ -270,6 +303,65 @@ class PlaylistServiceTest {
 
         assertThatThrownBy(() -> playlistService.atualizarPlaylist(10L, dto))
                 .isInstanceOf(PlaylistAcessoNegadoException.class);
+
+        verify(playlistRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarExcecaoAoAtualizarPlaylistEspecial() {
+        Playlist favoritos = new Playlist("Favoritos", null, usuarioLogado);
+        favoritos.setEspecial(true);
+
+        when(playlistRepository.buscarComMusicasPorId(10L))
+                .thenReturn(Optional.of(favoritos));
+
+        PlaylistRequestDTO dto = new PlaylistRequestDTO();
+        dto.setNome("Novo nome");
+
+        assertThatThrownBy(() -> playlistService.atualizarPlaylist(10L, dto))
+                .isInstanceOf(PlaylistEspecialException.class);
+
+        verify(playlistRepository, never()).save(any());
+    }
+
+    @Test
+    void deveLancarExcecaoAoExcluirPlaylistEspecial() {
+        Playlist favoritos = new Playlist("Favoritos", null, usuarioLogado);
+        favoritos.setEspecial(true);
+
+        when(playlistRepository.buscarComMusicasPorId(10L))
+                .thenReturn(Optional.of(favoritos));
+
+        assertThatThrownBy(() -> playlistService.excluirPlaylist(10L))
+                .isInstanceOf(PlaylistEspecialException.class);
+
+        verify(playlistRepository, never()).delete(any());
+    }
+
+    @Test
+    void deveLancarExcecaoAoAdicionarMusicaNaPlaylistEspecial() {
+        Playlist favoritos = new Playlist("Favoritos", null, usuarioLogado);
+        favoritos.setEspecial(true);
+
+        when(playlistRepository.buscarComMusicasPorId(10L))
+                .thenReturn(Optional.of(favoritos));
+
+        assertThatThrownBy(() -> playlistService.adicionarMusica(10L, 5L))
+                .isInstanceOf(PlaylistEspecialException.class);
+
+        verify(musicaRepository, never()).findById(any());
+    }
+
+    @Test
+    void deveLancarExcecaoAoRemoverMusicaDaPlaylistEspecial() {
+        Playlist favoritos = new Playlist("Favoritos", null, usuarioLogado);
+        favoritos.setEspecial(true);
+
+        when(playlistRepository.buscarComMusicasPorId(10L))
+                .thenReturn(Optional.of(favoritos));
+
+        assertThatThrownBy(() -> playlistService.removerMusica(10L, 5L))
+                .isInstanceOf(PlaylistEspecialException.class);
 
         verify(playlistRepository, never()).save(any());
     }

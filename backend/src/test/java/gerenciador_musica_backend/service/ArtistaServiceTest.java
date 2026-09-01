@@ -38,6 +38,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.mock;
@@ -784,6 +785,50 @@ class ArtistaServiceTest {
         verify(artistaRepository, never()).findById(any());
         verify(artistaRepository, never())
                 .existsByNomeIgnoreCaseAndIdArtistaNot(any(), any());
+    }
+
+    @Test
+    void deveListarArtistasSeguidosPeloUsuarioAutenticado() {
+        Artista queen = montarArtistaExistente();
+
+        when(seguidorArtistaRepository.buscarArtistasSeguidosPeloUsuario(1L))
+                .thenReturn(List.of(queen));
+
+        List<ArtistaResponseDTO> response = artistaService.listarArtistasSeguidos();
+
+        assertThat(response)
+                .extracting(ArtistaResponseDTO::nome)
+                .containsExactly("Queen");
+        verify(seguidorArtistaRepository).buscarArtistasSeguidosPeloUsuario(1L);
+    }
+
+    @Test
+    void deveRetornarListaVaziaAoBuscarPorNomeSemTermo() {
+        assertThat(artistaService.buscarPorNome(null, 10)).isEmpty();
+        assertThat(artistaService.buscarPorNome("   ", 10)).isEmpty();
+
+        verify(artistaRepository, never())
+                .findByNomeContainingIgnoreCaseOrNomeCompletoContainingIgnoreCase(
+                        any(), any(), any()
+                );
+    }
+
+    @Test
+    void deveBuscarArtistasPorNome() {
+        Artista queen = montarArtistaExistente();
+
+        when(artistaRepository
+                .findByNomeContainingIgnoreCaseOrNomeCompletoContainingIgnoreCase(
+                        eq("queen"), eq("queen"), any()
+                ))
+                .thenReturn(List.of(queen));
+
+        List<ArtistaResponseDTO> response =
+                artistaService.buscarPorNome("  queen  ", 5);
+
+        assertThat(response)
+                .extracting(ArtistaResponseDTO::nome)
+                .containsExactly("Queen");
     }
 
     private Artista montarArtistaExistente() {

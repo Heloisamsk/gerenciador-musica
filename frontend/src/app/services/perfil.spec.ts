@@ -40,6 +40,19 @@ describe('PerfilService', () => {
     expect(resultado?.artistaDestaque?.titulo).toBe('Marina Sena');
   });
 
+  it('deve obter o perfil público de outro usuário', () => {
+    let resultado: PerfilResponse | undefined;
+    service.obterPorId(2).subscribe(perfil => resultado = perfil);
+
+    const requisicao = httpMock.expectOne(
+      'http://localhost:8080/api/usuarios/2/perfil'
+    );
+    expect(requisicao.request.method).toBe('GET');
+    requisicao.flush(perfilExemplo());
+
+    expect(resultado?.nome).toBe('Ana Liz');
+  });
+
   it('deve enviar a curadoria atualizada do perfil', () => {
     const dados: AtualizarPerfilRequest = {
       nome: 'Ana Liz',
