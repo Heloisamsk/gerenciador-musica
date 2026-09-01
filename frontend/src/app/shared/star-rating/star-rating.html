@@ -1,33 +1,43 @@
 @if (interativo()) {
-  <fieldset class="star-rating star-rating--interativo">
+  <fieldset class="star-rating star-rating--interativo" (mouseleave)="aoSairMouse()">
     <legend class="star-rating__rotulo-oculto">{{ rotulo() }}</legend>
 
-    @for (valor of estrelas; track valor) {
-      <label
-        class="star-rating__botao"
-        (mouseenter)="aoPassarMouse(valor)"
-        (mouseleave)="aoSairMouse()"
-      >
-        <input
-          type="radio"
-          [name]="grupoNome"
-          [value]="valor"
-          [checked]="nota() === valor"
-          (change)="aoClicar(valor)"
-          (focus)="aoPassarMouse(valor)"
-          (blur)="aoSairMouse()"
-        />
+    @for (valor of estrelas; track valor; let indice = $index) {
+      <span class="star-rating__estrela">
+        <button
+          type="button"
+          class="star-rating__metade star-rating__metade--esquerda"
+          [attr.aria-label]="(valor - 0.5) + ' de 5'"
+          (mouseenter)="aoPassarMouse(valor, 'esquerda')"
+          (focus)="aoPassarMouse(valor, 'esquerda')"
+          (click)="aoClicar(valor, 'esquerda')"
+        ></button>
+        <button
+          type="button"
+          class="star-rating__metade star-rating__metade--direita"
+          [attr.aria-label]="valor + ' de 5'"
+          (mouseenter)="aoPassarMouse(valor, 'direita')"
+          (focus)="aoPassarMouse(valor, 'direita')"
+          (click)="aoClicar(valor, 'direita')"
+        ></button>
+
         <svg viewBox="0 0 24 24" aria-hidden="true">
+          <defs>
+            <clipPath [attr.id]="grupoNome + '-clip-' + indice">
+              <rect x="0" y="0" [attr.width]="24 * fracaoPreenchida(valor)" height="24" />
+            </clipPath>
+          </defs>
           <path
-            [class.estrela-preenchida]="notaExibida() >= valor"
-            [class.estrela-vazia]="notaExibida() < valor"
+            class="estrela-vazia"
+            d="M12 2.5 14.9 9l7.1.6-5.4 4.7 1.7 6.9L12 17.4 5.7 21.2l1.7-6.9L2 9.6 9.1 9z"
+          />
+          <path
+            class="estrela-preenchida"
+            [attr.clip-path]="'url(#' + grupoNome + '-clip-' + indice + ')'"
             d="M12 2.5 14.9 9l7.1.6-5.4 4.7 1.7 6.9L12 17.4 5.7 21.2l1.7-6.9L2 9.6 9.1 9z"
           />
         </svg>
-        <span class="star-rating__rotulo-oculto">
-          {{ valor }} {{ valor > 1 ? 'estrelas' : 'estrela' }}
-        </span>
-      </label>
+      </span>
     }
   </fieldset>
 } @else {
@@ -38,12 +48,22 @@
     [attr.aria-label]="rotulo() + ': ' + nota() + ' de 5'"
   >
     @for (valor of estrelas; track valor; let indice = $index) {
-      <path
-        [attr.transform]="'translate(' + indice * 26 + ', 0)'"
-        [class.estrela-preenchida]="notaExibida() >= valor"
-        [class.estrela-vazia]="notaExibida() < valor"
-        d="M12 2.5 14.9 9l7.1.6-5.4 4.7 1.7 6.9L12 17.4 5.7 21.2l1.7-6.9L2 9.6 9.1 9z"
-      />
+      <g [attr.transform]="'translate(' + indice * 26 + ', 0)'">
+        <defs>
+          <clipPath [attr.id]="grupoNome + '-clip-' + indice">
+            <rect x="0" y="0" [attr.width]="24 * fracaoPreenchida(valor)" height="24" />
+          </clipPath>
+        </defs>
+        <path
+          class="estrela-vazia"
+          d="M12 2.5 14.9 9l7.1.6-5.4 4.7 1.7 6.9L12 17.4 5.7 21.2l1.7-6.9L2 9.6 9.1 9z"
+        />
+        <path
+          class="estrela-preenchida"
+          [attr.clip-path]="'url(#' + grupoNome + '-clip-' + indice + ')'"
+          d="M12 2.5 14.9 9l7.1.6-5.4 4.7 1.7 6.9L12 17.4 5.7 21.2l1.7-6.9L2 9.6 9.1 9z"
+        />
+      </g>
     }
   </svg>
 }

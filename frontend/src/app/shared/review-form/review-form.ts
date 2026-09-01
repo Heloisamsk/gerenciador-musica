@@ -68,7 +68,7 @@ export class ReviewForm implements OnInit {
   );
 
   protected readonly podeSalvar = computed(() => {
-    if (this.nota() < 1 || this.nota() > 5) {
+    if (this.nota() < 0.5 || this.nota() > 5) {
       return false;
     }
 

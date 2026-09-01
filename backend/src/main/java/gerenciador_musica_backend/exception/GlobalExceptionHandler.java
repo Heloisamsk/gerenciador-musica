@@ -469,7 +469,21 @@ public class GlobalExceptionHandler {
                 Map.of()
         );
     }
-
+    /*
+     * 400 - Tentativa de seguir a si mesmo.
+     */
+    @ExceptionHandler(gerenciador_musica_backend.exception.SeguirUsuarioInvalidoException.class)
+    public ResponseEntity<ErrorResponseDTO> tratarSeguirUsuarioInvalido(
+            gerenciador_musica_backend.exception.SeguirUsuarioInvalidoException exception,
+            HttpServletRequest request
+    ) {
+        return criarResposta(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                Map.of()
+        );
+    }
     /*
      * 409 - Tentativa de renomear, trocar a capa, excluir ou
      * mexer diretamente na playlist especial "Favoritos".

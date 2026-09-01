@@ -33,9 +33,10 @@ public class AcessoController {
 
     @GetMapping("/usuarios/{idUsuario}/perfil")
     public PerfilResponseDTO perfilPublico(
-            @PathVariable("idUsuario") Long idUsuario
+            @PathVariable("idUsuario") Long idUsuario,
+            @AuthenticationPrincipal Usuario usuarioAutenticado
     ) {
-        return perfilService.obterPerfilPublico(idUsuario);
+        return perfilService.obterPerfilPublico(idUsuario, usuarioAutenticado);
     }
 
     @PutMapping("/user/perfil")

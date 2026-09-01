@@ -8,11 +8,12 @@ import type {
   TipoDestaquePerfil
 } from '../../models/Perfil';
 import { PerfilService } from '../../services/perfil';
+import { SeguirBotao } from '../../shared/seguir-botao/seguir-botao';
 
 @Component({
   selector: 'app-perfil-publico',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, SeguirBotao],
   templateUrl: './perfil-publico.html',
   styleUrls: ['../perfil/perfil.css']
 })
