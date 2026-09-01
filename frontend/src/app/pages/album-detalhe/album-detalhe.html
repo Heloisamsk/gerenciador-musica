@@ -120,7 +120,14 @@
                   [routerLink]="['/musicas', musica.idMusica]"
                   [attr.aria-label]="'Ver detalhes da música ' + musica.titulo"
                 >
-                  <span class="marcador" aria-hidden="true">♪</span>
+                  <span class="capa-faixa">
+                    <img
+                      [src]="detalhesAlbum.album.capaUrl || '/capa-padrao.png'"
+                      [alt]="'Capa de ' + musica.titulo"
+                      loading="lazy"
+                      (error)="substituirImagem($event, '/capa-padrao.png')"
+                    >
+                  </span>
 
                   <span class="dados-faixa">
                     <strong>{{ musica.titulo }}</strong>
