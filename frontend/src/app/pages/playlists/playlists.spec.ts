@@ -11,6 +11,7 @@ import { provideRouter } from '@angular/router';
 import { throwError } from 'rxjs';
 
 import { Playlists } from './playlists';
+import { AlbumResponse } from '../../models/AlbumResponse';
 import { PlaylistResponse } from '../../models/PlaylistResponse';
 import { PlaylistService } from '../../services/playlist';
 
@@ -107,6 +108,72 @@ describe('Playlists', () => {
         'Você não tem permissão para ver essas playlists.'
     }
   ];
+
+  it('deve mostrar mensagem de erro quando a busca de álbuns curtidos falha', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    fixture.detectChanges();
+
+    httpMock.expectOne(apiUrl).flush([]);
+    httpMock
+      .expectOne(albunsCurtidosUrl)
+      .flush({ message: 'erro' }, { status: 500, statusText: 'Internal Server Error' });
+
+    expect(component.mensagemErroAlbuns).toBe(
+      'Não foi possível carregar os álbuns curtidos.'
+    );
+    expect(component.carregandoAlbuns).toBe(false);
+  });
+
+  it('deve remover o álbum da lista ao descurtir', () => {
+    fixture.detectChanges();
+
+    httpMock.expectOne(apiUrl).flush([]);
+    httpMock.expectOne(albunsCurtidosUrl).flush([
+      {
+        idAlbum: 10,
+        titulo: 'A Night at the Opera',
+        anoLancamento: 1975,
+        capaUrl: null,
+        artista: { id: 5, nome: 'Queen', nomeCompleto: 'Queen', descricao: '', fotoPerfilUrl: null },
+        curtida: true
+      }
+    ] as AlbumResponse[]);
+
+    component.aoDescurtirAlbum(10, false);
+
+    expect(component.albunsCurtidos).toHaveLength(0);
+  });
+
+  it('não deve alterar a lista quando o álbum permanece curtido', () => {
+    fixture.detectChanges();
+
+    httpMock.expectOne(apiUrl).flush([]);
+    httpMock.expectOne(albunsCurtidosUrl).flush([
+      {
+        idAlbum: 10,
+        titulo: 'A Night at the Opera',
+        anoLancamento: 1975,
+        capaUrl: null,
+        artista: { id: 5, nome: 'Queen', nomeCompleto: 'Queen', descricao: '', fotoPerfilUrl: null },
+        curtida: true
+      }
+    ] as AlbumResponse[]);
+
+    component.aoDescurtirAlbum(10, true);
+
+    expect(component.albunsCurtidos).toHaveLength(1);
+  });
+
+  it('deve trocar a capa do álbum por padrão em caso de erro', () => {
+    fixture.detectChanges();
+    httpMock.expectOne(apiUrl).flush([]);
+    httpMock.expectOne(albunsCurtidosUrl).flush([]);
+
+    const imagem = document.createElement('img');
+    component.aoFalharCapaAlbum({ target: imagem } as unknown as Event);
+
+    expect(imagem.src).toContain('/capa-padrao.png');
+  });
 
   for (const cenario of cenariosDeAutorizacao) {
     it(`deve tratar erro ${cenario.status} ao listar playlists`, () => {
