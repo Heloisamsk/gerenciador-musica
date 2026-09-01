@@ -1,74 +1,5 @@
 <div class="home-shell">
-  <aside class="sidebar" aria-label="Navegação principal">
-    <a class="marca" routerLink="/home" aria-label="Crotchet - Music Hub — início">
-      <span class="marca-simbolo" aria-hidden="true">
-        <svg viewBox="0 0 32 32">
-          <path d="M21 4v17"></path>
-          <ellipse cx="15" cy="22" rx="6" ry="4.5" transform="rotate(-18 15 22)"></ellipse>
-        </svg>
-      </span>
-      <span class="marca-texto">
-        <strong>Crotchet - Music Hub</strong>
-      </span>
-    </a>
-
-    <nav class="menu">
-      <p class="menu-titulo">Descobrir</p>
-      <a class="menu-link menu-link--ativo" routerLink="/home">
-        <svg class="menu-nota" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M15.5 4v12.5"></path>
-          <ellipse class="nota-preenchida" cx="11.5" cy="17" rx="4.5" ry="3.25" transform="rotate(-18 11.5 17)"></ellipse>
-        </svg>
-        <span>Início</span>
-      </a>
-      <a class="menu-link" routerLink="/musicas">
-        <svg class="menu-nota" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M14.5 4v12.5M14.5 4c3.5.7 5.5 2.5 5.5 5.5"></path>
-          <ellipse class="nota-preenchida" cx="10.5" cy="17" rx="4.5" ry="3.25" transform="rotate(-18 10.5 17)"></ellipse>
-        </svg>
-        <span>Explorar</span>
-      </a>
-      <a class="menu-link" routerLink="/reviews">
-        <svg class="menu-nota" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 3.5 14.4 8.4l5.4.6-4 3.6 1.1 5.3L12 15.1l-4.9 2.8 1.1-5.3-4-3.6 5.4-.6z"></path>
-        </svg>
-        <span>Reviews</span>
-      </a>
-
-      <a class="menu-link menu-link--somente-mobile" routerLink="/playlists">
-        <svg class="menu-nota" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 6v11M18 4v11M8 6l10-2v4L8 10"></path>
-          <ellipse class="nota-preenchida" cx="5" cy="17.5" rx="4" ry="2.8" transform="rotate(-18 5 17.5)"></ellipse>
-          <ellipse class="nota-preenchida" cx="15" cy="15.5" rx="4" ry="2.8" transform="rotate(-18 15 15.5)"></ellipse>
-        </svg>
-        <span>Minhas playlists</span>
-      </a>
-      <a class="menu-link menu-link--somente-mobile" routerLink="/playlists/nova">
-        <svg class="menu-nota" viewBox="0 0 24 24" aria-hidden="true">
-          <ellipse class="nota-preenchida" cx="12" cy="13" rx="7" ry="4.5" transform="rotate(-12 12 13)"></ellipse>
-          <ellipse class="nota-vazia" cx="12" cy="13" rx="3" ry="1.7" transform="rotate(-12 12 13)"></ellipse>
-        </svg>
-        <span>Criar playlist</span>
-      </a>
-      <a class="menu-link" routerLink="/perfil">
-        <svg class="menu-nota" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M16 4v12"></path>
-          <ellipse class="nota-preenchida" cx="12" cy="16.5" rx="4.5" ry="3.25" transform="rotate(-18 12 16.5)"></ellipse>
-          <ellipse class="nota-vazia" cx="12" cy="16.5" rx="2" ry="1.25" transform="rotate(-18 12 16.5)"></ellipse>
-        </svg>
-        <span>Meu perfil</span>
-      </a>
-      @if (isAdmin()) {
-        <a class="menu-link" routerLink="/admin/painel">
-          <svg class="menu-nota" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M14.5 3.5v13M14.5 3.5c3.5.8 5.5 2.3 5.5 5M14.5 7c3.2.7 5 2.2 5 4.7"></path>
-            <ellipse class="nota-preenchida" cx="10.5" cy="17" rx="4.5" ry="3.25" transform="rotate(-18 10.5 17)"></ellipse>
-          </svg>
-          <span>Painel</span>
-        </a>
-      }
-    </nav>
-
+  <aside class="sidebar" aria-label="Sua biblioteca">
     <div class="biblioteca" [class.biblioteca--expandida]="bibliotecaExpandida()">
       <div class="biblioteca-topo">
         <button type="button" class="biblioteca-alternar"
@@ -231,3 +162,51 @@
     </section>
   </main>
 </div>
+
+<nav class="menu-mobile" aria-label="Navegação principal">
+  <a class="ativo" routerLink="/home">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M15.5 4v12.5"></path>
+      <ellipse class="nota-preenchida" cx="11.5" cy="17" rx="4.5" ry="3.25" transform="rotate(-18 11.5 17)"></ellipse>
+    </svg>
+    <span>Início</span>
+  </a>
+  <a routerLink="/musicas">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14.5 4v12.5M14.5 4c3.5.7 5.5 2.5 5.5 5.5"></path>
+      <ellipse class="nota-preenchida" cx="10.5" cy="17" rx="4.5" ry="3.25" transform="rotate(-18 10.5 17)"></ellipse>
+    </svg>
+    <span>Explorar</span>
+  </a>
+  <a routerLink="/reviews">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3.5 14.4 8.4l5.4.6-4 3.6 1.1 5.3L12 15.1l-4.9 2.8 1.1-5.3-4-3.6 5.4-.6z"></path>
+    </svg>
+    <span>Reviews</span>
+  </a>
+  <a routerLink="/playlists">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8 6v11M18 4v11M8 6l10-2v4L8 10"></path>
+      <ellipse class="nota-preenchida" cx="5" cy="17.5" rx="4" ry="2.8" transform="rotate(-18 5 17.5)"></ellipse>
+      <ellipse class="nota-preenchida" cx="15" cy="15.5" rx="4" ry="2.8" transform="rotate(-18 15 15.5)"></ellipse>
+    </svg>
+    <span>Playlists</span>
+  </a>
+  <a routerLink="/perfil">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M16 4v12"></path>
+      <ellipse class="nota-preenchida" cx="12" cy="16.5" rx="4.5" ry="3.25" transform="rotate(-18 12 16.5)"></ellipse>
+      <ellipse class="nota-vazia" cx="12" cy="16.5" rx="2" ry="1.25" transform="rotate(-18 12 16.5)"></ellipse>
+    </svg>
+    <span>Perfil</span>
+  </a>
+  @if (isAdmin()) {
+    <a routerLink="/admin/painel">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M14.5 3.5v13M14.5 3.5c3.5.8 5.5 2.3 5.5 5M14.5 7c3.2.7 5 2.2 5 4.7"></path>
+        <ellipse class="nota-preenchida" cx="10.5" cy="17" rx="4.5" ry="3.25" transform="rotate(-18 10.5 17)"></ellipse>
+      </svg>
+      <span>Painel</span>
+    </a>
+  }
+</nav>
